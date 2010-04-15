@@ -16,7 +16,8 @@ To Build
 ============
 
 I run K/Ubuntu. I was able to pull in the bsd libs using:  
-    sudo apt-get install libbsd-dev
+    sudo apt-get install libbsd-dev  
+_Eventually I'd like to get it so that the libs are all built in to the same package. But, as a work in progress, this gets the job done for now._
 
 What is required is the file `random.h` within `/usr/includes/bsd/` and the compiled bsd libs in `/usr/lib/`. These have to match the conf.check.
 
