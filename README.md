@@ -16,7 +16,7 @@ To Build
 ============
 
 I run K/Ubuntu. I was able to pull in the bsd libs using:  
-`sudo apt-get install libbsd-dev`
+    sudo apt-get install libbsd-dev
 
 What is required is the file `random.h` within `/usr/includes/bsd/` and the compiled bsd libs in `/usr/lib/`. These have to match the conf.check.
 
@@ -29,13 +29,13 @@ Usage
 ============
 
 To hash a password:  
-   var bc = new bcrypt.BCrypt();  
-   var salt = bc.gen_salt(20);  
-   var hash = bc.hashpw("B4c0/\/", salt);
+    var bc = new bcrypt.BCrypt();  
+    var salt = bc.gen_salt(20);  
+    var hash = bc.hashpw("B4c0/\/", salt);
 
 To check a password:  
-   bc.compare("B4c0/\/", hash); // true    
-   bc.compare("not_bacon", hash); // false
+    bc.compare("B4c0/\/", hash); // true    
+    bc.compare("not_bacon", hash); // false
 
 
 Credits
