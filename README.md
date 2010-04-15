@@ -8,8 +8,8 @@ Lib to help you hash passwords.
 Dependencies
 =============
 
-BSD Libs
-NodeJS
+* NodeJS
+* BSD Libs
 
 
 To Build
