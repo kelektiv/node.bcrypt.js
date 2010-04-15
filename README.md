@@ -1,8 +1,8 @@
 bcrypt-node
 =============
 
-Lib to help you hash passwords.
-http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme
+Lib to help you hash passwords.  
+[bcrypt on wikipedia](http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme)
 
 
 Dependencies
@@ -45,7 +45,7 @@ The code for this comes from a few sources:
 
 * blowfish.cc - OpenBSD
 * bcrypt.cc - OpenBSD
-* bcrypt::gen_salt - http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
+* bcrypt::gen_salt - [gen_salt inclusion to bcrypt](http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html)
 * bcrypt_node.cc - me
 
 
