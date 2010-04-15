@@ -55,8 +55,8 @@ License
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
 
 
-References
-============
+
+
 
 [bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
