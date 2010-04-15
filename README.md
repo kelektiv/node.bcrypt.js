@@ -21,21 +21,21 @@ I run K/Ubuntu. I was able to pull in the bsd libs using:
 What is required is the file `random.h` within `/usr/includes/bsd/` and the compiled bsd libs in `/usr/lib/`. These have to match the conf.check.
 
 Assuming you've already built node, you can run the waf script:  
-`node-waf configure  
-node-waf build`
+    node-waf configure  
+    node-waf build
 
 
 Usage
 ============
 
 To hash a password:  
-`var bc = new bcrypt.BCrypt();  
-var salt = bc.gen_salt(20);  
-var hash = bc.hashpw("B4c0/\/", salt);`
+   var bc = new bcrypt.BCrypt();  
+   var salt = bc.gen_salt(20);  
+   var hash = bc.hashpw("B4c0/\/", salt);
 
 To check a password:  
-`bc.compare("B4c0/\/", hash); // true    
-bc.compare("not_bacon", hash); // false`
+   bc.compare("B4c0/\/", hash); // true    
+   bc.compare("not_bacon", hash); // false
 
 
 Credits
