@@ -29,13 +29,13 @@ Usage
 ============
 
 To hash a password:  
-`var bc = new bcrypt.BCrypt();
-var salt = bc.gen_salt(20);
+`var bc = new bcrypt.BCrypt();  
+var salt = bc.gen_salt(20);  
 var hash = bc.hashpw("B4c0/\/", salt);`
 
 To check a password:  
-`bc.compare("B4c0/\/", hash); // true`  
-`bc.compare("not_bacon", hash); // false`
+`bc.compare("B4c0/\/", hash); // true    
+bc.compare("not_bacon", hash); // false`
 
 
 Credits
