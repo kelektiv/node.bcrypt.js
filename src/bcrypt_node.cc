@@ -47,7 +47,7 @@ public:
     Initialize (v8::Handle<v8::Object> target)
     {
 	HandleScope scope;
-
+	
 	Local<FunctionTemplate> t = FunctionTemplate::New(New);
 
 	t->InstanceTemplate()->SetInternalFieldCount(1);
@@ -83,27 +83,31 @@ protected:
     static Handle<Value>
     BCryptGenerateSalt(const Arguments& args) {
 	BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
-		
+	
 	HandleScope scope;
 	
+	if (args.Length() < 1) {
+	    return ThrowException(String::New("Must give number of rounds."));
+	}
+
 	ssize_t rounds = DecodeBytes(args[0], BINARY);
 
 	//need to allow this param to be passed in.
 	char* salt = bcrypt->BCryptGenerateSalt(rounds);
 	int salt_len = strlen(salt);
 	Local<Value> outString = Encode(salt, salt_len, BINARY);
-	//free(salt);
+
 	return scope.Close(outString);
     }
 
     static Handle<Value>
     BCryptHashPW(const Arguments& args) {
 	BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
-		
+	
 	HandleScope scope;
 
-	if (args.Length() <= 1 || !args[0]->IsString() || !args[1]->IsString()) {
-	    return ThrowException(String::New("Must give key as argument"));
+	if (args.Length() < 2 || !args[0]->IsString() || !args[1]->IsString()) {
+	    return ThrowException(String::New("Must give password and salt."));
 	}
 
 	String::Utf8Value pw(args[0]->ToString());
@@ -112,7 +116,7 @@ protected:
 	char* bcrypted = bcrypt->BCryptHashPW(*pw, *salt);
 	int bcrypted_len = strlen(bcrypted);
 	Local<Value> outString = Encode(bcrypted, bcrypted_len, BINARY);
-	//free(bcrypted);
+
 	return scope.Close(outString);
     }
 
@@ -120,11 +124,11 @@ protected:
     static Handle<Value>
     BCryptCompare(const Arguments& args) {
 	BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
-		
+	
 	HandleScope scope;
 
-	if (args.Length() <= 1 || !args[0]->IsString() || !args[1]->IsString()) {
-	    return ThrowException(String::New("Must give key as argument"));
+	if (args.Length() < 2 || !args[0]->IsString() || !args[1]->IsString()) {
+	    return ThrowException(String::New("Must give password and hash."));
 	}
 
 	String::Utf8Value pw(args[0]->ToString());

@@ -10,7 +10,7 @@ Dependencies
 
 * NodeJS
 * BSD Libs
-
+* [mjsunit.runner][mjsunit.runner]
 
 To Build
 ============
@@ -38,6 +38,13 @@ To check a password:
     bc.compare("not_bacon", hash); // false
 
 
+Testing
+============
+
+To test this module from the JS level, make sure to build the module. Then, assuming node is on your $PATH:
+    node test/runner.js
+
+
 Credits
 ============
 
@@ -60,3 +67,4 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 
 [bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
+[mjsunit.runner]: http://github.com/tmpvar/mjsunit.runner
