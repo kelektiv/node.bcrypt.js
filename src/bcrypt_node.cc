@@ -87,12 +87,13 @@ protected:
 	HandleScope scope;
 	
 	if (args.Length() < 1) {
-	    return ThrowException(String::New("Must give number of rounds."));
+	    return ThrowException(Exception::Error(String::New("Must give number of rounds.")));
+	} else if (!args[0]->IsNumber()) {
+	    return ThrowException(Exception::Error(String::New("Param must be a number.")));
 	}
 
 	ssize_t rounds = DecodeBytes(args[0], BINARY);
 
-	//need to allow this param to be passed in.
 	char* salt = bcrypt->BCryptGenerateSalt(rounds);
 	int salt_len = strlen(salt);
 	Local<Value> outString = Encode(salt, salt_len, BINARY);
@@ -106,8 +107,10 @@ protected:
 	
 	HandleScope scope;
 
-	if (args.Length() < 2 || !args[0]->IsString() || !args[1]->IsString()) {
-	    return ThrowException(String::New("Must give password and salt."));
+	if (args.Length() < 2) {
+	    return ThrowException(Exception::Error(String::New("Must give password and salt.")));
+	} else if (!args[0]->IsString() || !args[1]->IsString()) {
+	    return ThrowException(Exception::Error(String::New("Params must be strings.")));
 	}
 
 	String::Utf8Value pw(args[0]->ToString());
@@ -127,8 +130,10 @@ protected:
 	
 	HandleScope scope;
 
-	if (args.Length() < 2 || !args[0]->IsString() || !args[1]->IsString()) {
-	    return ThrowException(String::New("Must give password and hash."));
+	if (args.Length() < 2) {
+	    return ThrowException(Exception::Error(String::New("Must give password and hash.")));
+	} else if (!args[0]->IsString() || !args[1]->IsString()) {
+	    return ThrowException(Exception::Error(String::New("Params must be strings.")));
 	}
 
 	String::Utf8Value pw(args[0]->ToString());
