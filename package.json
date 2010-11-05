@@ -19,10 +19,5 @@
    },
    "dependencies": {
      "nodeunit": ">=0.3.1",
-   },
-   "scripts": {
-     "build" : "node-waf configure build",
-     "test" : "node-waf test"
-     "clean" : "node-waf clean"
    }
 }
