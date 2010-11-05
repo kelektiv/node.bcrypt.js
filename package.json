@@ -1,0 +1,28 @@
+{
+  "name": "bcrypt",
+  "description": "A bcrypt library for NodeJS.",
+  "main": "./bcrypt",
+  "version": "0.1.0",
+  "author": "Nick Campbell (http://github.com/ncb000gt)",
+  "engines": { "node": ">= 0.1.100" },
+  "repository": {
+        "type": "git",
+        "url": "http://github.com/ncb000gt/node.bcrypt.js.git"
+   },
+   "licenses": [
+     {
+        "type": "MIT"
+     }
+   ],
+   "bugs": {
+     "web" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
+   },
+   "dependencies": {
+     "nodeunit": ">=0.3.1",
+   },
+   "scripts": {
+     "build" : "node-waf configure build",
+     "test" : "node-waf test"
+     "clean" : "node-waf clean"
+   }
+}

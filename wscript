@@ -1,6 +1,6 @@
-import Options
+import Options, Utils
 from os import unlink, symlink, popen
-from os.path import exists 
+from os.path import exists, islink
 
 srcdir = "."
 blddir = "build"
@@ -20,7 +20,7 @@ def configure(conf):
 
 def build(bld):
   bcryptnode = bld.new_task_gen("cxx", "shlib", "node_addon")
-  bcryptnode.target = "bcrypt_node"
+  bcryptnode.target = "bcrypt_lib"
   bcryptnode.source = """
     src/blowfish.cc
     src/bcrypt.cc
@@ -30,12 +30,13 @@ def build(bld):
     /usr/includes/bsd/
   """
   bcryptnode.uselib = 'LIBBSD'
+def test(t):
+  Utils.exec_command('nodeunit test')
 
 def shutdown():
-  # HACK to get bcrypt.node out of build directory.
-  # better way to do this?
+  t = 'bcrypt_lib.node'
   if Options.commands['clean']:
-    if exists('bcrypt_node.node'): unlink('bcrypt_node.node')
+    if exists(t): unlink(t)
   else:
-    if exists('build/default/bcrypt_node.node') and not exists('bcrypt_node.node'):
-      symlink('build/default/bcrypt_node.node', 'bcrypt_node.node')
+    if exists('build/default/' + t) and not exists(t):
+      symlink('build/default/' + t, t)
