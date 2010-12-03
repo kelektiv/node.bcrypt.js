@@ -40,6 +40,6 @@ def shutdown():
   t = 'bcrypt_lib.node'
   if Options.commands['clean']:
     if exists(t): unlink(t)
-  else:
+  if Options.commands['build']:
     if exists('build/default/' + t) and not exists(t):
       symlink('build/default/' + t, t)
