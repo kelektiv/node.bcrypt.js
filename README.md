@@ -9,7 +9,7 @@ Dependencies
 =============
 
 * NodeJS
-* BSD Libs
+* BSD Libs (non-mac)
 
 
 From NPM
@@ -63,6 +63,10 @@ The code for this comes from a few sources:
 * bcrypt::gen_salt - [gen_salt inclusion to bcrypt][bcryptgs]
 * bcrypt_node.cc - me
 
+Contributors
+============
+
+[Antonio Cardozo][shadowfiend]
 
 License
 ============
@@ -73,3 +77,5 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 
 [bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
+
+[shadowfiend]:https://github.com/Shadowfiend
