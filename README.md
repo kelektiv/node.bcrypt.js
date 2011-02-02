@@ -66,7 +66,7 @@ The code for this comes from a few sources:
 Contributors
 ============
 
-[Antonio Cardozo][shadowfiend]
+[Antonio Salazar Cardozo][shadowfiend]
 
 License
 ============
