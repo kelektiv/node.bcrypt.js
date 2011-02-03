@@ -42,117 +42,117 @@ using namespace v8;
 using namespace node;
 
 class BCrypt : public ObjectWrap {
-public:
-    static void
-    Initialize (v8::Handle<v8::Object> target)
-    {
-	HandleScope scope;
-	
-	Local<FunctionTemplate> t = FunctionTemplate::New(New);
+    public:
+        static void
+            Initialize (v8::Handle<v8::Object> target)
+            {
+                HandleScope scope;
 
-	t->InstanceTemplate()->SetInternalFieldCount(1);
+                Local<FunctionTemplate> t = FunctionTemplate::New(New);
 
-	NODE_SET_PROTOTYPE_METHOD(t, "gen_salt", BCryptGenerateSalt);
-	NODE_SET_PROTOTYPE_METHOD(t, "hashpw", BCryptHashPW);
-	NODE_SET_PROTOTYPE_METHOD(t, "compare", BCryptCompare);
+                t->InstanceTemplate()->SetInternalFieldCount(1);
 
-	target->Set(String::NewSymbol("BCrypt"), t->GetFunction());
-    }
+                NODE_SET_PROTOTYPE_METHOD(t, "gen_salt", BCryptGenerateSalt);
+                NODE_SET_PROTOTYPE_METHOD(t, "hashpw", BCryptHashPW);
+                NODE_SET_PROTOTYPE_METHOD(t, "compare", BCryptCompare);
 
-    char* BCryptGenerateSalt(u_int8_t rounds)
-    {
-	return bcrypt_gensalt(rounds);
-    }
+                target->Set(String::NewSymbol("BCrypt"), t->GetFunction());
+            }
 
-    char* BCryptHashPW(char* key, char* salt)
-    {
-	return bcrypt(key, salt);
-    }
-protected:
-    static Handle<Value>
-    New (const Arguments& args)
-    {
-	HandleScope scope;
-	
-	BCrypt *bcrypt = new BCrypt();
-	bcrypt->Wrap(args.This());
-	
-	return args.This();
-    }
+        char* BCryptGenerateSalt(u_int8_t rounds)
+        {
+            return bcrypt_gensalt(rounds);
+        }
 
-    static Handle<Value>
-    BCryptGenerateSalt(const Arguments& args) {
-	BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
-	
-	HandleScope scope;
-	
-	if (args.Length() < 1) {
-	    return ThrowException(Exception::Error(String::New("Must give number of rounds.")));
-	} else if (!args[0]->IsNumber()) {
-	    return ThrowException(Exception::Error(String::New("Param must be a number.")));
-	}
+        char* BCryptHashPW(char* key, char* salt)
+        {
+            return bcrypt(key, salt);
+        }
+    protected:
+        static Handle<Value>
+            New (const Arguments& args)
+            {
+                HandleScope scope;
 
-	ssize_t rounds = args[0]->Int32Value();
+                BCrypt *bcrypt = new BCrypt();
+                bcrypt->Wrap(args.This());
 
-	char* salt = bcrypt->BCryptGenerateSalt(rounds);
-	int salt_len = strlen(salt);
-	Local<Value> outString = Encode(salt, salt_len, BINARY);
+                return args.This();
+            }
 
-	return scope.Close(outString);
-    }
+        static Handle<Value>
+            BCryptGenerateSalt(const Arguments& args) {
+                BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
 
-    static Handle<Value>
-    BCryptHashPW(const Arguments& args) {
-	BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
-	
-	HandleScope scope;
+                HandleScope scope;
 
-	if (args.Length() < 2) {
-	    return ThrowException(Exception::Error(String::New("Must give password and salt.")));
-	} else if (!args[0]->IsString() || !args[1]->IsString()) {
-	    return ThrowException(Exception::Error(String::New("Params must be strings.")));
-	}
+                if (args.Length() < 1) {
+                    return ThrowException(Exception::Error(String::New("Must give number of rounds.")));
+                } else if (!args[0]->IsNumber()) {
+                    return ThrowException(Exception::Error(String::New("Param must be a number.")));
+                }
 
-	String::Utf8Value pw(args[0]->ToString());
-	String::Utf8Value salt(args[1]->ToString());
+                ssize_t rounds = args[0]->Int32Value();
 
-	char* bcrypted = bcrypt->BCryptHashPW(*pw, *salt);
-	int bcrypted_len = strlen(bcrypted);
-	Local<Value> outString = Encode(bcrypted, bcrypted_len, BINARY);
+                char* salt = bcrypt->BCryptGenerateSalt(rounds);
+                int salt_len = strlen(salt);
+                Local<Value> outString = Encode(salt, salt_len, BINARY);
 
-	return scope.Close(outString);
-    }
+                return scope.Close(outString);
+            }
+
+        static Handle<Value>
+            BCryptHashPW(const Arguments& args) {
+                BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
+
+                HandleScope scope;
+
+                if (args.Length() < 2) {
+                    return ThrowException(Exception::Error(String::New("Must give password and salt.")));
+                } else if (!args[0]->IsString() || !args[1]->IsString()) {
+                    return ThrowException(Exception::Error(String::New("Params must be strings.")));
+                }
+
+                String::Utf8Value pw(args[0]->ToString());
+                String::Utf8Value salt(args[1]->ToString());
+
+                char* bcrypted = bcrypt->BCryptHashPW(*pw, *salt);
+                int bcrypted_len = strlen(bcrypted);
+                Local<Value> outString = Encode(bcrypted, bcrypted_len, BINARY);
+
+                return scope.Close(outString);
+            }
 
 
-    static Handle<Value>
-    BCryptCompare(const Arguments& args) {
-	BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
-	
-	HandleScope scope;
+        static Handle<Value>
+            BCryptCompare(const Arguments& args) {
+                BCrypt *bcrypt = ObjectWrap::Unwrap<BCrypt>(args.This());
 
-	if (args.Length() < 2) {
-	    return ThrowException(Exception::Error(String::New("Must give password and hash.")));
-	} else if (!args[0]->IsString() || !args[1]->IsString()) {
-	    return ThrowException(Exception::Error(String::New("Params must be strings.")));
-	}
+                HandleScope scope;
 
-	String::Utf8Value pw(args[0]->ToString());
-	String::Utf8Value hash(args[1]->ToString());
+                if (args.Length() < 2) {
+                    return ThrowException(Exception::Error(String::New("Must give password and hash.")));
+                } else if (!args[0]->IsString() || !args[1]->IsString()) {
+                    return ThrowException(Exception::Error(String::New("Params must be strings.")));
+                }
 
-	return Boolean::New(strcmp(bcrypt->BCryptHashPW(*pw, *hash),*hash) == 0);
-    }
+                String::Utf8Value pw(args[0]->ToString());
+                String::Utf8Value hash(args[1]->ToString());
 
-    BCrypt () : ObjectWrap () 
-    {
-    }
+                return Boolean::New(strcmp(bcrypt->BCryptHashPW(*pw, *hash),*hash) == 0);
+            }
 
-    ~BCrypt ()
+        BCrypt () : ObjectWrap () 
     {
     }
-    //private:
+
+        ~BCrypt ()
+        {
+        }
+        //private:
 };
 
-extern "C" void
+    extern "C" void
 init (Handle<Object> target) 
 {
     HandleScope scope;
