@@ -17,6 +17,10 @@
    "bugs": {
      "web" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
    },
+   "scripts": {
+     "install": "node-waf configure build",
+     "test": "node-waf configure build; nodeunit test/"
+   },
    "dependencies": {
      "nodeunit": ">=0.3.1",
    }
