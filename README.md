@@ -4,6 +4,8 @@ bcrypt-node
 Lib to help you hash passwords.  
 [bcrypt on wikipedia][bcryptwiki]
 
+Catalyst: [How To Safely Store A Password][codahale]
+
 
 Dependencies
 =============
@@ -25,7 +27,7 @@ I run K/Ubuntu. I was able to pull in the bsd libs using:
     sudo apt-get install libbsd-dev  
 _Eventually I'd like to get it so that the libs are all built in to the same package. But, as a work in progress, this gets the job done for now._
 
-What is required is the file `random.h` within `/usr/includes/bsd/` and the compiled bsd libs in `/usr/lib/`. These have to match the conf.check.
+What is required is the file `stdlib.h` within `/usr/includes/bsd/` and the compiled bsd libs in `/usr/lib/`. These have to match the conf.check.
 
 Assuming you've already built node, you can run the waf script:  
     node-waf configure
@@ -37,7 +39,7 @@ Usage
 
 To hash a password:  
     var bcrypt = require('bcrypt');  
-    var salt = bcrypt.gen_salt(20);  
+    var salt = bcrypt.gen_salt(10);  
     var hash = bcrypt.hashpw("B4c0/\/", salt);
 
 To check a password:  
@@ -77,5 +79,6 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 
 [bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
+[codahale]: http://codahale.com/how-to-safely-store-a-password/
 
 [shadowfiend]:https://github.com/Shadowfiend
