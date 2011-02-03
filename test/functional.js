@@ -12,7 +12,7 @@ module.exports = testCase({
         assert.done();
     },
     test_salt_rounds_is_string_number: function(assert) {
-        assert.throws(function() {bcrypt.gen_salt('55');}, "Should throw an Error. No params.");
+        assert.throws(function() {bcrypt.gen_salt('10');}, "Should throw an Error. No params.");
         assert.done();
     },
     test_salt_rounds_is_NaN: function(assert) {
@@ -20,7 +20,7 @@ module.exports = testCase({
         assert.done();
     },
     test_hashpw: function(assert) {
-        assert.ok(bcrypt.hashpw('password', bcrypt.gen_salt(100)), "Should throw an Error. hash should not be null/undefined.");
+        assert.ok(bcrypt.hashpw('password', bcrypt.gen_salt(10)), "Shouldn't throw an Error.");
         assert.done();
     },
     test_hash_pw_no_params: function(assert) {
@@ -28,11 +28,32 @@ module.exports = testCase({
         assert.done();
     },
     test_hash_pw_one_param: function(assert) {
-        assert.throws(function() {bcrypt.hashpw('password');}, "Should throw an Error. No hash.");
+        assert.throws(function() {bcrypt.hashpw('password');}, "Should throw an Error. No salt.");
         assert.done();
     },
     test_hash_pw_not_hash_str: function(assert) {
         assert.throws(function() {bcrypt.hashpw('password', 1);}, "Should throw an Error. hash should be a string.");
+        assert.done();
+    },
+    test_verify_salt: function(assert) {
+        var salt = bcrypt.gen_salt(10);
+        var split_salt = salt.split('$');
+        assert.ok(split_salt[1], '2a');
+        assert.ok(split_salt[2], '10');
+        assert.done();
+    },
+    test_verify_salt_min_rounds: function(assert) {
+        var salt = bcrypt.gen_salt(1);
+        var split_salt = salt.split('$');
+        assert.ok(split_salt[1], '2a');
+        assert.ok(split_salt[2], '4');
+        assert.done();
+    },
+    test_verify_salt_max_rounds: function(assert) {
+        var salt = bcrypt.gen_salt(100);
+        var split_salt = salt.split('$');
+        assert.ok(split_salt[1], '2a');
+        assert.ok(split_salt[2], '31');
         assert.done();
     },
     test_hash_compare: function(assert) {

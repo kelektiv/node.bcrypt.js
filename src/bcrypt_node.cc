@@ -59,7 +59,7 @@ public:
 	target->Set(String::NewSymbol("BCrypt"), t->GetFunction());
     }
 
-    char* BCryptGenerateSalt(int rounds)
+    char* BCryptGenerateSalt(u_int8_t rounds)
     {
 	return bcrypt_gensalt(rounds);
     }
@@ -92,7 +92,7 @@ protected:
 	    return ThrowException(Exception::Error(String::New("Param must be a number.")));
 	}
 
-	ssize_t rounds = DecodeBytes(args[0], BINARY);
+	ssize_t rounds = args[0]->Int32Value();
 
 	char* salt = bcrypt->BCryptGenerateSalt(rounds);
 	int salt_len = strlen(salt);
