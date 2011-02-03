@@ -1,13 +1,13 @@
 {
-  "name": "alfred-bcrypt",
+  "name": "bcrypt",
   "description": "A bcrypt library for NodeJS.",
   "main": "./bcrypt",
   "version": "0.1.2",
-  "author": "Nick Campbell (http://github.com/alfredwesterveld)",
+  "author": "Nick Campbell (http://github.com/ncb000gt)",
   "engines": { "node": ">= 0.1.100" },
   "repository": {
         "type": "git",
-        "url": "http://github.com/alfredwesterveld/node.bcrypt.js.git"
+        "url": "http://github.com/ncb000gt/node.bcrypt.js.git"
    },
    "directories": {
         "lib": "."
@@ -18,7 +18,7 @@
      }
    ],
    "bugs": {
-     "web" : "http://github.com/alfredwesterveld/node.bcrypt.js/issues"
+     "web" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
    },
    "scripts": {
      "install": "node-waf configure build",
