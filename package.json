@@ -9,9 +9,6 @@
         "type": "git",
         "url": "http://github.com/ncb000gt/node.bcrypt.js.git"
    },
-   "directories": {
-        "lib": "."
-   },
    "licenses": [
      {
         "type": "MIT"
