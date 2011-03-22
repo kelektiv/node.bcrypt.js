@@ -47,6 +47,10 @@ To check a password:
     bcrypt.compare("B4c0/\/", hash); // true    
     bcrypt.compare("not_bacon", hash); // false
 
+Hash Info
+============
+
+The characters that comprise passwords are `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$`.
 
 Testing
 ============
