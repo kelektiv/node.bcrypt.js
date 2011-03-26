@@ -53,9 +53,9 @@
 
 #include "node_blf.h"
 
-#if !defined(__APPLE__) && !defined(__MACH__)
-#include "bsd/stdlib.h"
-#endif
+//#if !defined(__APPLE__) && !defined(__MACH__)
+//#include "bsd/stdlib.h"
+//#endif
 
 /* This implementation is adaptable to current computing power.
  * You can have up to 2^31 rounds which should be enough for some
@@ -153,25 +153,14 @@ encode_salt(char *salt, u_int8_t *csalt, u_int16_t clen, u_int8_t logr)
    from: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 */
 char *
-bcrypt_gensalt(u_int8_t log_rounds)
+bcrypt_gensalt(u_int8_t log_rounds, u_int8_t *seed)
 {
-    u_int8_t csalt[BCRYPT_MAXSALT];
-    u_int16_t i;
-    u_int32_t seed = 0;
-
-    for (i = 0; i < BCRYPT_MAXSALT; i++) {
-        if (i % 4 == 0)
-            seed = arc4random();
-        csalt[i] = seed & 0xff;
-        seed = seed >> 8;
-    }
-
     if (log_rounds < 4)
         log_rounds = 4;
     else if (log_rounds > 31)
         log_rounds = 31;
 
-    encode_salt(gsalt, csalt, BCRYPT_MAXSALT, log_rounds);
+    encode_salt(gsalt, seed, BCRYPT_MAXSALT, log_rounds);
     return gsalt;
 }
 

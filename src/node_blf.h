@@ -90,7 +90,7 @@ void blf_cbc_decrypt(blf_ctx *, u_int8_t *, u_int8_t *, u_int32_t);
 u_int32_t Blowfish_stream2word(const u_int8_t *, u_int16_t , u_int16_t *);
 
 /* bcrypt functions*/
-char * bcrypt_gensalt(u_int8_t log_rounds);
+char * bcrypt_gensalt(u_int8_t, u_int8_t*);
 char *bcrypt(const char *, const char *);
 void encode_salt(char *, u_int8_t *, u_int16_t, u_int8_t);
 
