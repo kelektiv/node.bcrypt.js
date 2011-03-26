@@ -11,18 +11,6 @@ VERSION = "0.0.1"
 def set_options(opt):
   opt.tool_options("compiler_cxx")
   opt.tool_options("compiler_cc")
-  opt.add_option( '--openssl-libpath'
-                , action='store'
-                , default=False
-                , help="A directory to search for the OpenSSL libraries"
-                , dest='openssl_libpath'
-                )
-  opt.add_option( '--openssl-includes'
-                , action='store'
-                , default=False
-                , help='A directory to search for the OpenSSL includes'
-                , dest='openssl_includes'
-                )
 
 def configure(conf):
   conf.check_tool("compiler_cxx")
@@ -30,30 +18,22 @@ def configure(conf):
   conf.check_tool("node_addon")
   o = Options.options
 
-  if o.openssl_libpath: 
-    openssl_libpath = [o.openssl_libpath]
-  elif not sys.platform.startswith('win32'):
+  if not sys.platform.startswith('win32'):
     openssl_libpath = ['/usr/lib', '/usr/local/lib', '/opt/local/lib', '/usr/sfw/lib']
-  else:
-    openssl_libpath = [normpath(join(cwd, '../openssl'))]
+  #else:
+    #openssl_libpath = [normpath(join(cwd, '../openssl'))]
 
-  if o.openssl_includes: 
-    openssl_includes = [o.openssl_includes]
-  elif not sys.platform.startswith('win32'):
-    openssl_includes = [];
-  else:
-    openssl_includes = [normpath(join(cwd, '../openssl/include'))];
+  if not sys.platform.startswith('win32'):
+    openssl_includes = ['/usr/includes', '/usr/local/includes', '/opt/local/includes', '/usr/sfw/lib'];
+  #else:
+    #openssl_includes = [normpath(join(cwd, '../openssl/include'))];
 
-  libssl = conf.check_cc(lib="rand",
+  libssl = conf.check(lib="ssl",
           header_name='openssl/rand.h',
-          function_name='SSL',
+          function_name='RAND_bytes',
           includes=openssl_includes,
           libpath=openssl_libpath,
           uselib_store='OPENSSL')
-
-
-  #if conf.check(lib='ssl', libpath=['/usr/lib'], uselib_store='LIBSSL'):
-    #conf.fatal("Cannot find openssl libraries (used for randomness).")
 
 def build(bld):
   bcryptnode = bld.new_task_gen("cxx", "shlib", "node_addon")
@@ -63,10 +43,6 @@ def build(bld):
     src/bcrypt.cc
     src/bcrypt_node.cc
   """
-
-  #bcryptnode.includes = """
-    #/usr/includes/openssl/
-  #"""
   bcryptnode.uselib = 'OPENSSL'
 
 def test(t):

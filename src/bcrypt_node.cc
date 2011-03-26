@@ -99,8 +99,9 @@ class BCrypt : public ObjectWrap {
                     size = args[1]->Int32Value();
                 }
 
-                unsigned char* _seed;
-                switch (RAND_bytes(_seed, size)) {
+                u_int8_t *_seed;
+                _seed = (u_int8_t *)malloc(size * sizeof(u_int8_t));
+                switch (RAND_bytes((unsigned char *)_seed, size)) {
                     case -1:
                         return ThrowException(Exception::Error(String::New("RAND does not support bytes operation")));
                     case 0:
@@ -113,6 +114,7 @@ class BCrypt : public ObjectWrap {
                 }
                 char* salt = bcrypt->BCryptGenerateSalt(rounds, _seed);
                 int salt_len = strlen(salt);
+                delete _seed;
                 Local<Value> outString = Encode(salt, salt_len, BINARY);
 
                 return scope.Close(outString);
