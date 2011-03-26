@@ -114,7 +114,7 @@ class BCrypt : public ObjectWrap {
                 }
                 char* salt = bcrypt->BCryptGenerateSalt(rounds, _seed);
                 int salt_len = strlen(salt);
-                delete _seed;
+                free(_seed);
                 Local<Value> outString = Encode(salt, salt_len, BINARY);
 
                 return scope.Close(outString);
