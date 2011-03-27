@@ -50,10 +50,10 @@ void BCrypt::Initialize (Handle<Object> target) {
     t->InstanceTemplate()->SetInternalFieldCount(1);
 
     NODE_SET_PROTOTYPE_METHOD(t, "gen_salt_sync", BCrypt::GenerateSaltSync);
-    NODE_SET_PROTOTYPE_METHOD(t, "hashpw_sync", BCrypt::HashPWSync);
+    NODE_SET_PROTOTYPE_METHOD(t, "encrypt_sync", BCrypt::EncryptSync);
     NODE_SET_PROTOTYPE_METHOD(t, "compare_sync", BCrypt::CompareSync);
     NODE_SET_PROTOTYPE_METHOD(t, "gen_salt", BCrypt::GenerateSalt);
-    //NODE_SET_PROTOTYPE_METHOD(t, "hashpw", BCrypt::HashPW);
+    NODE_SET_PROTOTYPE_METHOD(t, "encrypt", BCrypt::Encrypt);
     //NODE_SET_PROTOTYPE_METHOD(t, "compare", BCrypt::Compare);
 
     target->Set(String::NewSymbol("BCrypt"), t->GetFunction());
@@ -82,10 +82,10 @@ int BCrypt::GetSeed(u_int8_t *seed, int size) {
             }
         default:
             return 1;
-
     }
 }
 
+/* SALT GENERATION */
 int BCrypt::EIO_GenSalt(eio_req *req) {
     salt_request *s_req = (salt_request *)req->data;
     BCrypt *bcrypt_obj = (BCrypt *)s_req->bcrypt_obj;
@@ -100,7 +100,6 @@ int BCrypt::EIO_GenSalt(eio_req *req) {
         }
         char* salt = bcrypt_gensalt(s_req->rounds, _seed);
         s_req->salt_len = strlen(salt);
-        //memcpy(s_req->salt, (const char *)salt, s_req->salt_len);
         s_req->salt = strdup(salt);
         free(_seed);
     } catch (const char *err) {
@@ -227,7 +226,92 @@ Handle<Value> BCrypt::GenerateSaltSync(const Arguments& args) {
     return scope.Close(outString);
 }
 
-Handle<Value> BCrypt::HashPWSync(const Arguments& args) {
+/* ENCRYPT DATA - USED TO BE HASHPW */
+int BCrypt::EIO_Encrypt(eio_req *req) {
+    encrypt_request *encrypt_req = (encrypt_request *)req->data;
+    BCrypt *bcrypt_obj = (BCrypt *)encrypt_req->bcrypt_obj;
+
+    try {
+        char* bcrypted = bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt);
+        encrypt_req->output_len = strlen(bcrypted);
+        encrypt_req->output = strdup(bcrypted);
+    } catch (const char *err) {
+        encrypt_req->error = strdup(err);
+    }
+
+    return 0;
+}
+
+int BCrypt::EIO_EncryptAfter(eio_req *req)
+{
+    HandleScope scope;
+
+    ev_unref(EV_DEFAULT_UC);
+    encrypt_request *encrypt_req = (encrypt_request *)req->data;
+
+    Handle<Value> argv[2];
+
+    if (encrypt_req->error) {
+        argv[0] = Exception::Error(String::New(encrypt_req->error));
+        argv[1] = Undefined();
+    }
+    else {
+        argv[0] = Undefined();
+        argv[1] = Encode(encrypt_req->output, encrypt_req->output_len, BINARY);
+    }
+
+    TryCatch try_catch; // don't quite see the necessity of this
+
+    encrypt_req->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+
+    if (try_catch.HasCaught())
+        FatalException(try_catch);
+
+    encrypt_req->callback.Dispose();
+    free(encrypt_req->salt);
+    free(encrypt_req->input);
+    free(encrypt_req->output);
+    free(encrypt_req->error);
+
+    ((BCrypt *)encrypt_req->bcrypt_obj)->Unref();
+    free(encrypt_req);
+
+    return 0;
+}
+
+Handle<Value> BCrypt::Encrypt(const Arguments& args) {
+    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+    HandleScope scope;
+
+    if (args.Length() < 3) {
+        return ThrowException(Exception::Error(String::New("Must give data, salt and callback.")));
+    } else if (!args[0]->IsString() || !args[1]->IsString() || !args[2]->IsFunction()) {
+        return ThrowException(Exception::Error(String::New("Data and salt must be strings and the callback must be a function.")));
+    }
+
+    String::Utf8Value data(args[0]->ToString());
+    String::Utf8Value salt(args[1]->ToString());
+    Local<Function> callback = Local<Function>::Cast(args[2]);
+
+    encrypt_request *encrypt_req = (encrypt_request *)malloc(sizeof(*encrypt_req));
+    if (!encrypt_req)
+        return ThrowException(Exception::Error(String::New("malloc in BCrypt::GenerateSalt failed.")));
+
+    encrypt_req->callback = Persistent<Function>::New(callback);
+    encrypt_req->bcrypt_obj = bcrypt_obj;
+    encrypt_req->input = strdup(*data);
+    encrypt_req->salt = strdup(*salt);
+    encrypt_req->error = NULL;
+
+    eio_custom(EIO_Encrypt, EIO_PRI_DEFAULT, EIO_EncryptAfter, encrypt_req);
+
+    ev_ref(EV_DEFAULT_UC);
+    bcrypt_obj->Ref();
+
+    return Undefined();
+}
+
+Handle<Value> BCrypt::EncryptSync(const Arguments& args) {
     BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
     HandleScope scope;
 
@@ -237,10 +321,10 @@ Handle<Value> BCrypt::HashPWSync(const Arguments& args) {
         return ThrowException(Exception::Error(String::New("Params must be strings.")));
     }
 
-    String::Utf8Value pw(args[0]->ToString());
+    String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
 
-    char* bcrypted = bcrypt(*pw, *salt);
+    char* bcrypted = bcrypt(*data, *salt);
     int bcrypted_len = strlen(bcrypted);
     Local<Value> outString = Encode(bcrypted, bcrypted_len, BINARY);
 
