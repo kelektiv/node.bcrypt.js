@@ -52,7 +52,7 @@ void BCrypt::Initialize (Handle<Object> target) {
     NODE_SET_PROTOTYPE_METHOD(t, "gen_salt_sync", BCrypt::GenerateSaltSync);
     NODE_SET_PROTOTYPE_METHOD(t, "hashpw_sync", BCrypt::HashPWSync);
     NODE_SET_PROTOTYPE_METHOD(t, "compare_sync", BCrypt::CompareSync);
-    //NODE_SET_PROTOTYPE_METHOD(t, "gen_salt", BCrypt::GenerateSalt);
+    NODE_SET_PROTOTYPE_METHOD(t, "gen_salt", BCrypt::GenerateSalt);
     //NODE_SET_PROTOTYPE_METHOD(t, "hashpw", BCrypt::HashPW);
     //NODE_SET_PROTOTYPE_METHOD(t, "compare", BCrypt::Compare);
 
@@ -84,6 +84,116 @@ int BCrypt::GetSeed(u_int8_t *seed, int size) {
             return 1;
 
     }
+}
+
+int BCrypt::EIO_GenSalt(eio_req *req) {
+    salt_request *s_req = (salt_request *)req->data;
+    BCrypt *bcrypt_obj = (BCrypt *)s_req->bcrypt_obj;
+
+    try {
+        u_int8_t *_seed = (u_int8_t *)malloc(s_req->rand_len * sizeof(u_int8_t));
+        switch(BCrypt::GetSeed(_seed, s_req->rand_len)) {
+            case -1:
+                s_req->error = strdup("Rand operation not supported.");
+            case 0:
+                s_req->error = strdup("Rand operation did not generate a cryptographically sound seed.");
+        }
+        char* salt = bcrypt_gensalt(s_req->rounds, _seed);
+        s_req->salt_len = strlen(salt);
+        //memcpy(s_req->salt, (const char *)salt, s_req->salt_len);
+        s_req->salt = strdup(salt);
+        free(_seed);
+    } catch (const char *err) {
+        s_req->error = strdup(err);
+    }
+
+    return 0;
+}
+
+int BCrypt::EIO_GenSaltAfter(eio_req *req)
+{
+    HandleScope scope;
+
+    ev_unref(EV_DEFAULT_UC);
+    salt_request *s_req = (salt_request *)req->data;
+
+    Handle<Value> argv[2];
+
+    if (s_req->error) {
+        argv[0] = Exception::Error(String::New(s_req->error));
+        argv[1] = Undefined();
+    }
+    else {
+        argv[0] = Undefined();
+        argv[1] = Encode(s_req->salt, s_req->salt_len, BINARY);
+    }
+
+    TryCatch try_catch; // don't quite see the necessity of this
+
+    s_req->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+
+    if (try_catch.HasCaught())
+        FatalException(try_catch);
+
+    s_req->callback.Dispose();
+    free(s_req->salt);
+    free(s_req->error);
+
+    ((BCrypt *)s_req->bcrypt_obj)->Unref();
+    free(s_req);
+
+    return 0;
+}
+
+Handle<Value> BCrypt::GenerateSalt(const Arguments &args) {
+    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+    HandleScope scope;
+
+    Local<Function> callback;
+    int rand_len = 20;
+    ssize_t rounds = 10;
+    if (args.Length() < 1) {
+        return ThrowException(Exception::Error(String::New("Must provide at least a callback.")));
+    } else if (args[0]->IsFunction()) {
+        callback = Local<Function>::Cast(args[0]);
+    } else if (args.Length() == 1) {
+        return ThrowException(Exception::Error(String::New("Must provide at least a callback.")));
+    }
+    if (args.Length() > 1) {
+        if (args[1]->IsFunction()) {
+            rounds = args[0]->Int32Value();
+            callback = Local<Function>::Cast(args[1]);
+        } else if (args.Length() > 2 && args[1]->IsNumber()) {
+            rand_len = args[1]->Int32Value();
+
+            if (args[2]->IsFunction()) {
+                callback = Local<Function>::Cast(args[2]);
+            } else {
+                return ThrowException(Exception::Error(String::New("No callback supplied."))); 
+            }
+        } else {
+            return ThrowException(Exception::Error(String::New("No callback supplied."))); 
+        }
+    } else {
+        return ThrowException(Exception::Error(String::New("No callback supplied."))); 
+    }
+
+    salt_request *s_req = (salt_request *)malloc(sizeof(*s_req));
+    if (!s_req)
+        return ThrowException(Exception::Error(String::New("malloc in BCrypt::GenerateSalt failed.")));
+
+    s_req->callback = Persistent<Function>::New(callback);
+    s_req->bcrypt_obj = bcrypt_obj;
+    s_req->rand_len = rand_len;
+    s_req->rounds = rounds;
+    s_req->error = NULL;
+
+    eio_custom(EIO_GenSalt, EIO_PRI_DEFAULT, EIO_GenSaltAfter, s_req);
+
+    ev_ref(EV_DEFAULT_UC);
+    bcrypt_obj->Ref();
+
+    return Undefined();
 }
 
 Handle<Value> BCrypt::GenerateSaltSync(const Arguments& args) {

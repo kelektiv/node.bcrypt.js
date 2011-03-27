@@ -10,7 +10,17 @@ class BCrypt : public node::ObjectWrap {
         static v8::Handle<v8::Value> GenerateSaltSync(const v8::Arguments& args);
         static v8::Handle<v8::Value> HashPWSync(const v8::Arguments& args);
         static v8::Handle<v8::Value> CompareSync(const v8::Arguments& args);
-        /*static v8::Handle<v8::Value> GenerateSalt(const v8::Arguments& args);
-        static v8::Handle<v8::Value> HashPW(const v8::Arguments& args);
-        static v8::Handle<v8::Value> Compare(const v8::Arguments& args);*/
+        static v8::Handle<v8::Value> GenerateSalt(const v8::Arguments& args);
+        //static v8::Handle<v8::Value> HashPW(const v8::Arguments& args);
+        //static v8::Handle<v8::Value> Compare(const v8::Arguments& args);
+};
+
+struct salt_request {
+    v8::Persistent<v8::Function> callback;
+    void *bcrypt_obj;
+    char *salt;
+    int salt_len;
+    int rand_len;
+    ssize_t rounds;
+    char *error;
 };
