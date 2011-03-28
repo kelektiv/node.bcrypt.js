@@ -54,7 +54,7 @@ void BCrypt::Initialize (Handle<Object> target) {
     NODE_SET_PROTOTYPE_METHOD(t, "compare_sync", BCrypt::CompareSync);
     NODE_SET_PROTOTYPE_METHOD(t, "gen_salt", BCrypt::GenerateSalt);
     NODE_SET_PROTOTYPE_METHOD(t, "encrypt", BCrypt::Encrypt);
-    //NODE_SET_PROTOTYPE_METHOD(t, "compare", BCrypt::Compare);
+    NODE_SET_PROTOTYPE_METHOD(t, "compare", BCrypt::Compare);
 
     target->Set(String::NewSymbol("BCrypt"), t->GetFunction());
 }
@@ -109,8 +109,7 @@ int BCrypt::EIO_GenSalt(eio_req *req) {
     return 0;
 }
 
-int BCrypt::EIO_GenSaltAfter(eio_req *req)
-{
+int BCrypt::EIO_GenSaltAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
@@ -242,8 +241,7 @@ int BCrypt::EIO_Encrypt(eio_req *req) {
     return 0;
 }
 
-int BCrypt::EIO_EncryptAfter(eio_req *req)
-{
+int BCrypt::EIO_EncryptAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
@@ -295,7 +293,7 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
 
     encrypt_request *encrypt_req = (encrypt_request *)malloc(sizeof(*encrypt_req));
     if (!encrypt_req)
-        return ThrowException(Exception::Error(String::New("malloc in BCrypt::GenerateSalt failed.")));
+        return ThrowException(Exception::Error(String::New("malloc in BCrypt::Encrypt failed.")));
 
     encrypt_req->callback = Persistent<Function>::New(callback);
     encrypt_req->bcrypt_obj = bcrypt_obj;
@@ -329,6 +327,88 @@ Handle<Value> BCrypt::EncryptSync(const Arguments& args) {
     Local<Value> outString = Encode(bcrypted, bcrypted_len, BINARY);
 
     return scope.Close(outString);
+}
+
+/* COMPARATOR */
+int BCrypt::EIO_Compare(eio_req *req) {
+    compare_request *compare_req = (compare_request *)req->data;
+    BCrypt *bcrypt_obj = (BCrypt *)compare_req->bcrypt_obj;
+
+    try {
+        compare_req->result = (strcmp(bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted), (const char *)compare_req->encrypted) == 0);
+
+    } catch (const char *err) {
+        compare_req->error = strdup(err);
+    }
+
+    return 0;
+}
+
+int BCrypt::EIO_CompareAfter(eio_req *req) {
+    HandleScope scope;
+
+    ev_unref(EV_DEFAULT_UC);
+    compare_request *compare_req = (compare_request *)req->data;
+
+    Handle<Value> argv[2];
+
+    if (compare_req->error) {
+        argv[0] = Exception::Error(String::New(compare_req->error));
+        argv[1] = Undefined();
+    }
+    else {
+        argv[0] = Undefined();
+        argv[1] = Boolean::New(compare_req->result);
+    }
+
+    TryCatch try_catch; // don't quite see the necessity of this
+
+    compare_req->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+
+    if (try_catch.HasCaught())
+        FatalException(try_catch);
+
+    compare_req->callback.Dispose();
+    free(compare_req->encrypted);
+    free(compare_req->input);
+    free(compare_req->error);
+
+    ((BCrypt *)compare_req->bcrypt_obj)->Unref();
+    free(compare_req);
+
+    return 0;
+}
+
+Handle<Value> BCrypt::Compare(const Arguments& args) {
+    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+    HandleScope scope;
+
+    if (args.Length() < 3) {
+        return ThrowException(Exception::Error(String::New("Must give input, data and callback.")));
+    } else if (!args[0]->IsString() || !args[1]->IsString() || !args[2]->IsFunction()) {
+        return ThrowException(Exception::Error(String::New("Input and data to compare against must be strings and the callback must be a function.")));
+    }
+
+    String::Utf8Value input(args[0]->ToString());
+    String::Utf8Value encrypted(args[1]->ToString());
+    Local<Function> callback = Local<Function>::Cast(args[2]);
+
+    compare_request *compare_req = (compare_request *)malloc(sizeof(*compare_req));
+    if (!compare_req)
+        return ThrowException(Exception::Error(String::New("malloc in BCrypt::Compare failed.")));
+
+    compare_req->callback = Persistent<Function>::New(callback);
+    compare_req->bcrypt_obj = bcrypt_obj;
+    compare_req->input = strdup(*input);
+    compare_req->encrypted = strdup(*encrypted);
+    compare_req->error = NULL;
+
+    eio_custom(EIO_Compare, EIO_PRI_DEFAULT, EIO_CompareAfter, compare_req);
+
+    ev_ref(EV_DEFAULT_UC);
+    bcrypt_obj->Ref();
+
+    return Undefined();
 }
 
 Handle<Value> BCrypt::CompareSync(const Arguments& args) {
