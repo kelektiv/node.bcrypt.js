@@ -71,11 +71,11 @@ API
 
 * BCrypt
   * gen_salt_sync(rounds, seed_length)
-    * rounds - [OPTIONAL] - the number of rounds to process the data for.
-    * seed_length - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length.
+    * rounds - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
+    * seed_length - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length. (default - 20)
   * gen_salt(rounds, seed_length, cb)
-    * rounds - [OPTIONAL] - the number of rounds to process the data for.
-    * seed_length - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length.
+    * rounds - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
+    * seed_length - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length. (default - 20)
     * cb - [REQUIRED] - a callback to be fired once the salt has been generated. uses eio making it asynchronous.
   * encrypt_sync(data, salt)
     * data - [REQUIRED] - the data to be encrypted.
