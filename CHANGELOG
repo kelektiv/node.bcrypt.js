@@ -1,0 +1,9 @@
+v0.2.0
+* Added async functionality
+* API changes
+  * hashpw -> encrypt
+  * all old sync methods now end with _sync
+* Removed libbsd(arc4random) dependency...now uses openssl which is more widely spread
+
+v0.1.2
+* Security fix. Wasn't reading rounds in properly and was always only using 4 rounds.
