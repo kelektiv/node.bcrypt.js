@@ -2,7 +2,7 @@
   "name": "bcrypt",
   "description": "A bcrypt library for NodeJS.",
   "main": "./bcrypt",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": "Nick Campbell (http://github.com/ncb000gt)",
   "engines": { "node": ">= 0.1.100" },
   "repository": {
@@ -22,6 +22,6 @@
      "test": "node-waf configure build; nodeunit test/"
    },
    "dependencies": {
-     "nodeunit": ">=0.3.1"
+     "nodeunit": ">=0.5.1"
    }
 }

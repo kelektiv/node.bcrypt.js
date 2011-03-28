@@ -11,8 +11,7 @@ Dependencies
 =============
 
 * NodeJS
-* BSD Libs (non-mac)
-
+* OpenSSL
 
 From NPM
 ============
@@ -34,18 +33,44 @@ Assuming you've already built node, you can run the waf script:
     node-waf build
     npm link
 
-Usage
+Usage - Sync
 ============
 
 To hash a password:  
     var bcrypt = require('bcrypt');  
-    var salt = bcrypt.gen_salt(10);  
-    var hash = bcrypt.hashpw("B4c0/\/", salt);
+    var salt = bcrypt.gen_salt_sync(10);  
+    var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
 
 To check a password:  
     var bcrypt = require('bcrypt');  
-    bcrypt.compare("B4c0/\/", hash); // true    
-    bcrypt.compare("not_bacon", hash); // false
+    var salt = bcrypt.gen_salt_sync(10);  
+    var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
+    bcrypt.compare_sync("B4c0/\/", hash); // true    
+    bcrypt.compare_sync("not_bacon", hash); // false
+
+Usage - Async
+============
+
+To hash a password:  
+    var bcrypt = require('bcrypt');  
+    bcrypt.gen_salt(10, function(err, salt) {
+        bcrypt.encrypt("B4c0/\/", salt, function(err, hash) {
+            //something
+        });
+    });
+
+To check a password:  
+    var bcrypt = require('bcrypt');
+    bcrypt.gen_salt(10, function(err, salt) {
+        bcrypt.encrypt("B4c0/\/", salt, function(err, hash) {
+            bcrypt.compare("B4c0/\/", hash, function(err, res) {
+                // res == true    
+            });
+            bcrypt.compare("not_bacon", hash, function(err, res) {
+                // res = false
+            });
+        });
+    });
 
 Hash Info
 ============
@@ -55,8 +80,8 @@ The characters that comprise passwords are `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh
 Testing
 ============
 
-I am using nodeunit. I like the way you write tests with it and I like the default output. As such you'll need it to run the tests. I suspect my tests would run on an older version, but these were written and worked against 0.3.1
-   npm install nodeunit@0.3.1
+I am using nodeunit. I like the way you write tests with it and I like the default output. As such you'll need it to run the tests. I suspect my tests would run on an older version, but these were written and worked against 0.5.1
+   npm install nodeunit@0.5.1
    nodeunit test/
 
 Credits
