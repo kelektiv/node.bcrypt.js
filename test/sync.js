@@ -19,20 +19,20 @@ module.exports = testCase({
         assert.throws(function() {bcrypt.gen_salt_sync('b');}, "Should throw an Error. gen_salt requires rounds to be a number.");
         assert.done();
     },
-    test_hashpw: function(assert) {
-        assert.ok(bcrypt.hashpw_sync('password', bcrypt.gen_salt_sync(10)), "Shouldn't throw an Error.");
+    test_encrypt: function(assert) {
+        assert.ok(bcrypt.encrypt_sync('password', bcrypt.gen_salt_sync(10)), "Shouldn't throw an Error.");
         assert.done();
     },
     test_hash_pw_no_params: function(assert) {
-        assert.throws(function() {bcrypt.hashpw_sync();}, "Should throw an Error. No Params.");
+        assert.throws(function() {bcrypt.encrypt_sync();}, "Should throw an Error. No Params.");
         assert.done();
     },
     test_hash_pw_one_param: function(assert) {
-        assert.throws(function() {bcrypt.hashpw_sync('password');}, "Should throw an Error. No salt.");
+        assert.throws(function() {bcrypt.encrypt_sync('password');}, "Should throw an Error. No salt.");
         assert.done();
     },
     test_hash_pw_not_hash_str: function(assert) {
-        assert.throws(function() {bcrypt.hashpw_sync('password', 1);}, "Should throw an Error. hash should be a string.");
+        assert.throws(function() {bcrypt.encrypt_sync('password', 1);}, "Should throw an Error. hash should be a string.");
         assert.done();
     },
     test_verify_salt: function(assert) {
@@ -59,7 +59,7 @@ module.exports = testCase({
     test_hash_compare: function(assert) {
         var salt = bcrypt.gen_salt_sync(10);
         assert.equals(29, salt.length, "Salt isn't the correct length.");
-        var hash = bcrypt.hashpw_sync("test", salt);
+        var hash = bcrypt.encrypt_sync("test", salt);
         assert.ok(bcrypt.compare_sync("test", hash), "These hashes should be equal.");
         assert.ok(!(bcrypt.compare_sync("blah", hash)), "These hashes should not be equal.");
         assert.done();
