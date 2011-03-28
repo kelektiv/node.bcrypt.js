@@ -66,6 +66,32 @@ To check a password:
         });
     });
 
+API
+============
+
+* BCrypt
+ * gen_salt_sync(rounds, seed_length)
+  * rounds - [OPTIONAL] - the number of rounds to process the data for.
+  * seed_length - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length.
+ * gen_salt(rounds, seed_length, cb)
+  * rounds - [OPTIONAL] - the number of rounds to process the data for.
+  * seed_length - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length.
+  * cb - [REQUIRED] - a callback to be fired once the salt has been generated. uses eio making it asynchronous.
+ * encrypt_sync(data, salt)
+  * data - [REQUIRED] - the data to be encrypted.
+  * salt - [REQUIRED] - the salt to be used in encryption.
+ * encrypt(data, salt, cb)
+  * data - [REQUIRED] - the data to be encrypted.
+  * salt - [REQUIRED] - the salt to be used in encryption.
+  * cb - [REQUIRED] - a callback to be fired once the data has been encrypted. uses eio making it asynchronous.
+ * compare_sync(data, encrypted)
+  * data - [REQUIRED] - data to compare.
+  * encrypted - [REQUIRED] - data to be compared to.
+ * compare(data, encrypted, cb)
+  * data - [REQUIRED] - data to compare.
+  * encrypted - [REQUIRED] - data to be compared to.
+  * cb - [REQUIRED] - a callback to be fired once the data has been compared. uses eio making it asynchronous.
+
 Hash Info
 ============
 
