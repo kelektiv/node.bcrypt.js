@@ -330,12 +330,30 @@ Handle<Value> BCrypt::EncryptSync(const Arguments& args) {
 }
 
 /* COMPARATOR */
+bool CompareStrings(char* s1, char* s2) {
+    bool eq = true;
+    int s1_len = strlen(s1);
+    int s2_len = strlen(s2);
+
+    if (s1_len != s2_len) {
+        eq = false;
+    }
+
+    for (int i = 0; i < s1_len; i++) {
+        if (s1[i] != s2[i]) {
+            eq = false;
+        }
+    }
+
+    return eq;
+}
+
 int BCrypt::EIO_Compare(eio_req *req) {
     compare_request *compare_req = (compare_request *)req->data;
     BCrypt *bcrypt_obj = (BCrypt *)compare_req->bcrypt_obj;
 
     try {
-        compare_req->result = (strcmp(bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted), (const char *)compare_req->encrypted) == 0);
+        compare_req->result = CompareStrings(bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted), (char *)compare_req->encrypted);
 
     } catch (const char *err) {
         compare_req->error = strdup(err);
@@ -424,7 +442,7 @@ Handle<Value> BCrypt::CompareSync(const Arguments& args) {
     String::Utf8Value pw(args[0]->ToString());
     String::Utf8Value hash(args[1]->ToString());
 
-    return Boolean::New(strcmp(bcrypt(*pw, *hash), *hash) == 0);
+    return Boolean::New(CompareString(bcrypt(*pw, *hash), *hash));
 }
 
 extern "C" void init(Handle<Object> target) {
