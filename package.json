@@ -2,7 +2,7 @@
   "name": "bcrypt",
   "description": "A bcrypt library for NodeJS.",
   "main": "./bcrypt",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Nick Campbell (http://github.com/ncb000gt)",
   "engines": { "node": ">= 0.1.100" },
   "repository": {
@@ -23,5 +23,11 @@
    },
    "dependencies": {
      "nodeunit": ">=0.5.1"
-   }
+   },
+   "contributors": [
+     "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
+     "Van Nguyen <the.gol.effect@gmail.com> (https://github.com/thegoleffect)",
+     "David Trejo <david@dtrejo.com> (https://github.com/dtrejo)",
+     "Alfred Westerveld <alfredwesterveld@gmail.com> (https://github.com/alfredwesterveld)"
+   ]
 }
