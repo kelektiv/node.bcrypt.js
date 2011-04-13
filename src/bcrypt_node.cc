@@ -442,7 +442,7 @@ Handle<Value> BCrypt::CompareSync(const Arguments& args) {
     String::Utf8Value pw(args[0]->ToString());
     String::Utf8Value hash(args[1]->ToString());
 
-    return Boolean::New(CompareString(bcrypt(*pw, *hash), *hash));
+    return Boolean::New(CompareStrings(bcrypt(*pw, *hash), *hash));
 }
 
 extern "C" void init(Handle<Object> target) {
