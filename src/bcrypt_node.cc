@@ -30,6 +30,7 @@
 
 #include <node.h>
 #include <node_events.h>
+#include <ctype.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
@@ -68,7 +69,7 @@ Handle<Value> BCrypt::New(const Arguments& args) {
     return args.This();
 }
 
-int BCrypt::GetSeed(u_int8_t *seed, int size) {
+int GetSeed(u_int8_t *seed, int size) {
     switch (RAND_bytes((unsigned char *)seed, size)) {
         case -1:
         case 0:
@@ -85,6 +86,39 @@ int BCrypt::GetSeed(u_int8_t *seed, int size) {
     }
 }
 
+bool ValidateSalt(char *str) {
+    int count = 0;
+    bool valid = true;
+
+    char *new_str = strdup(str);
+    char *result = strtok(new_str, "$");
+
+    while (result != NULL) {
+        if (count == 0) {
+            //check version
+            if (!isdigit(result[0])) {
+                return false;
+            }
+            if (strlen(result) == 2 && !isalpha(result[1])) {
+                return false;
+            }
+        } else if (count == 1) {
+            //check rounds
+            if (!(isdigit(result[0]) && isdigit(result[1]))) {
+                return false;
+            }
+        }
+
+        count++;
+        result = strtok(NULL, "$");
+    }
+
+    free(new_str);
+    free(result);
+
+    return (count == 3);
+}
+
 /* SALT GENERATION */
 int BCrypt::EIO_GenSalt(eio_req *req) {
     salt_request *s_req = (salt_request *)req->data;
@@ -92,7 +126,7 @@ int BCrypt::EIO_GenSalt(eio_req *req) {
 
     try {
         u_int8_t *_seed = (u_int8_t *)malloc(s_req->rand_len * sizeof(u_int8_t));
-        switch(BCrypt::GetSeed(_seed, s_req->rand_len)) {
+        switch(GetSeed(_seed, s_req->rand_len)) {
             case -1:
                 s_req->error = strdup("Rand operation not supported.");
             case 0:
@@ -211,7 +245,7 @@ Handle<Value> BCrypt::GenerateSaltSync(const Arguments& args) {
     }
 
     u_int8_t *_seed = (u_int8_t *)malloc(size * sizeof(u_int8_t));
-    switch(BCrypt::GetSeed(_seed, size)) {
+    switch(GetSeed(_seed, size)) {
         case -1:
             return ThrowException(Exception::Error(String::New("Rand operation not supported.")));
         case 0:
@@ -230,12 +264,17 @@ int BCrypt::EIO_Encrypt(eio_req *req) {
     encrypt_request *encrypt_req = (encrypt_request *)req->data;
     BCrypt *bcrypt_obj = (BCrypt *)encrypt_req->bcrypt_obj;
 
+    if (!(ValidateSalt(encrypt_req->salt))) {
+        encrypt_req->error = strdup("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+        return 0;
+    }
+
     try {
-        char* bcrypted = bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt);
-        encrypt_req->output_len = strlen(bcrypted);
-        encrypt_req->output = strdup(bcrypted);
+      char* bcrypted = bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt);
+      encrypt_req->output_len = strlen(bcrypted);
+      encrypt_req->output = strdup(bcrypted);
     } catch (const char *err) {
-        encrypt_req->error = strdup(err);
+      encrypt_req->error = strdup(err);
     }
 
     return 0;
@@ -249,7 +288,7 @@ int BCrypt::EIO_EncryptAfter(eio_req *req) {
 
     Handle<Value> argv[2];
 
-    if (encrypt_req->error) {
+    if (encrypt_req->error != NULL) {
         argv[0] = Exception::Error(String::New(encrypt_req->error));
         argv[1] = Undefined();
     }
@@ -299,6 +338,7 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
     encrypt_req->bcrypt_obj = bcrypt_obj;
     encrypt_req->input = strdup(*data);
     encrypt_req->salt = strdup(*salt);
+    encrypt_req->output = NULL;
     encrypt_req->error = NULL;
 
     eio_custom(EIO_Encrypt, EIO_PRI_DEFAULT, EIO_EncryptAfter, encrypt_req);
@@ -321,6 +361,10 @@ Handle<Value> BCrypt::EncryptSync(const Arguments& args) {
 
     String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
+
+    if (!(ValidateSalt(*salt))) {
+        return ThrowException(Exception::Error(String::New("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue")));
+    }
 
     char* bcrypted = bcrypt(*data, *salt);
     int bcrypted_len = strlen(bcrypted);
@@ -354,7 +398,6 @@ int BCrypt::EIO_Compare(eio_req *req) {
 
     try {
         compare_req->result = CompareStrings(bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted), (char *)compare_req->encrypted);
-
     } catch (const char *err) {
         compare_req->error = strdup(err);
     }

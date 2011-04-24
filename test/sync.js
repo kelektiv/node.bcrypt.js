@@ -35,6 +35,14 @@ module.exports = testCase({
         assert.throws(function() {bcrypt.encrypt_sync('password', 1);}, "Should throw an Error. hash should be a string.");
         assert.done();
     },
+    test_encrypt_salt_validity: function(assert) {
+        assert.expect(2);
+        assert.ok(bcrypt.encrypt_sync('password', '$2a$10$somesaltyvaluertsetrse'));
+        assert.throws(function() { 
+            bcrypt.encrypt('password', 'some$value');
+        });
+        assert.done();
+    },
     test_verify_salt: function(assert) {
         var salt = bcrypt.gen_salt_sync(10);
         var split_salt = salt.split('$');

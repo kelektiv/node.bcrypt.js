@@ -7,7 +7,6 @@ class BCrypt : public node::ObjectWrap {
     static int EIO_EncryptAfter(eio_req *req);
     static int EIO_Compare(eio_req *req);
     static int EIO_CompareAfter(eio_req *req);
-    static int GetSeed(u_int8_t *seed, int size);
     public:
         static void Initialize(v8::Handle<v8::Object> target);
         static v8::Handle<v8::Value> New(const v8::Arguments& args);
