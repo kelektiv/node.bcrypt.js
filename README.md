@@ -124,6 +124,10 @@ License
 
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
 
+Trademarks?
+============
+
+Node.js™ is an official trademark of Joyent. This module is not formally related to or endorsed by the official Joyent Node.js open source or commercial project
 
 
 [bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
