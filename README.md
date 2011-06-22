@@ -95,7 +95,7 @@ API
 Hash Info
 ============
 
-The characters that comprise passwords are `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$`.
+The characters that comprise the resultant hash are `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$`.
 
 Testing
 ============
