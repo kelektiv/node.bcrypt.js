@@ -15,7 +15,7 @@ As should be the case with any security tool, this library should be scrutinized
 To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
 
 * [GH-13][gh13] - There was a timing attack present in the comparator. This is fixed in versions higher than 0.2.1, but I recommend using 0.2.3 (code fixes) or later.
-* An [issue with passwords][jtr] was found with a version of the Blowfish algorithm. This is not present in the OpenBSD version and is thus not a problem for this module.
+* An [issue with passwords][jtr] was found with a version of the Blowfish algorithm developed for John the Ripper. This is not present in the OpenBSD version and is thus not a problem for this module.
 
 Dependencies
 =============
