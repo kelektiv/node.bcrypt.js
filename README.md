@@ -7,6 +7,16 @@ Lib to help you hash passwords.
 Catalyst: [How To Safely Store A Password][codahale]
 
 
+Security Issues/Concerns
+=============
+
+As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code- please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
+
+To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
+
+* [GH-13][gh13] - There was a timing attack present in the comparator. This is fixed in versions higher than 0.2.1, but I recommend using 0.2.3 (code fixes) or later.
+* An [issue with passwords][jtr] was found with a version of the Blowfish algorithm. This is not present in the OpenBSD version and is thus not a problem for this module.
+
 Dependencies
 =============
 
@@ -133,5 +143,6 @@ Node.js™ is an official trademark of Joyent. This module is not formally relat
 [bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 [codahale]: http://codahale.com/how-to-safely-store-a-password/
-
 [shadowfiend]:https://github.com/Shadowfiend
+[gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
+[jtr]: http://www.openwall.com/lists/oss-security/2011/06/20/2
