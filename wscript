@@ -18,22 +18,25 @@ def configure(conf):
   conf.check_tool("node_addon")
   o = Options.options
 
-  if not sys.platform.startswith('win32'):
-    openssl_libpath = ['/usr/lib', '/usr/local/lib', '/opt/local/lib', '/usr/sfw/lib']
-  #else:
-    #openssl_libpath = [normpath(join(cwd, '../openssl'))]
-
-  if not sys.platform.startswith('win32'):
-    openssl_includes = ['/usr/includes', '/usr/local/includes', '/opt/local/includes', '/usr/sfw/lib'];
-  #else:
-    #openssl_includes = [normpath(join(cwd, '../openssl/include'))];
+  libpath = ['/lib', '/usr/lib', '/usr/local/lib', '/opt/local/lib', '/usr/sfw/lib']
+  includes = ['/usr/include', '/usr/includes', '/usr/local/includes', '/opt/local/includes', '/usr/sfw/lib'];
 
   libssl = conf.check(lib="ssl",
           header_name='openssl/rand.h',
           function_name='RAND_bytes',
-          includes=openssl_includes,
-          libpath=openssl_libpath,
+          includes=includes,
+          libpath=libpath,
           uselib_store='OPENSSL')
+
+  libcrypto = conf.check(lib="crypto",
+          includes=includes,
+          libpath=libpath,
+          uselib_store='CRYPTO')
+
+  libz = conf.check(lib="z",
+          includes=includes,
+          libpath=libpath,
+          uselib_store='Z')
 
 def build(bld):
   bcryptnode = bld.new_task_gen("cxx", "shlib", "node_addon")
@@ -43,7 +46,7 @@ def build(bld):
     src/bcrypt.cc
     src/bcrypt_node.cc
   """
-  bcryptnode.uselib = 'OPENSSL'
+  bcryptnode.uselib = 'OPENSSL CRYPTO Z'
 
 def test(t):
   Utils.exec_command('nodeunit test')
