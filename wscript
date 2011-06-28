@@ -28,16 +28,16 @@ def configure(conf):
           libpath=libpath,
           uselib_store='OPENSSL')
 
-  libcrypto = conf.check(lib="crypto",
-          includes=includes,
-          libpath=libpath,
-          uselib_store='CRYPTO')
-
-  libz = conf.check(lib="z",
-          includes=includes,
-          libpath=libpath,
-          uselib_store='Z')
-
+  if sys.platform == "cygwin":
+    libcrypto = conf.check(lib="crypto",
+            includes=includes,
+            libpath=libpath,
+            uselib_store='CRYPTO')
+    libz = conf.check(lib="z",
+            includes=includes,
+            libpath=libpath,
+            uselib_store='Z')
+  
 def build(bld):
   bcryptnode = bld.new_task_gen("cxx", "shlib", "node_addon")
   bcryptnode.target = "bcrypt_lib"
@@ -46,7 +46,10 @@ def build(bld):
     src/bcrypt.cc
     src/bcrypt_node.cc
   """
-  bcryptnode.uselib = 'OPENSSL CRYPTO Z'
+  uselib = "OPENSSL"
+  if sys.platform == "cygwin":
+    uselib += " CRYPTO Z"
+  bcryptnode.uselib = uselib
 
 def test(t):
   Utils.exec_command('nodeunit test')
