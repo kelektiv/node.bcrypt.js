@@ -3,9 +3,10 @@ var testCase = require('nodeunit').testCase,
 
 module.exports = testCase({
   test_salt_length: function(assert) {
-    assert.expect(499);
+    var EXPECTED = 500;
+    assert.expect(EXPECTED);
     var n = 0;
-    for (var i = 0; i < 500; i++) {
+    for (var i = 0; i < EXPECTED; i++) {
       bcrypt.gen_salt(4, function(err, salt) {
         console.log('salt: ' + salt);
         assert.equals(29, salt.length, "Salt ("+salt+") isn't the correct length.");
@@ -19,7 +20,7 @@ module.exports = testCase({
     }
 
     function checkVal() {
-        if (n >= 500) {
+        if (n == EXPECTED) {
           assert.done();
         } else {
           setTimeout(checkVal, 100);

@@ -127,7 +127,12 @@ The code for this comes from a few sources:
 Contributors
 ============
 
-[Antonio Salazar Cardozo][shadowfiend]
+[Antonio Salazar Cardozo][shadowfiend] - Early MacOS X support (when we used libbsd)
+[Ben Glow][pixelglow] - Fixes for thread safety with async calls
+[Van Nguyen][thegoleffect] - Found a timing attack in the comparator
+[NewITFarmer][newitfarmer] - Initial Cygwin support
+[David Trejo][dtrejo] - packaging fixes
+[Alfred Westerveld][alfredwesterveld] - packaging fixes
 
 License
 ============
@@ -140,9 +145,15 @@ Trademarks?
 Node.js™ is an official trademark of Joyent. This module is not formally related to or endorsed by the official Joyent Node.js open source or commercial project
 
 
+
 [bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 [codahale]: http://codahale.com/how-to-safely-store-a-password/
-[shadowfiend]:https://github.com/Shadowfiend
 [gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
 [jtr]: http://www.openwall.com/lists/oss-security/2011/06/20/2
+
+[shadowfiend]:https://github.com/Shadowfiend
+[thegoleffect]:https://github.com/thegoleffect
+[dtrejo]:https://github.com/dtrejo
+[alfredwesterveld]:https://github.com/alfredwesterveld
+[newitfarmer]:https://github.com/newitfarmer
