@@ -154,6 +154,7 @@ Node.js™ is an official trademark of Joyent. This module is not formally relat
 
 [shadowfiend]:https://github.com/Shadowfiend
 [thegoleffect]:https://github.com/thegoleffect
+[pixelglow]:https://github.com/pixelglow
 [dtrejo]:https://github.com/dtrejo
 [alfredwesterveld]:https://github.com/alfredwesterveld
 [newitfarmer]:https://github.com/newitfarmer
