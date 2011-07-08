@@ -33,6 +33,7 @@ From Source
 ============
 
 Assuming you've already built node, you can run the waf script:  
+
     node-waf configure
     node-waf build
     npm link
@@ -41,11 +42,13 @@ Usage - Sync
 ============
 
 To hash a password:  
+
     var bcrypt = require('bcrypt');  
     var salt = bcrypt.gen_salt_sync(10);  
     var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
 
 To check a password:  
+
     var bcrypt = require('bcrypt');  
     var salt = bcrypt.gen_salt_sync(10);  
     var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
@@ -56,6 +59,7 @@ Usage - Async
 ============
 
 To hash a password:  
+
     var bcrypt = require('bcrypt');  
     bcrypt.gen_salt(10, function(err, salt) {
         bcrypt.encrypt("B4c0/\/", salt, function(err, hash) {
@@ -64,6 +68,7 @@ To hash a password:
     });
 
 To check a password:  
+
     var bcrypt = require('bcrypt');
     bcrypt.gen_salt(10, function(err, salt) {
         bcrypt.encrypt("B4c0/\/", salt, function(err, hash) {
