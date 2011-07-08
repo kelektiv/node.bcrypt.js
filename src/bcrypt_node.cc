@@ -91,10 +91,11 @@ bool ValidateSalt(char *str) {
     bool valid = true;
 
     char *new_str = strdup(str);
-    char *result = strtok(new_str, "$");
+    char *next_tok = new_str;
+    char *result = strsep(&next_tok, "$");
 
     while (result != NULL) {
-        if (count == 0) {
+        if (count == 1) {
             //check version
             if (!isdigit(result[0])) {
                 return false;
@@ -102,7 +103,7 @@ bool ValidateSalt(char *str) {
             if (strlen(result) == 2 && !isalpha(result[1])) {
                 return false;
             }
-        } else if (count == 1) {
+        } else if (count == 2) {
             //check rounds
             if (!(isdigit(result[0]) && isdigit(result[1]))) {
                 return false;
@@ -110,13 +111,13 @@ bool ValidateSalt(char *str) {
         }
 
         count++;
-        result = strtok(NULL, "$");
+        result = strsep(&next_tok, "$");
     }
 
     free(new_str);
     free(result);
 
-    return (count == 3);
+    return (count == 4);
 }
 
 /* SALT GENERATION */
