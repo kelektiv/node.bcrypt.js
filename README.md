@@ -127,12 +127,12 @@ The code for this comes from a few sources:
 Contributors
 ============
 
-[Antonio Salazar Cardozo][shadowfiend] - Early MacOS X support (when we used libbsd)
-[Ben Glow][pixelglow] - Fixes for thread safety with async calls
-[Van Nguyen][thegoleffect] - Found a timing attack in the comparator
-[NewITFarmer][newitfarmer] - Initial Cygwin support
-[David Trejo][dtrejo] - packaging fixes
-[Alfred Westerveld][alfredwesterveld] - packaging fixes
+* [Antonio Salazar Cardozo][shadowfiend] - Early MacOS X support (when we used libbsd)
+* [Ben Glow][pixelglow] - Fixes for thread safety with async calls
+* [Van Nguyen][thegoleffect] - Found a timing attack in the comparator
+* [NewITFarmer][newitfarmer] - Initial Cygwin support
+* [David Trejo][dtrejo] - packaging fixes
+* [Alfred Westerveld][alfredwesterveld] - packaging fixes
 
 License
 ============
