@@ -116,6 +116,7 @@ Testing
 ============
 
 I am using nodeunit. I like the way you write tests with it and I like the default output. As such you'll need it to run the tests. I suspect my tests would run on an older version, but these were written and worked against 0.5.1
+
    npm install nodeunit@0.5.1
    nodeunit test/
 
