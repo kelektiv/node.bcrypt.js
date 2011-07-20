@@ -1,4 +1,5 @@
 #include "node_blf.h"
+#include <pthread.h>
 
 class BCrypt : public node::ObjectWrap {
     static int EIO_GenSalt(eio_req *req);

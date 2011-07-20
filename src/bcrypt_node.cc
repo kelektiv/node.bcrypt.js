@@ -43,6 +43,13 @@
 using namespace v8;
 using namespace node;
 
+//mutex locks for each place we'd need em. don't want 1 lock to rule them all or all operations will hang
+pthread_mutex_t gensalt_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t setup_encrypt_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t encrypt_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t setup_compare_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t compare_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void BCrypt::Initialize (Handle<Object> target) {
     HandleScope scope;
 
@@ -90,7 +97,9 @@ bool ValidateSalt(char *str) {
     int count = 0;
     bool valid = true;
 
-    char *new_str = strdup(str);
+    int str_len = strlen(str);
+    char *new_str = (char *)malloc(str_len * sizeof(str));
+    memcpy(new_str, str, str_len * sizeof(str));
     char *next_tok = new_str;
     char *result = strsep(&next_tok, "$");
 
@@ -129,16 +138,21 @@ int BCrypt::EIO_GenSalt(eio_req *req) {
         u_int8_t *_seed = (u_int8_t *)malloc(s_req->rand_len * sizeof(u_int8_t));
         switch(GetSeed(_seed, s_req->rand_len)) {
             case -1:
-                s_req->error = strdup("Rand operation not supported.");
+                s_req->error = "Rand operation not supported.";
             case 0:
-                s_req->error = strdup("Rand operation did not generate a cryptographically sound seed.");
+                s_req->error = "Rand operation did not generate a cryptographically sound seed.";
         }
+        pthread_mutex_lock(&gensalt_mutex);
         char* salt = bcrypt_gensalt(s_req->rounds, _seed);
         s_req->salt_len = strlen(salt);
         s_req->salt = strdup(salt);
+        pthread_mutex_unlock(&gensalt_mutex);
+
         free(_seed);
     } catch (const char *err) {
-        s_req->error = strdup(err);
+        int err_len = strlen(err);
+        s_req->error = (char *)malloc(err_len * sizeof(err));
+        memcpy(s_req->error, err, err_len * sizeof(err));
     }
 
     return 0;
@@ -271,9 +285,11 @@ int BCrypt::EIO_Encrypt(eio_req *req) {
     }
 
     try {
+      pthread_mutex_lock(&encrypt_mutex);
       char* bcrypted = bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt);
       encrypt_req->output_len = strlen(bcrypted);
       encrypt_req->output = strdup(bcrypted);
+      pthread_mutex_unlock(&encrypt_mutex);
     } catch (const char *err) {
       encrypt_req->error = strdup(err);
     }
@@ -331,6 +347,7 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
     String::Utf8Value salt(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
+    pthread_mutex_lock(&setup_encrypt_mutex);
     encrypt_request *encrypt_req = (encrypt_request *)malloc(sizeof(*encrypt_req));
     if (!encrypt_req)
         return ThrowException(Exception::Error(String::New("malloc in BCrypt::Encrypt failed.")));
@@ -339,6 +356,7 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
     encrypt_req->bcrypt_obj = bcrypt_obj;
     encrypt_req->input = strdup(*data);
     encrypt_req->salt = strdup(*salt);
+    pthread_mutex_unlock(&setup_encrypt_mutex);
     encrypt_req->output = NULL;
     encrypt_req->error = NULL;
 
@@ -398,7 +416,9 @@ int BCrypt::EIO_Compare(eio_req *req) {
     BCrypt *bcrypt_obj = (BCrypt *)compare_req->bcrypt_obj;
 
     try {
+        pthread_mutex_lock(&compare_mutex);
         compare_req->result = CompareStrings(bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted), (char *)compare_req->encrypted);
+        pthread_mutex_unlock(&compare_mutex);
     } catch (const char *err) {
         compare_req->error = strdup(err);
     }
@@ -458,11 +478,12 @@ Handle<Value> BCrypt::Compare(const Arguments& args) {
     compare_request *compare_req = (compare_request *)malloc(sizeof(*compare_req));
     if (!compare_req)
         return ThrowException(Exception::Error(String::New("malloc in BCrypt::Compare failed.")));
-
     compare_req->callback = Persistent<Function>::New(callback);
     compare_req->bcrypt_obj = bcrypt_obj;
+    pthread_mutex_lock(&setup_compare_mutex);
     compare_req->input = strdup(*input);
     compare_req->encrypted = strdup(*encrypted);
+    pthread_mutex_unlock(&setup_compare_mutex);
     compare_req->error = NULL;
 
     eio_custom(EIO_Compare, EIO_PRI_DEFAULT, EIO_CompareAfter, compare_req);
