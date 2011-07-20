@@ -8,13 +8,10 @@ module.exports = testCase({
     assert.expect(EXPECTED);
     var n = 0;
     for (var i = 0; i < EXPECTED; i++) {
-      var start = new Date().getTime();
-      (function(start) {
-        bcrypt.gen_salt(10, function(err, salt) {
-          assert.equals(29, salt.length, "Salt ("+salt+") isn't the correct length. It is: " + salt.length);
-          n++;
-        });
-      })(start);
+      bcrypt.gen_salt(10, function(err, salt) {
+        assert.equals(29, salt.length, "Salt ("+salt+") isn't the correct length. It is: " + salt.length);
+        n++;
+      });
     }
 
     function checkVal() {
