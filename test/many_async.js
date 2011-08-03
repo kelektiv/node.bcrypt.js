@@ -62,5 +62,58 @@ module.exports = testCase({
       }
     }
     setTimeout(checkVal, 100);
+  },
+  test_encrypt_and_compare: function(assert) {
+    assert.expect((EXPECTED-1)*3);
+    var salt = bcrypt.gen_salt_sync(4),
+        idx = 0,
+        good_done = false,
+        bad_done = false;
+
+    function next() {
+      return test('secret' + Math.random());
+    }
+
+    function test(password) {
+      idx += 1;
+      return bcrypt.encrypt(password, salt, function(err, hash) {
+        if (err) throw err;
+        //console.log('\nbcrypt iter ' + idx);
+
+        assert.ok(hash);
+
+        bcrypt.compare(password, hash, function(err, res) {
+          //if (err) throw err;
+          assert.ok(res);
+          if (idx >= (EXPECTED-1)) {
+            good_done = true;
+          }
+        });
+
+        bcrypt.compare('bad' + password, hash, function(err, res) {
+          //if (err) throw err;
+          assert.ok(!res);
+          if (idx >= (EXPECTED-1)) {
+            bad_done = true;
+          }
+        });
+
+        if (idx < ((EXPECTED)-1)) {
+          next();
+        } else {
+          function checkDone() {
+            if (idx >= (EXPECTED-1) && good_done && bad_done) {
+              assert.done();
+            } else {
+              setTimeout(checkDone, 100);
+            }
+          }
+
+          setTimeout(checkDone, 100);
+        }
+      });
+    }
+
+    next();
   }
 });

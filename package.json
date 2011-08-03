@@ -21,7 +21,7 @@
      "install": "node-waf configure build",
      "test": "node-waf configure build; nodeunit test/"
    },
-   "dependencies": {
+   "devDependencies": {
      "nodeunit": ">=0.5.1"
    },
    "contributors": [
@@ -30,6 +30,7 @@
      "David Trejo <david@dtrejo.com> (https://github.com/dtrejo)",
      "Ben Glow <glen.low@pixelglow.com> (https://github.com/pixelglow)",
      "NewITFarmer.com <> (https://github.com/newitfarmer)",
-     "Alfred Westerveld <alfredwesterveld@gmail.com> (https://github.com/alfredwesterveld)"
+     "Alfred Westerveld <alfredwesterveld@gmail.com> (https://github.com/alfredwesterveld)",
+     "vincentcr <> (https://github.com/vincentcr)"
    ]
 }

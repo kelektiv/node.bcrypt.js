@@ -285,9 +285,9 @@ int BCrypt::EIO_Encrypt(eio_req *req) {
     }
 
     try {
-      pthread_mutex_lock(&encrypt_mutex);
       char* bcrypted = bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt);
       encrypt_req->output_len = strlen(bcrypted);
+      pthread_mutex_lock(&encrypt_mutex);
       encrypt_req->output = strdup(bcrypted);
       pthread_mutex_unlock(&encrypt_mutex);
     } catch (const char *err) {
@@ -401,11 +401,12 @@ bool CompareStrings(char* s1, char* s2) {
     if (s1_len != s2_len) {
         eq = false;
     }
+    int max_len = (s2_len < s1_len)?s1_len:s2_len; 
 
-    for (int i = 0; i < s1_len; i++) {
-        if (s1[i] != s2[i]) {
-            eq = false;
-        }
+    for (int i = 0; i < max_len; i++) {
+      if (s1_len >= i && s2_len >= i && s1[i] != s2[i]) {
+        eq = false;
+      }
     }
 
     return eq;
@@ -416,9 +417,7 @@ int BCrypt::EIO_Compare(eio_req *req) {
     BCrypt *bcrypt_obj = (BCrypt *)compare_req->bcrypt_obj;
 
     try {
-        pthread_mutex_lock(&compare_mutex);
         compare_req->result = CompareStrings(bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted), (char *)compare_req->encrypted);
-        pthread_mutex_unlock(&compare_mutex);
     } catch (const char *err) {
         compare_req->error = strdup(err);
     }
@@ -437,10 +436,13 @@ int BCrypt::EIO_CompareAfter(eio_req *req) {
     if (compare_req->error) {
         argv[0] = Exception::Error(String::New(compare_req->error));
         argv[1] = Undefined();
-    }
-    else {
+    } else {
         argv[0] = Undefined();
-        argv[1] = Boolean::New(compare_req->result);
+        if (compare_req->result) {
+          argv[1] = Boolean::New(true);
+        } else {
+          argv[1] = Boolean::New(false);
+        }
     }
 
     TryCatch try_catch; // don't quite see the necessity of this
@@ -471,6 +473,7 @@ Handle<Value> BCrypt::Compare(const Arguments& args) {
         return ThrowException(Exception::Error(String::New("Input and data to compare against must be strings and the callback must be a function.")));
     }
 
+    pthread_mutex_lock(&setup_compare_mutex);
     String::Utf8Value input(args[0]->ToString());
     String::Utf8Value encrypted(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
@@ -480,7 +483,6 @@ Handle<Value> BCrypt::Compare(const Arguments& args) {
         return ThrowException(Exception::Error(String::New("malloc in BCrypt::Compare failed.")));
     compare_req->callback = Persistent<Function>::New(callback);
     compare_req->bcrypt_obj = bcrypt_obj;
-    pthread_mutex_lock(&setup_compare_mutex);
     compare_req->input = strdup(*input);
     compare_req->encrypted = strdup(*encrypted);
     pthread_mutex_unlock(&setup_compare_mutex);

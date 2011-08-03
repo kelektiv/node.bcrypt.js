@@ -50,6 +50,7 @@
 #include <sys/types.h>
 #include <string.h>
 #include <pwd.h>
+#include <pthread.h>
 
 #include "node_blf.h"
 
@@ -66,6 +67,8 @@
 #define BCRYPT_MAXSALT 16	/* Precomputation is just so nice */
 #define BCRYPT_BLOCKS 6		/* Ciphertext blocks */
 #define BCRYPT_MINROUNDS 16	/* we have log2(rounds) in salt */
+
+pthread_mutex_t bcrypt_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /*char *bcrypt(const char *, const char *);
 void encode_salt(char *, u_int8_t *, u_int16_t, u_int8_t);
@@ -227,6 +230,8 @@ bcrypt(const char *key, const char *salt)
 	salt_len = BCRYPT_MAXSALT;
 	key_len = strlen(key) + (minor >= 'a' ? 1 : 0);
 
+  pthread_mutex_lock(&bcrypt_mutex);
+
 	/* Setting up S-Boxes and Subkeys */
 	Blowfish_initstate(&state);
 	Blowfish_expandstate(&state, csalt, salt_len,
@@ -244,6 +249,8 @@ bcrypt(const char *key, const char *salt)
 	/* Now do the encryption */
 	for (k = 0; k < 64; k++)
 		blf_enc(&state, cdata, BCRYPT_BLOCKS / 2);
+
+  pthread_mutex_unlock(&bcrypt_mutex);
 
 	for (i = 0; i < BCRYPT_BLOCKS; i++) {
 		ciphertext[4 * i + 3] = cdata[i] & 0xff;
