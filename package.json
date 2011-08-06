@@ -21,13 +21,16 @@
      "install": "node-waf configure build",
      "test": "node-waf configure build; nodeunit test/"
    },
-   "dependencies": {
+   "devDependencies": {
      "nodeunit": ">=0.5.1"
    },
    "contributors": [
      "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
      "Van Nguyen <the.gol.effect@gmail.com> (https://github.com/thegoleffect)",
      "David Trejo <david@dtrejo.com> (https://github.com/dtrejo)",
-     "Alfred Westerveld <alfredwesterveld@gmail.com> (https://github.com/alfredwesterveld)"
+     "Ben Glow <glen.low@pixelglow.com> (https://github.com/pixelglow)",
+     "NewITFarmer.com <> (https://github.com/newitfarmer)",
+     "Alfred Westerveld <alfredwesterveld@gmail.com> (https://github.com/alfredwesterveld)",
+     "Vincent Côté-Roy <vincentcr@gmail.com> (https://github.com/vincentcr)"
    ]
 }
