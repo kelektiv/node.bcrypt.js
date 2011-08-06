@@ -43,12 +43,6 @@
 using namespace v8;
 using namespace node;
 
-//mutex locks for each place we'd need em. don't want 1 lock to rule them all or all operations will hang
-pthread_mutex_t gensalt_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t setup_encrypt_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t encrypt_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t setup_compare_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t compare_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void BCrypt::Initialize (Handle<Object> target) {
     HandleScope scope;
@@ -134,6 +128,7 @@ int BCrypt::EIO_GenSalt(eio_req *req) {
     salt_request *s_req = (salt_request *)req->data;
     BCrypt *bcrypt_obj = (BCrypt *)s_req->bcrypt_obj;
 
+    char *salt = (char *)malloc(_SALT_LEN);
     try {
         u_int8_t *_seed = (u_int8_t *)malloc(s_req->rand_len * sizeof(u_int8_t));
         switch(GetSeed(_seed, s_req->rand_len)) {
@@ -142,17 +137,16 @@ int BCrypt::EIO_GenSalt(eio_req *req) {
             case 0:
                 s_req->error = "Rand operation did not generate a cryptographically sound seed.";
         }
-        pthread_mutex_lock(&gensalt_mutex);
-        char* salt = bcrypt_gensalt(s_req->rounds, _seed);
+        bcrypt_gensalt(s_req->rounds, _seed, salt);
         s_req->salt_len = strlen(salt);
-        s_req->salt = strdup(salt);
-        pthread_mutex_unlock(&gensalt_mutex);
+        s_req->salt = salt;
 
         free(_seed);
     } catch (const char *err) {
         int err_len = strlen(err);
         s_req->error = (char *)malloc(err_len * sizeof(err));
         memcpy(s_req->error, err, err_len * sizeof(err));
+        free(salt);
     }
 
     return 0;
@@ -266,7 +260,8 @@ Handle<Value> BCrypt::GenerateSaltSync(const Arguments& args) {
         case 0:
             return ThrowException(Exception::Error(String::New("Rand operation did not generate a cryptographically sound seed.")));
     }
-    char* salt = bcrypt_gensalt(rounds, _seed);
+    char salt[_SALT_LEN];
+    bcrypt_gensalt(rounds, _seed, salt);
     int salt_len = strlen(salt);
     free(_seed);
     Local<Value> outString = Encode(salt, salt_len, BINARY);
@@ -284,14 +279,14 @@ int BCrypt::EIO_Encrypt(eio_req *req) {
         return 0;
     }
 
+    char* bcrypted = (char *)malloc(_PASSWORD_LEN);
     try {
-      char* bcrypted = bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt);
+      bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt, bcrypted);
       encrypt_req->output_len = strlen(bcrypted);
-      pthread_mutex_lock(&encrypt_mutex);
-      encrypt_req->output = strdup(bcrypted);
-      pthread_mutex_unlock(&encrypt_mutex);
+      encrypt_req->output = bcrypted;
     } catch (const char *err) {
       encrypt_req->error = strdup(err);
+      free(bcrypted);
     }
 
     return 0;
@@ -347,7 +342,6 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
     String::Utf8Value salt(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
-    pthread_mutex_lock(&setup_encrypt_mutex);
     encrypt_request *encrypt_req = (encrypt_request *)malloc(sizeof(*encrypt_req));
     if (!encrypt_req)
         return ThrowException(Exception::Error(String::New("malloc in BCrypt::Encrypt failed.")));
@@ -356,7 +350,6 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
     encrypt_req->bcrypt_obj = bcrypt_obj;
     encrypt_req->input = strdup(*data);
     encrypt_req->salt = strdup(*salt);
-    pthread_mutex_unlock(&setup_encrypt_mutex);
     encrypt_req->output = NULL;
     encrypt_req->error = NULL;
 
@@ -385,7 +378,8 @@ Handle<Value> BCrypt::EncryptSync(const Arguments& args) {
         return ThrowException(Exception::Error(String::New("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue")));
     }
 
-    char* bcrypted = bcrypt(*data, *salt);
+    char bcrypted[_PASSWORD_LEN];
+    bcrypt(*data, *salt, bcrypted);
     int bcrypted_len = strlen(bcrypted);
     Local<Value> outString = Encode(bcrypted, bcrypted_len, BINARY);
 
@@ -417,7 +411,9 @@ int BCrypt::EIO_Compare(eio_req *req) {
     BCrypt *bcrypt_obj = (BCrypt *)compare_req->bcrypt_obj;
 
     try {
-        compare_req->result = CompareStrings(bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted), (char *)compare_req->encrypted);
+        char bcrypted[_PASSWORD_LEN];
+        bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted, bcrypted);
+        compare_req->result = CompareStrings(bcrypted, (char *)compare_req->encrypted);
     } catch (const char *err) {
         compare_req->error = strdup(err);
     }
@@ -473,7 +469,6 @@ Handle<Value> BCrypt::Compare(const Arguments& args) {
         return ThrowException(Exception::Error(String::New("Input and data to compare against must be strings and the callback must be a function.")));
     }
 
-    pthread_mutex_lock(&setup_compare_mutex);
     String::Utf8Value input(args[0]->ToString());
     String::Utf8Value encrypted(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
@@ -485,7 +480,6 @@ Handle<Value> BCrypt::Compare(const Arguments& args) {
     compare_req->bcrypt_obj = bcrypt_obj;
     compare_req->input = strdup(*input);
     compare_req->encrypted = strdup(*encrypted);
-    pthread_mutex_unlock(&setup_compare_mutex);
     compare_req->error = NULL;
 
     eio_custom(EIO_Compare, EIO_PRI_DEFAULT, EIO_CompareAfter, compare_req);
@@ -509,7 +503,9 @@ Handle<Value> BCrypt::CompareSync(const Arguments& args) {
     String::Utf8Value pw(args[0]->ToString());
     String::Utf8Value hash(args[1]->ToString());
 
-    return Boolean::New(CompareStrings(bcrypt(*pw, *hash), *hash));
+    char bcrypted[_PASSWORD_LEN];
+    bcrypt(*pw, *hash, bcrypted);
+    return Boolean::New(CompareStrings(bcrypted, *hash));
 }
 
 extern "C" void init(Handle<Object> target) {
