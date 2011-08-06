@@ -68,8 +68,6 @@
 #define BCRYPT_BLOCKS 6		/* Ciphertext blocks */
 #define BCRYPT_MINROUNDS 16	/* we have log2(rounds) in salt */
 
-pthread_mutex_t bcrypt_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 /*char *bcrypt(const char *, const char *);
 void encode_salt(char *, u_int8_t *, u_int16_t, u_int8_t);
 char * bcrypt_gensalt(u_int8_t log_rounds);*/
@@ -77,9 +75,7 @@ char * bcrypt_gensalt(u_int8_t log_rounds);*/
 static void encode_base64(u_int8_t *, u_int8_t *, u_int16_t);
 static void decode_base64(u_int8_t *, u_int16_t, u_int8_t *);
 
-static char    encrypted[_PASSWORD_LEN];
-static char    error[] = ":";
-static char    gsalt[BCRYPT_MAXSALT * 4 / 3 + 1];
+const static char* error = ":";
 
 const static u_int8_t Base64Code[] =
 "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -155,8 +151,8 @@ encode_salt(char *salt, u_int8_t *csalt, u_int16_t clen, u_int8_t logr)
    seems sensible.
    from: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 */
-char *
-bcrypt_gensalt(u_int8_t log_rounds, u_int8_t *seed)
+void
+bcrypt_gensalt(u_int8_t log_rounds, u_int8_t *seed, char *gsalt)
 {
     if (log_rounds < 4)
         log_rounds = 4;
@@ -164,14 +160,13 @@ bcrypt_gensalt(u_int8_t log_rounds, u_int8_t *seed)
         log_rounds = 31;
 
     encode_salt(gsalt, seed, BCRYPT_MAXSALT, log_rounds);
-    return gsalt;
 }
 
 /* We handle $Vers$log2(NumRounds)$salt+passwd$
    i.e. $2$04$iwouldntknowwhattosayetKdJ6iFtacBqJdKe6aW7ou */
 
-char   *
-bcrypt(const char *key, const char *salt)
+void
+bcrypt(const char *key, const char *salt, char *encrypted)
 {
 	blf_ctx state;
 	u_int32_t rounds, i, k;
@@ -187,7 +182,8 @@ bcrypt(const char *key, const char *salt)
 
 	if (*salt > BCRYPT_VERSION) {
 		/* How do I handle errors ? Return ':' */
-		return error;
+		strcpy(encrypted, error);
+		return;
 	}
 
 	/* Check for minor versions */
@@ -199,7 +195,8 @@ bcrypt(const char *key, const char *salt)
 			 salt++;
 			 break;
 		 default:
-			 return error;
+			 strcpy(encrypted, error);
+			 return;
 		 }
 	} else
 		 minor = 0;
@@ -207,30 +204,37 @@ bcrypt(const char *key, const char *salt)
 	/* Discard version + "$" identifier */
 	salt += 2;
 
-	if (salt[2] != '$')
+	if (salt[2] != '$') {
 		/* Out of sync with passwd entry */
-		return error;
-
+		strcpy(encrypted, error);
+		return;
+	}
+	
 	/* Computer power doesn't increase linear, 2^x should be fine */
 	n = atoi(salt);
-	if (n > 31 || n < 0)
-		return error;
+	if (n > 31 || n < 0) {
+		strcpy(encrypted, error);
+		return;
+	}
 	logr = (u_int8_t)n;
-	if ((rounds = (u_int32_t) 1 << logr) < BCRYPT_MINROUNDS)
-		return error;
+	if ((rounds = (u_int32_t) 1 << logr) < BCRYPT_MINROUNDS) {
+		strcpy(encrypted, error);
+		return;
+	}
 
 	/* Discard num rounds + "$" identifier */
 	salt += 3;
 
-	if (strlen(salt) * 3 / 4 < BCRYPT_MAXSALT)
-		return error;
+	if (strlen(salt) * 3 / 4 < BCRYPT_MAXSALT) {
+		strcpy(encrypted, error);
+		return;
+	}
 
 	/* We dont want the base64 salt but the raw data */
 	decode_base64(csalt, BCRYPT_MAXSALT, (u_int8_t *) salt);
 	salt_len = BCRYPT_MAXSALT;
 	key_len = strlen(key) + (minor >= 'a' ? 1 : 0);
 
-  pthread_mutex_lock(&bcrypt_mutex);
 
 	/* Setting up S-Boxes and Subkeys */
 	Blowfish_initstate(&state);
@@ -241,7 +245,7 @@ bcrypt(const char *key, const char *salt)
 		Blowfish_expand0state(&state, csalt, salt_len);
 	}
 
-	/* This can be precomputed later */
+ 	/* This can be precomputed later */
 	j = 0;
 	for (i = 0; i < BCRYPT_BLOCKS; i++)
 		cdata[i] = Blowfish_stream2word(ciphertext, 4 * BCRYPT_BLOCKS, &j);
@@ -249,8 +253,6 @@ bcrypt(const char *key, const char *salt)
 	/* Now do the encryption */
 	for (k = 0; k < 64; k++)
 		blf_enc(&state, cdata, BCRYPT_BLOCKS / 2);
-
-  pthread_mutex_unlock(&bcrypt_mutex);
 
 	for (i = 0; i < BCRYPT_BLOCKS; i++) {
 		ciphertext[4 * i + 3] = cdata[i] & 0xff;
@@ -261,7 +263,6 @@ bcrypt(const char *key, const char *salt)
 		cdata[i] = cdata[i] >> 8;
 		ciphertext[4 * i + 0] = cdata[i] & 0xff;
 	}
-
 
 	i = 0;
 	encrypted[i++] = '$';
@@ -279,7 +280,6 @@ bcrypt(const char *key, const char *salt)
 	memset(ciphertext, 0, sizeof(ciphertext));
 	memset(csalt, 0, sizeof(csalt));
 	memset(cdata, 0, sizeof(cdata));
-	return encrypted;
 }
 
 static void
