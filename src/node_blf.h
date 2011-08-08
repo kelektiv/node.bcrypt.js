@@ -54,6 +54,7 @@
 #define BLF_MAXUTILIZED ((BLF_N+2)*4)	/* 576 bits */
 
 #define _PASSWORD_LEN   128             /* max length, not counting NUL */
+#define _SALT_LEN       32              /* max length */
 
 /* Blowfish context */
 typedef struct BlowfishContext {
@@ -90,8 +91,8 @@ void blf_cbc_decrypt(blf_ctx *, u_int8_t *, u_int8_t *, u_int32_t);
 u_int32_t Blowfish_stream2word(const u_int8_t *, u_int16_t , u_int16_t *);
 
 /* bcrypt functions*/
-char * bcrypt_gensalt(u_int8_t, u_int8_t*);
-char *bcrypt(const char *, const char *);
+void bcrypt_gensalt(u_int8_t, u_int8_t*, char *);
+void bcrypt(const char *, const char *, char *);
 void encode_salt(char *, u_int8_t *, u_int16_t, u_int8_t);
 
 #endif
