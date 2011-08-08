@@ -139,7 +139,7 @@ Contributors
 * [NewITFarmer][newitfarmer] - Initial Cygwin support
 * [David Trejo][dtrejo] - packaging fixes
 * [Alfred Westerveld][alfredwesterveld] - packaging fixes
-* [Vincent Côté-Roy][vincentcr] - Testing around concurrency issues
+* [Vincent Côté-Roy][vincentr] - Testing around concurrency issues
 
 License
 ============

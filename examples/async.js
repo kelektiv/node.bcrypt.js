@@ -1,4 +1,4 @@
-var bcrypt = require('./bcrypt');
+var bcrypt = require('../bcrypt');
 
 var start = Date.now();
 bcrypt.gen_salt(10, function(err, salt) {
