@@ -141,6 +141,7 @@ Contributors
 * [David Trejo][dtrejo] - packaging fixes
 * [Alfred Westerveld][alfredwesterveld] - packaging fixes
 * [Vincent Côté-Roy][vincentr] - Testing around concurrency issues
+* [Lloyd Hilaiel][lloyd] - Documentation fixes
 
 License
 ============
@@ -168,3 +169,4 @@ Node.js™ is an official trademark of Joyent. This module is not formally relat
 [newitfarmer]:https://github.com/newitfarmer
 [zooko]:https://twitter.com/zooko
 [vincentr]:https://twitter.com/vincentcr
+[lloyd]:https://github.com/lloyd
