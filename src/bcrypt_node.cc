@@ -29,7 +29,6 @@
  */
 
 #include <node.h>
-#include <node_events.h>
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
