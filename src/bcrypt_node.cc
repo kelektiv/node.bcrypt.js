@@ -37,37 +37,36 @@
 #include <openssl/rand.h>
 
 #include "node_blf.h"
-#include "bcrypt_node.h"
 
 using namespace v8;
 using namespace node;
 
+namespace {
 
-void BCrypt::Initialize (Handle<Object> target) {
-    HandleScope scope;
+struct base_request {
+    v8::Persistent<v8::Function> callback;
+    char *error;
+};
 
-    Local<FunctionTemplate> t = FunctionTemplate::New(New);
+struct salt_request : base_request {
+    char *salt;
+    int salt_len;
+    int rand_len;
+    ssize_t rounds;
+};
 
-    t->InstanceTemplate()->SetInternalFieldCount(1);
+struct encrypt_request : base_request {
+    char *salt;
+    char *input;
+    char *output;
+    int output_len;
+};
 
-    NODE_SET_PROTOTYPE_METHOD(t, "gen_salt_sync", BCrypt::GenerateSaltSync);
-    NODE_SET_PROTOTYPE_METHOD(t, "encrypt_sync", BCrypt::EncryptSync);
-    NODE_SET_PROTOTYPE_METHOD(t, "compare_sync", BCrypt::CompareSync);
-    NODE_SET_PROTOTYPE_METHOD(t, "gen_salt", BCrypt::GenerateSalt);
-    NODE_SET_PROTOTYPE_METHOD(t, "encrypt", BCrypt::Encrypt);
-    NODE_SET_PROTOTYPE_METHOD(t, "compare", BCrypt::Compare);
-
-    target->Set(String::NewSymbol("BCrypt"), t->GetFunction());
-}
-
-Handle<Value> BCrypt::New(const Arguments& args) {
-    HandleScope scope;
-
-    BCrypt *bcrypt = new BCrypt();
-    bcrypt->Wrap(args.This());
-
-    return args.This();
-}
+struct compare_request : base_request {
+    char *input;
+    char *encrypted;
+    bool result;
+};
 
 int GetSeed(u_int8_t *seed, int size) {
     switch (RAND_bytes((unsigned char *)seed, size)) {
@@ -123,9 +122,8 @@ bool ValidateSalt(char *str) {
 }
 
 /* SALT GENERATION */
-int BCrypt::EIO_GenSalt(eio_req *req) {
+int EIO_GenSalt(eio_req *req) {
     salt_request *s_req = (salt_request *)req->data;
-    BCrypt *bcrypt_obj = (BCrypt *)s_req->bcrypt_obj;
 
     char *salt = (char *)malloc(_SALT_LEN);
     try {
@@ -151,7 +149,7 @@ int BCrypt::EIO_GenSalt(eio_req *req) {
     return 0;
 }
 
-int BCrypt::EIO_GenSaltAfter(eio_req *req) {
+int EIO_GenSaltAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
@@ -179,14 +177,12 @@ int BCrypt::EIO_GenSaltAfter(eio_req *req) {
     free(s_req->salt);
     free(s_req->error);
 
-    ((BCrypt *)s_req->bcrypt_obj)->Unref();
     free(s_req);
 
     return 0;
 }
 
-Handle<Value> BCrypt::GenerateSalt(const Arguments &args) {
-    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+Handle<Value> GenerateSalt(const Arguments &args) {
     HandleScope scope;
 
     Local<Function> callback;
@@ -220,10 +216,9 @@ Handle<Value> BCrypt::GenerateSalt(const Arguments &args) {
 
     salt_request *s_req = (salt_request *)malloc(sizeof(*s_req));
     if (!s_req)
-        return ThrowException(Exception::Error(String::New("malloc in BCrypt::GenerateSalt failed.")));
+        return ThrowException(Exception::Error(String::New("malloc in GenerateSalt failed.")));
 
     s_req->callback = Persistent<Function>::New(callback);
-    s_req->bcrypt_obj = bcrypt_obj;
     s_req->rand_len = rand_len;
     s_req->rounds = rounds;
     s_req->error = NULL;
@@ -231,13 +226,11 @@ Handle<Value> BCrypt::GenerateSalt(const Arguments &args) {
     eio_custom(EIO_GenSalt, EIO_PRI_DEFAULT, EIO_GenSaltAfter, s_req);
 
     ev_ref(EV_DEFAULT_UC);
-    bcrypt_obj->Ref();
 
     return Undefined();
 }
 
-Handle<Value> BCrypt::GenerateSaltSync(const Arguments& args) {
-    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+Handle<Value> GenerateSaltSync(const Arguments& args) {
     HandleScope scope;
 
     int size = 20;
@@ -269,9 +262,8 @@ Handle<Value> BCrypt::GenerateSaltSync(const Arguments& args) {
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
-int BCrypt::EIO_Encrypt(eio_req *req) {
+int EIO_Encrypt(eio_req *req) {
     encrypt_request *encrypt_req = (encrypt_request *)req->data;
-    BCrypt *bcrypt_obj = (BCrypt *)encrypt_req->bcrypt_obj;
 
     if (!(ValidateSalt(encrypt_req->salt))) {
         encrypt_req->error = strdup("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
@@ -291,7 +283,7 @@ int BCrypt::EIO_Encrypt(eio_req *req) {
     return 0;
 }
 
-int BCrypt::EIO_EncryptAfter(eio_req *req) {
+int EIO_EncryptAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
@@ -321,14 +313,12 @@ int BCrypt::EIO_EncryptAfter(eio_req *req) {
     free(encrypt_req->output);
     free(encrypt_req->error);
 
-    ((BCrypt *)encrypt_req->bcrypt_obj)->Unref();
     free(encrypt_req);
 
     return 0;
 }
 
-Handle<Value> BCrypt::Encrypt(const Arguments& args) {
-    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+Handle<Value> Encrypt(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 3) {
@@ -343,10 +333,9 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
 
     encrypt_request *encrypt_req = (encrypt_request *)malloc(sizeof(*encrypt_req));
     if (!encrypt_req)
-        return ThrowException(Exception::Error(String::New("malloc in BCrypt::Encrypt failed.")));
+        return ThrowException(Exception::Error(String::New("malloc in Encrypt failed.")));
 
     encrypt_req->callback = Persistent<Function>::New(callback);
-    encrypt_req->bcrypt_obj = bcrypt_obj;
     encrypt_req->input = strdup(*data);
     encrypt_req->salt = strdup(*salt);
     encrypt_req->output = NULL;
@@ -355,13 +344,11 @@ Handle<Value> BCrypt::Encrypt(const Arguments& args) {
     eio_custom(EIO_Encrypt, EIO_PRI_DEFAULT, EIO_EncryptAfter, encrypt_req);
 
     ev_ref(EV_DEFAULT_UC);
-    bcrypt_obj->Ref();
 
     return Undefined();
 }
 
-Handle<Value> BCrypt::EncryptSync(const Arguments& args) {
-    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+Handle<Value> EncryptSync(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 2) {
@@ -405,9 +392,8 @@ bool CompareStrings(char* s1, char* s2) {
     return eq;
 }
 
-int BCrypt::EIO_Compare(eio_req *req) {
+int EIO_Compare(eio_req *req) {
     compare_request *compare_req = (compare_request *)req->data;
-    BCrypt *bcrypt_obj = (BCrypt *)compare_req->bcrypt_obj;
 
     try {
         char bcrypted[_PASSWORD_LEN];
@@ -420,7 +406,7 @@ int BCrypt::EIO_Compare(eio_req *req) {
     return 0;
 }
 
-int BCrypt::EIO_CompareAfter(eio_req *req) {
+int EIO_CompareAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
@@ -451,15 +437,12 @@ int BCrypt::EIO_CompareAfter(eio_req *req) {
     free(compare_req->encrypted);
     free(compare_req->input);
     free(compare_req->error);
-
-    ((BCrypt *)compare_req->bcrypt_obj)->Unref();
     free(compare_req);
 
     return 0;
 }
 
-Handle<Value> BCrypt::Compare(const Arguments& args) {
-    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+Handle<Value> Compare(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 3) {
@@ -474,9 +457,8 @@ Handle<Value> BCrypt::Compare(const Arguments& args) {
 
     compare_request *compare_req = (compare_request *)malloc(sizeof(*compare_req));
     if (!compare_req)
-        return ThrowException(Exception::Error(String::New("malloc in BCrypt::Compare failed.")));
+        return ThrowException(Exception::Error(String::New("malloc in Compare failed.")));
     compare_req->callback = Persistent<Function>::New(callback);
-    compare_req->bcrypt_obj = bcrypt_obj;
     compare_req->input = strdup(*input);
     compare_req->encrypted = strdup(*encrypted);
     compare_req->error = NULL;
@@ -484,13 +466,11 @@ Handle<Value> BCrypt::Compare(const Arguments& args) {
     eio_custom(EIO_Compare, EIO_PRI_DEFAULT, EIO_CompareAfter, compare_req);
 
     ev_ref(EV_DEFAULT_UC);
-    bcrypt_obj->Ref();
 
     return Undefined();
 }
 
-Handle<Value> BCrypt::CompareSync(const Arguments& args) {
-    BCrypt *bcrypt_obj = ObjectWrap::Unwrap<BCrypt>(args.This());
+Handle<Value> CompareSync(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 2) {
@@ -507,8 +487,17 @@ Handle<Value> BCrypt::CompareSync(const Arguments& args) {
     return Boolean::New(CompareStrings(bcrypted, *hash));
 }
 
+} // anonymous namespace
+
+// bind the bcrypt module
 extern "C" void init(Handle<Object> target) {
     HandleScope scope;
 
-    BCrypt::Initialize(target);
+    NODE_SET_METHOD(target, "gen_salt_sync", GenerateSaltSync);
+    NODE_SET_METHOD(target, "encrypt_sync", EncryptSync);
+    NODE_SET_METHOD(target, "compare_sync", CompareSync);
+    NODE_SET_METHOD(target, "gen_salt", GenerateSalt);
+    NODE_SET_METHOD(target, "encrypt", Encrypt);
+    NODE_SET_METHOD(target, "compare", Compare);
 };
+
