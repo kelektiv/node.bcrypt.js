@@ -1,4 +1,4 @@
-all: build test
+all: test
 
 build: clean configure compile
 
@@ -8,7 +8,7 @@ configure:
 compile:
 	node-waf build
 
-test:
+test: build
 	node_modules/nodeunit/bin/nodeunit test/*
 
 clean:
