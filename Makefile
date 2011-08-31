@@ -9,7 +9,7 @@ compile:
 	node-waf build
 
 test:
-	nodeunit test/*
+	node_modules/nodeunit/bin/nodeunit test/*
 
 clean:
 	node-waf clean
