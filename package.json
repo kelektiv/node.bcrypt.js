@@ -18,8 +18,8 @@
      "web" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
    },
    "scripts": {
-     "install": "node-waf configure build",
-     "test": "node-waf configure build; nodeunit test/"
+     "install": "make build",
+     "test": "make test"
    },
    "devDependencies": {
      "nodeunit": "=0.5.1"
