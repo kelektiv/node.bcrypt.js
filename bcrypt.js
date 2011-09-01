@@ -1,1 +1,1 @@
-module.exports = require('./bcrypt_lib');
+module.exports = require('./build/Release/bcrypt_lib');
