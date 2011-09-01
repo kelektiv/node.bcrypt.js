@@ -122,7 +122,7 @@ bool ValidateSalt(char *str) {
 }
 
 /* SALT GENERATION */
-int EIO_GenSalt(eio_req *req) {
+void EIO_GenSalt(eio_req *req) {
     salt_request *s_req = (salt_request *)req->data;
 
     char *salt = (char *)malloc(_SALT_LEN);
@@ -143,8 +143,6 @@ int EIO_GenSalt(eio_req *req) {
         s_req->error = err;
         free(salt);
     }
-
-    return 0;
 }
 
 int EIO_GenSaltAfter(eio_req *req) {
@@ -259,7 +257,7 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
-int EIO_Encrypt(eio_req *req) {
+void EIO_Encrypt(eio_req *req) {
     encrypt_request *encrypt_req = (encrypt_request *)req->data;
 
     if (!(ValidateSalt(encrypt_req->salt))) {
@@ -276,8 +274,6 @@ int EIO_Encrypt(eio_req *req) {
       encrypt_req->error = err;
       free(bcrypted);
     }
-
-    return 0;
 }
 
 int EIO_EncryptAfter(eio_req *req) {
@@ -388,7 +384,7 @@ bool CompareStrings(char* s1, char* s2) {
     return eq;
 }
 
-int EIO_Compare(eio_req *req) {
+void EIO_Compare(eio_req *req) {
     compare_request *compare_req = (compare_request *)req->data;
 
     try {
@@ -398,8 +394,6 @@ int EIO_Compare(eio_req *req) {
     } catch (const char *err) {
         compare_req->error = err;
     }
-
-    return 0;
 }
 
 int EIO_CompareAfter(eio_req *req) {
