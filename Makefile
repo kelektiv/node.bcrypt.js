@@ -16,7 +16,7 @@ test: build
 		$(TESTS)
 
 clean:
-	rm -Rf bcrypt_lib.node
+	rm -f bcrypt_lib.node
 	rm -Rf build
 
 

@@ -29,6 +29,7 @@
  */
 
 #include <node.h>
+#include <node_version.h>
 #include <ctype.h>
 #include <string.h>
 #include <assert.h>
@@ -37,6 +38,8 @@
 #include <openssl/rand.h>
 
 #include "node_blf.h"
+
+#define NODE_LESS_THAN (!(NODE_VERSION_AT_LEAST(0, 5, 0)))
 
 using namespace v8;
 using namespace node;
@@ -122,7 +125,11 @@ bool ValidateSalt(char *str) {
 }
 
 /* SALT GENERATION */
+#if NODE_LESS_THAN
+int EIO_GenSalt(eio_req *req) {
+#else
 void EIO_GenSalt(eio_req *req) {
+#endif
     salt_request *s_req = (salt_request *)req->data;
 
     char *salt = (char *)malloc(_SALT_LEN);
@@ -143,6 +150,9 @@ void EIO_GenSalt(eio_req *req) {
         s_req->error = err;
         free(salt);
     }
+#if NODE_LESS_THAN
+    return 0;
+#endif
 }
 
 int EIO_GenSaltAfter(eio_req *req) {
@@ -257,12 +267,20 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
+#if NODE_LESS_THAN 
+int EIO_Encrypt(eio_req *req) {
+#else
 void EIO_Encrypt(eio_req *req) {
+#endif
     encrypt_request *encrypt_req = (encrypt_request *)req->data;
 
     if (!(ValidateSalt(encrypt_req->salt))) {
         encrypt_req->error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
+#if NODE_LESS_THAN
+        return 1;
+#else
         return;
+#endif
     }
 
     char* bcrypted = (char *)malloc(_PASSWORD_LEN);
@@ -274,6 +292,10 @@ void EIO_Encrypt(eio_req *req) {
       encrypt_req->error = err;
       free(bcrypted);
     }
+
+#if NODE_LESS_THAN 
+    return 0;
+#endif
 }
 
 int EIO_EncryptAfter(eio_req *req) {
@@ -384,7 +406,11 @@ bool CompareStrings(char* s1, char* s2) {
     return eq;
 }
 
+#if NODE_LESS_THAN 
+int EIO_Compare(eio_req *req) {
+#else
 void EIO_Compare(eio_req *req) {
+#endif
     compare_request *compare_req = (compare_request *)req->data;
 
     try {
@@ -394,6 +420,9 @@ void EIO_Compare(eio_req *req) {
     } catch (const char *err) {
         compare_req->error = err;
     }
+#if NODE_LESS_THAN
+    return 0;
+#endif
 }
 
 int EIO_CompareAfter(eio_req *req) {
