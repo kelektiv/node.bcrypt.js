@@ -45,7 +45,7 @@ namespace {
 
 struct base_request {
     v8::Persistent<v8::Function> callback;
-    char *error;
+    const char *error;
 };
 
 struct salt_request : base_request {
@@ -140,9 +140,7 @@ int EIO_GenSalt(eio_req *req) {
 
         free(_seed);
     } catch (const char *err) {
-        int err_len = strlen(err);
-        s_req->error = (char *)malloc(err_len * sizeof(err));
-        memcpy(s_req->error, err, err_len * sizeof(err));
+        s_req->error = err;
         free(salt);
     }
 
@@ -175,7 +173,6 @@ int EIO_GenSaltAfter(eio_req *req) {
 
     s_req->callback.Dispose();
     free(s_req->salt);
-    free(s_req->error);
 
     free(s_req);
 
@@ -266,8 +263,8 @@ int EIO_Encrypt(eio_req *req) {
     encrypt_request *encrypt_req = (encrypt_request *)req->data;
 
     if (!(ValidateSalt(encrypt_req->salt))) {
-        encrypt_req->error = strdup("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
-        return 0;
+        encrypt_req->error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
+        return;
     }
 
     char* bcrypted = (char *)malloc(_PASSWORD_LEN);
@@ -276,7 +273,7 @@ int EIO_Encrypt(eio_req *req) {
       encrypt_req->output_len = strlen(bcrypted);
       encrypt_req->output = bcrypted;
     } catch (const char *err) {
-      encrypt_req->error = strdup(err);
+      encrypt_req->error = err;
       free(bcrypted);
     }
 
@@ -311,7 +308,6 @@ int EIO_EncryptAfter(eio_req *req) {
     free(encrypt_req->salt);
     free(encrypt_req->input);
     free(encrypt_req->output);
-    free(encrypt_req->error);
 
     free(encrypt_req);
 
@@ -400,7 +396,7 @@ int EIO_Compare(eio_req *req) {
         bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted, bcrypted);
         compare_req->result = CompareStrings(bcrypted, (char *)compare_req->encrypted);
     } catch (const char *err) {
-        compare_req->error = strdup(err);
+        compare_req->error = err;
     }
 
     return 0;
@@ -436,7 +432,6 @@ int EIO_CompareAfter(eio_req *req) {
     compare_req->callback.Dispose();
     free(compare_req->encrypted);
     free(compare_req->input);
-    free(compare_req->error);
     free(compare_req);
 
     return 0;
