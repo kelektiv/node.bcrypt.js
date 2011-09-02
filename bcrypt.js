@@ -1,3 +1,6 @@
-var bcrypt_lib = require('./bcrypt_lib');
-
-module.exports = new bcrypt_lib.BCrypt();
+try {
+  module.exports = require('./build/default/bcrypt_lib');
+} catch(e) {
+  //update for v0.5.5+
+  module.exports = require('./build/Release/bcrypt_lib');
+}
