@@ -39,7 +39,7 @@
 
 #include "node_blf.h"
 
-#define NODE_LESS_THAN (!(NODE_VERSION_AT_LEAST(0, 5, 0)))
+#define NODE_LESS_THAN (!(NODE_VERSION_AT_LEAST(0, 5, 4)))
 
 using namespace v8;
 using namespace node;
