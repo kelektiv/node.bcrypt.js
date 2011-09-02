@@ -3,7 +3,6 @@ TESTS = test/*.js
 all: test
 
 build: clean configure compile
-	ln -sf build/default/bcrypt_lib.node bcrypt_lib.node
 
 configure:
 	node-waf configure
