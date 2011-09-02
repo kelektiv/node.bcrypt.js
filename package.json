@@ -2,9 +2,9 @@
   "name": "bcrypt",
   "description": "A bcrypt library for NodeJS.",
   "main": "./bcrypt",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "author": "Nick Campbell (http://github.com/ncb000gt)",
-  "engines": { "node": ">= 0.1.100" },
+  "engines": { "node": ">= 0.4.0" },
   "repository": {
         "type": "git",
         "url": "http://github.com/ncb000gt/node.bcrypt.js.git"
@@ -32,6 +32,8 @@
      "NewITFarmer.com <> (https://github.com/newitfarmer)",
      "Alfred Westerveld <alfredwesterveld@gmail.com> (https://github.com/alfredwesterveld)",
      "Vincent Côté-Roy <vincentcr@gmail.com> (https://github.com/vincentcr)",
-     "Lloyd Hilaiel <lloyd@hilaiel.com> (https://github.com/lloyd)"
+     "Lloyd Hilaiel <lloyd@hilaiel.com> (https://github.com/lloyd)",
+     "Roman Shtylman <shtylman@gmail.com> (https://github.com/shtylman)",
+     "Vadim Graboys <dimva13@gmail.com> (https://github.com/vadimg)"
    ]
 }

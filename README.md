@@ -1,10 +1,10 @@
-bcrypt-node
+node.bcrypt.js
 =============
 
-Lib to help you hash passwords.  
+Lib to help you hash passwords.
 [bcrypt on wikipedia][bcryptwiki]
 
-Catalyst: [How To Safely Store A Password][codahale]
+Catalyst for this module: [How To Safely Store A Password][codahale]
 
 
 Security Issues/Concerns
@@ -14,7 +14,6 @@ As should be the case with any security tool, this library should be scrutinized
 
 To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
 
-* [GH-13][gh13] - There was a timing attack present in the comparator. This is fixed in versions higher than 0.2.1, but I recommend using 0.2.3 (code fixes) or later. HT [thegoleffect][thegoleffect].
 * An [issue with passwords][jtr] was found with a version of the Blowfish algorithm developed for John the Ripper. This is not present in the OpenBSD version and is thus not a problem for this module. HT [zooko][zooko].
 
 Dependencies
@@ -148,16 +147,13 @@ Contributors
 * [Alfred Westerveld][alfredwesterveld] - packaging fixes
 * [Vincent Côté-Roy][vincentr] - Testing around concurrency issues
 * [Lloyd Hilaiel][lloyd] - Documentation fixes
+* [Roman Shtylman][shtylman] - Code refactoring and general rot reduction
+* [Vadim Graboys][vadimg] - Code changes to support 0.5.5+
 
 License
 ============
 
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
-
-Trademarks?
-============
-
-Node.js™ is an official trademark of Joyent. This module is not formally related to or endorsed by the official Joyent Node.js open source or commercial project
 
 
 
@@ -176,3 +172,5 @@ Node.js™ is an official trademark of Joyent. This module is not formally relat
 [zooko]:https://twitter.com/zooko
 [vincentr]:https://twitter.com/vincentcr
 [lloyd]:https://github.com/lloyd
+[shtylman]:https://github.com/shtylman
+[vadimg]:https://github.com/vadimg
