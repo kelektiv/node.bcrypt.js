@@ -45,18 +45,12 @@ To hash a password:
     var bcrypt = require('bcrypt');  
     var salt = bcrypt.gen_salt_sync(10);  
     var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
+    // Store hash in your password DB.
 
 To check a password:  
 
-    var bcrypt = require('bcrypt');  
-    //get salt to generate hash
-    var salt = bcrypt.gen_salt_sync(10);  
-    //get hash to compare strings against
-    var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
-    
-    //compare B4c0/\/ against the hash value
+    // Load hash from your password DB.
     bcrypt.compare_sync("B4c0/\/", hash); // true    
-    //compare not_bacon against the hash value
     bcrypt.compare_sync("not_bacon", hash); // false
 
 Usage - Async
@@ -67,22 +61,18 @@ To hash a password:
     var bcrypt = require('bcrypt');  
     bcrypt.gen_salt(10, function(err, salt) {
         bcrypt.encrypt("B4c0/\/", salt, function(err, hash) {
-            //something
+            // Store hash in your password DB.
         });
     });
 
 To check a password:  
 
-    var bcrypt = require('bcrypt');
-    bcrypt.gen_salt(10, function(err, salt) {
-        bcrypt.encrypt("B4c0/\/", salt, function(err, hash) {
-            bcrypt.compare("B4c0/\/", hash, function(err, res) {
-                // res == true    
-            });
-            bcrypt.compare("not_bacon", hash, function(err, res) {
-                // res = false
-            });
-        });
+    // Load hash from your password DB.
+    bcrypt.compare("B4c0/\/", hash, function(err, res) {
+        // res == true    
+    });
+    bcrypt.compare("not_bacon", hash, function(err, res) {
+        // res = false
     });
 
 API
