@@ -49,9 +49,14 @@ To hash a password:
 To check a password:  
 
     var bcrypt = require('bcrypt');  
+    //get salt to generate hash
     var salt = bcrypt.gen_salt_sync(10);  
+    //get hash to compare strings against
     var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
+    
+    //compare B4c0/\/ against the hash value
     bcrypt.compare_sync("B4c0/\/", hash); // true    
+    //compare not_bacon against the hash value
     bcrypt.compare_sync("not_bacon", hash); // false
 
 Usage - Async
