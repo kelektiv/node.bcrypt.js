@@ -215,8 +215,6 @@ Handle<Value> GenerateSalt(const Arguments &args) {
         } else {
             return ThrowException(Exception::Error(String::New("No callback supplied."))); 
         }
-    } else {
-        return ThrowException(Exception::Error(String::New("No callback supplied."))); 
     }
 
     salt_request *s_req = (salt_request *)malloc(sizeof(*s_req));
@@ -239,13 +237,16 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     HandleScope scope;
 
     int size = 20;
+    ssize_t rounds = 10;
     if (args.Length() < 1) {
         return ThrowException(Exception::Error(String::New("Must give number of rounds.")));
     } else if (!args[0]->IsNumber()) {
         return ThrowException(Exception::Error(String::New("Param must be a number.")));
     }
 
-    ssize_t rounds = args[0]->Int32Value();
+    if (args.Length() > 0 && args[0]->IsNumber()) {
+      rounds = args[0]->Int32Value();
+    }
     if (args.Length() > 1 && args[1]->IsNumber()) {
         size = args[1]->Int32Value();
     }
