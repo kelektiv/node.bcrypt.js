@@ -8,7 +8,7 @@ module.exports = testCase({
         assert.done();
     },
     test_salt_no_params: function(assert) {
-        assert.throws(function() {bcrypt.gen_salt_sync();}, "Should throw an Error. gen_salt requires # of rounds.");
+        assert.throws(function() {bcrypt.gen_salt_sync();}, "Should not throw an Error. .");
         assert.done();
     },
     test_salt_rounds_is_string_number: function(assert) {
