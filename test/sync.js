@@ -71,5 +71,10 @@ module.exports = testCase({
         assert.ok(bcrypt.compare_sync("test", hash), "These hashes should be equal.");
         assert.ok(!(bcrypt.compare_sync("blah", hash)), "These hashes should not be equal.");
         assert.done();
+    },
+    test_get_rounds: function(assert) {
+        var hash = bcrypt.encrypt_sync("test", bcrypt.gen_salt_sync(9));
+        assert.equals(9, bcrypt.get_rounds(hash), "get_rounds can't extract rounds");
+        assert.done();
     }
 });
