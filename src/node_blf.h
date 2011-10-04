@@ -94,5 +94,6 @@ u_int32_t Blowfish_stream2word(const u_int8_t *, u_int16_t , u_int16_t *);
 void bcrypt_gensalt(u_int8_t, u_int8_t*, char *);
 void bcrypt(const char *, const char *, char *);
 void encode_salt(char *, u_int8_t *, u_int16_t, u_int8_t);
+u_int32_t bcrypt_get_rounds(const char *);
 
 #endif

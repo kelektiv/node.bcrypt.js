@@ -107,6 +107,9 @@ API
     * `cb` - [REQUIRED] - a callback to be fired once the data has been compared. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `same` - Second parameter to the callback providing whether the data and encrypted forms match [true | false].
+  * `get_rounds(encrypted)` - return the number of rounds used to encrypt a given hash
+    * `encrypted` - [REQUIRED] - hash from which the number of rounds used should be extracted.
+
 
 Hash Info
 ============

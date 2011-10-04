@@ -7,6 +7,7 @@ bcrypt.gen_salt(10, function(err, salt) {
   bcrypt.encrypt('test', salt, function(err, crypted) {
     console.log('crypted: ' + crypted);
     console.log('crypted cb end: ' + (Date.now() - start) + 'ms');
+    console.log('rounds used from hash:', bcrypt.get_rounds(crypted));
     bcrypt.compare('test', crypted, function(err, res) {
       console.log('compared true: ' + res);
       console.log('compared true cb end: ' + (Date.now() - start) + 'ms');

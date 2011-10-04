@@ -506,6 +506,26 @@ Handle<Value> CompareSync(const Arguments& args) {
     return Boolean::New(CompareStrings(bcrypted, *hash));
 }
 
+Handle<Value> GetRounds(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 1) {
+        return ThrowException(Exception::Error(String::New("Must provide hash.")));
+    } else if (!args[0]->IsString()) {
+        return ThrowException(Exception::Error(String::New("Hash must be a string.")));
+    }
+
+    String::Utf8Value hash(args[0]->ToString());
+
+    u_int32_t rounds;
+
+    if (!(rounds = bcrypt_get_rounds(*hash))) {
+        return ThrowException(Exception::Error(String::New("invalid hash provided")));
+    }
+
+    return Integer::New(rounds);
+}
+
 } // anonymous namespace
 
 // bind the bcrypt module
@@ -515,6 +535,7 @@ extern "C" void init(Handle<Object> target) {
     NODE_SET_METHOD(target, "gen_salt_sync", GenerateSaltSync);
     NODE_SET_METHOD(target, "encrypt_sync", EncryptSync);
     NODE_SET_METHOD(target, "compare_sync", CompareSync);
+    NODE_SET_METHOD(target, "get_rounds", GetRounds);
     NODE_SET_METHOD(target, "gen_salt", GenerateSalt);
     NODE_SET_METHOD(target, "encrypt", Encrypt);
     NODE_SET_METHOD(target, "compare", Compare);
