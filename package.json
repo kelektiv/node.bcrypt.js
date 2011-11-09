@@ -16,7 +16,7 @@
      }
    ],
    "bugs": {
-     "web" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
+     "url" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
    },
    "scripts": {
      "install": "make build",
