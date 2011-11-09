@@ -8,7 +8,11 @@ module.exports = testCase({
         assert.done();
     },
     test_salt_no_params: function(assert) {
-        assert.throws(function() {bcrypt.gen_salt_sync();}, "Should not throw an Error. .");
+        // same as test_verify_salt except using default rounds of 10
+        var salt = bcrypt.gen_salt_sync();
+        var split_salt = salt.split('$');
+        assert.ok(split_salt[1], '2a');
+        assert.ok(split_salt[2], '10');
         assert.done();
     },
     test_salt_rounds_is_string_number: function(assert) {

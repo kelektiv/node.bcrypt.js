@@ -190,32 +190,9 @@ int EIO_GenSaltAfter(eio_req *req) {
 Handle<Value> GenerateSalt(const Arguments &args) {
     HandleScope scope;
 
-    Local<Function> callback;
-    int rand_len = 20;
-    ssize_t rounds = 10;
-    if (args.Length() < 1) {
-        return ThrowException(Exception::Error(String::New("Must provide at least a callback.")));
-    } else if (args[0]->IsFunction()) {
-        callback = Local<Function>::Cast(args[0]);
-    } else if (args.Length() == 1) {
-        return ThrowException(Exception::Error(String::New("Must provide at least a callback.")));
-    }
-    if (args.Length() > 1) {
-        if (args[1]->IsFunction()) {
-            rounds = args[0]->Int32Value();
-            callback = Local<Function>::Cast(args[1]);
-        } else if (args.Length() > 2 && args[1]->IsNumber()) {
-            rand_len = args[1]->Int32Value();
-
-            if (args[2]->IsFunction()) {
-                callback = Local<Function>::Cast(args[2]);
-            } else {
-                return ThrowException(Exception::Error(String::New("No callback supplied."))); 
-            }
-        } else {
-            return ThrowException(Exception::Error(String::New("No callback supplied."))); 
-        }
-    }
+    const ssize_t rounds = args[0]->Int32Value();
+    const int rand_len = args[1]->Int32Value();
+    Local<Function> callback = Local<Function>::Cast(args[2]);
 
     salt_request *s_req = (salt_request *)malloc(sizeof(*s_req));
     if (!s_req)
@@ -236,20 +213,8 @@ Handle<Value> GenerateSalt(const Arguments &args) {
 Handle<Value> GenerateSaltSync(const Arguments& args) {
     HandleScope scope;
 
-    int size = 20;
-    ssize_t rounds = 10;
-    if (args.Length() < 1) {
-        return ThrowException(Exception::Error(String::New("Must give number of rounds.")));
-    } else if (!args[0]->IsNumber()) {
-        return ThrowException(Exception::Error(String::New("Param must be a number.")));
-    }
-
-    if (args.Length() > 0 && args[0]->IsNumber()) {
-      rounds = args[0]->Int32Value();
-    }
-    if (args.Length() > 1 && args[1]->IsNumber()) {
-        size = args[1]->Int32Value();
-    }
+    const ssize_t rounds = args[0]->Int32Value();
+    const int size = args[1]->Int32Value();
 
     u_int8_t *_seed = (u_int8_t *)malloc(size * sizeof(u_int8_t));
     switch(GetSeed(_seed, size)) {
@@ -258,6 +223,7 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
         case 0:
             return ThrowException(Exception::Error(String::New("Rand operation did not generate a cryptographically sound seed.")));
     }
+
     char salt[_SALT_LEN];
     bcrypt_gensalt(rounds, _seed, salt);
     int salt_len = strlen(salt);
@@ -336,12 +302,6 @@ int EIO_EncryptAfter(eio_req *req) {
 Handle<Value> Encrypt(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 3) {
-        return ThrowException(Exception::Error(String::New("Must give data, salt and callback.")));
-    } else if (!args[0]->IsString() || !args[1]->IsString() || !args[2]->IsFunction()) {
-        return ThrowException(Exception::Error(String::New("Data and salt must be strings and the callback must be a function.")));
-    }
-
     String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
@@ -365,12 +325,6 @@ Handle<Value> Encrypt(const Arguments& args) {
 
 Handle<Value> EncryptSync(const Arguments& args) {
     HandleScope scope;
-
-    if (args.Length() < 2) {
-        return ThrowException(Exception::Error(String::New("Must give password and salt.")));
-    } else if (!args[0]->IsString() || !args[1]->IsString()) {
-        return ThrowException(Exception::Error(String::New("Params must be strings.")));
-    }
 
     String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
@@ -464,12 +418,6 @@ int EIO_CompareAfter(eio_req *req) {
 Handle<Value> Compare(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 3) {
-        return ThrowException(Exception::Error(String::New("Must give input, data and callback.")));
-    } else if (!args[0]->IsString() || !args[1]->IsString() || !args[2]->IsFunction()) {
-        return ThrowException(Exception::Error(String::New("Input and data to compare against must be strings and the callback must be a function.")));
-    }
-
     String::Utf8Value input(args[0]->ToString());
     String::Utf8Value encrypted(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
@@ -492,12 +440,6 @@ Handle<Value> Compare(const Arguments& args) {
 Handle<Value> CompareSync(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 2) {
-        return ThrowException(Exception::Error(String::New("Must give password and hash.")));
-    } else if (!args[0]->IsString() || !args[1]->IsString()) {
-        return ThrowException(Exception::Error(String::New("Params must be strings.")));
-    }
-
     String::Utf8Value pw(args[0]->ToString());
     String::Utf8Value hash(args[1]->ToString());
 
@@ -509,16 +451,8 @@ Handle<Value> CompareSync(const Arguments& args) {
 Handle<Value> GetRounds(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 1) {
-        return ThrowException(Exception::Error(String::New("Must provide hash.")));
-    } else if (!args[0]->IsString()) {
-        return ThrowException(Exception::Error(String::New("Hash must be a string.")));
-    }
-
     String::Utf8Value hash(args[0]->ToString());
-
     u_int32_t rounds;
-
     if (!(rounds = bcrypt_get_rounds(*hash))) {
         return ThrowException(Exception::Error(String::New("invalid hash provided")));
     }
