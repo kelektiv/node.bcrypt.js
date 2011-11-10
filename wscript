@@ -1,8 +1,6 @@
 # -*- mode: python -*-
 
 import Options, Utils, sys
-from os import unlink, symlink, popen
-from os.path import exists, islink
 
 srcdir = "."
 blddir = "build"
@@ -37,10 +35,10 @@ def configure(conf):
             includes=includes,
             libpath=libpath,
             uselib_store='Z')
-  
+
 def build(bld):
   bcryptnode = bld.new_task_gen("cxx", "shlib", "node_addon")
-  #bcryptnode.cxxflags =  [ "-g" ] #debugging.
+  bcryptnode.cxxflags =  [ "-O3" ]
   bcryptnode.target = "bcrypt_lib"
   bcryptnode.source = """
     src/blowfish.cc
