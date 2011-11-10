@@ -30,11 +30,10 @@
 
 #include <node.h>
 #include <node_version.h>
-#include <ctype.h>
-#include <string.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+#include <string>
+#include <cstring>
+
 #include <openssl/rand.h>
 
 #include "node_blf.h"
@@ -46,32 +45,34 @@ using namespace node;
 
 namespace {
 
-struct base_request {
+struct baton_base {
     v8::Persistent<v8::Function> callback;
-    const char *error;
+    std::string error;
+
+    virtual ~baton_base() {
+        callback.Dispose();
+    }
 };
 
-struct salt_request : base_request {
-    char *salt;
-    int salt_len;
+struct salt_baton : baton_base {
+    std::string salt;
     int rand_len;
     ssize_t rounds;
 };
 
-struct encrypt_request : base_request {
-    char *salt;
-    char *input;
-    char *output;
-    int output_len;
+struct encrypt_baton : baton_base {
+    std::string salt;
+    std::string input;
+    std::string output;
 };
 
-struct compare_request : base_request {
-    char *input;
-    char *encrypted;
+struct compare_baton : baton_base {
+    std::string input;
+    std::string encrypted;
     bool result;
 };
 
-int GetSeed(u_int8_t *seed, int size) {
+int GetSeed(uint8_t* seed, int size) {
     switch (RAND_bytes((unsigned char *)seed, size)) {
         case -1:
         case 0:
@@ -88,40 +89,51 @@ int GetSeed(u_int8_t *seed, int size) {
     }
 }
 
-bool ValidateSalt(char *str) {
-    int count = 0;
-    bool valid = true;
+bool ValidateSalt(const char* salt) {
 
-    int str_len = strlen(str);
-    char *new_str = (char *)malloc(str_len * sizeof(str));
-    memcpy(new_str, str, str_len * sizeof(str));
-    char *next_tok = new_str;
-    char *result = strsep(&next_tok, "$");
-
-    while (result != NULL) {
-        if (count == 1) {
-            //check version
-            if (!isdigit(result[0])) {
-                return false;
-            }
-            if (strlen(result) == 2 && !isalpha(result[1])) {
-                return false;
-            }
-        } else if (count == 2) {
-            //check rounds
-            if (!(isdigit(result[0]) && isdigit(result[1]))) {
-                return false;
-            }
-        }
-
-        count++;
-        result = strsep(&next_tok, "$");
+    if (!salt || *salt != '$') {
+        return false;
     }
 
-    free(new_str);
-    free(result);
+    // discard $
+    salt++;
 
-    return (count == 4);
+    if (*salt > BCRYPT_VERSION) {
+        return false;
+    }
+
+    if (salt[1] != '$') {
+        switch (salt[1]) {
+        case 'a':
+            salt++;
+            break;
+        default:
+            return false;
+        }
+    }
+
+    // discard version + $
+    salt += 2;
+
+    if (salt[2] != '$') {
+        return false;
+    }
+
+    int n = atoi(salt);
+    if (n > 31 || n < 0) {
+        return false;
+    }
+
+    if (((uint8_t)1 << (uint8_t)n) < BCRYPT_MINROUNDS) {
+        return false;
+    }
+
+    salt += 3;
+    if (strlen(salt) * 3 / 4 < BCRYPT_MAXSALT) {
+        return false;
+    }
+
+    return true;
 }
 
 /* SALT GENERATION */
@@ -130,26 +142,24 @@ int EIO_GenSalt(eio_req *req) {
 #else
 void EIO_GenSalt(eio_req *req) {
 #endif
-    salt_request *s_req = (salt_request *)req->data;
 
-    char *salt = (char *)malloc(_SALT_LEN);
-    try {
-        u_int8_t *_seed = (u_int8_t *)malloc(s_req->rand_len * sizeof(u_int8_t));
-        switch(GetSeed(_seed, s_req->rand_len)) {
-            case -1:
-                s_req->error = "Rand operation not supported.";
-            case 0:
-                s_req->error = "Rand operation did not generate a cryptographically sound seed.";
-        }
-        bcrypt_gensalt(s_req->rounds, _seed, salt);
-        s_req->salt_len = strlen(salt);
-        s_req->salt = salt;
+    salt_baton* baton = static_cast<salt_baton*>(req->data);
 
-        free(_seed);
-    } catch (const char *err) {
-        s_req->error = err;
-        free(salt);
+    char* salt = new char[_SALT_LEN];
+    uint8_t* seed = new uint8_t[baton->rand_len];
+    switch(GetSeed(seed, baton->rand_len)) {
+        case -1:
+            baton->error = "Rand operation not supported.";
+        case 0:
+            baton->error = "Rand operation did not generate a cryptographically sound seed.";
     }
+
+    bcrypt_gensalt(baton->rounds, seed, salt);
+    baton->salt = std::string(salt);
+
+    delete[] salt;
+    delete[] seed;
+
 #if NODE_LESS_THAN
     return 0;
 #endif
@@ -159,31 +169,27 @@ int EIO_GenSaltAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
-    salt_request *s_req = (salt_request *)req->data;
+    salt_baton* baton = static_cast<salt_baton*>(req->data);
 
     Handle<Value> argv[2];
 
-    if (s_req->error) {
-        argv[0] = Exception::Error(String::New(s_req->error));
+    if (!baton->error.empty()) {
+        argv[0] = Exception::Error(String::New(baton->error.c_str()));
         argv[1] = Undefined();
     }
     else {
         argv[0] = Undefined();
-        argv[1] = Encode(s_req->salt, s_req->salt_len, BINARY);
+        argv[1] = Encode(baton->salt.c_str(), baton->salt.size(), BINARY);
     }
 
     TryCatch try_catch; // don't quite see the necessity of this
 
-    s_req->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
 
     if (try_catch.HasCaught())
         FatalException(try_catch);
 
-    s_req->callback.Dispose();
-    free(s_req->salt);
-
-    free(s_req);
-
+    delete baton;
     return 0;
 }
 
@@ -194,16 +200,13 @@ Handle<Value> GenerateSalt(const Arguments &args) {
     const int rand_len = args[1]->Int32Value();
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
-    salt_request *s_req = (salt_request *)malloc(sizeof(*s_req));
-    if (!s_req)
-        return ThrowException(Exception::Error(String::New("malloc in GenerateSalt failed.")));
+    salt_baton* baton = new salt_baton();
 
-    s_req->callback = Persistent<Function>::New(callback);
-    s_req->rand_len = rand_len;
-    s_req->rounds = rounds;
-    s_req->error = NULL;
+    baton->callback = Persistent<Function>::New(callback);
+    baton->rand_len = rand_len;
+    baton->rounds = rounds;
 
-    eio_custom(EIO_GenSalt, EIO_PRI_DEFAULT, EIO_GenSaltAfter, s_req);
+    eio_custom(EIO_GenSalt, EIO_PRI_DEFAULT, EIO_GenSaltAfter, baton);
 
     ev_ref(EV_DEFAULT_UC);
 
@@ -216,8 +219,8 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     const ssize_t rounds = args[0]->Int32Value();
     const int size = args[1]->Int32Value();
 
-    u_int8_t *_seed = (u_int8_t *)malloc(size * sizeof(u_int8_t));
-    switch(GetSeed(_seed, size)) {
+    uint8_t* seed = new uint8_t[size];
+    switch(GetSeed(seed, size)) {
         case -1:
             return ThrowException(Exception::Error(String::New("Rand operation not supported.")));
         case 0:
@@ -225,24 +228,22 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     }
 
     char salt[_SALT_LEN];
-    bcrypt_gensalt(rounds, _seed, salt);
-    int salt_len = strlen(salt);
-    free(_seed);
-    Local<Value> outString = Encode(salt, salt_len, BINARY);
+    bcrypt_gensalt(rounds, seed, salt);
+    delete[] seed;
 
-    return scope.Close(outString);
+    return scope.Close(Encode(salt, strlen(salt), BINARY));
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
-#if NODE_LESS_THAN 
+#if NODE_LESS_THAN
 int EIO_Encrypt(eio_req *req) {
 #else
 void EIO_Encrypt(eio_req *req) {
 #endif
-    encrypt_request *encrypt_req = (encrypt_request *)req->data;
+    encrypt_baton* baton = static_cast<encrypt_baton*>(req->data);
 
-    if (!(ValidateSalt(encrypt_req->salt))) {
-        encrypt_req->error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
+    if (!(ValidateSalt(baton->salt.c_str()))) {
+        baton->error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
 #if NODE_LESS_THAN
         return 1;
 #else
@@ -250,17 +251,13 @@ void EIO_Encrypt(eio_req *req) {
 #endif
     }
 
-    char* bcrypted = (char *)malloc(_PASSWORD_LEN);
-    try {
-      bcrypt((const char *)encrypt_req->input, (const char *)encrypt_req->salt, bcrypted);
-      encrypt_req->output_len = strlen(bcrypted);
-      encrypt_req->output = bcrypted;
-    } catch (const char *err) {
-      encrypt_req->error = err;
-      free(bcrypted);
-    }
+    char* bcrypted = new char[_PASSWORD_LEN];
+    bcrypt(baton->input.c_str(), baton->salt.c_str(), bcrypted);
+    baton->output = std::string(bcrypted);
 
-#if NODE_LESS_THAN 
+    delete[] bcrypted;
+
+#if NODE_LESS_THAN
     return 0;
 #endif
 }
@@ -269,33 +266,27 @@ int EIO_EncryptAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
-    encrypt_request *encrypt_req = (encrypt_request *)req->data;
+    encrypt_baton* baton = static_cast<encrypt_baton*>(req->data);
 
     Handle<Value> argv[2];
 
-    if (encrypt_req->error != NULL) {
-        argv[0] = Exception::Error(String::New(encrypt_req->error));
+    if (!baton->error.empty()) {
+        argv[0] = Exception::Error(String::New(baton->error.c_str()));
         argv[1] = Undefined();
     }
     else {
         argv[0] = Undefined();
-        argv[1] = Encode(encrypt_req->output, encrypt_req->output_len, BINARY);
+        argv[1] = Encode(baton->output.c_str(), baton->output.size(), BINARY);
     }
 
     TryCatch try_catch; // don't quite see the necessity of this
 
-    encrypt_req->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
 
     if (try_catch.HasCaught())
         FatalException(try_catch);
 
-    encrypt_req->callback.Dispose();
-    free(encrypt_req->salt);
-    free(encrypt_req->input);
-    free(encrypt_req->output);
-
-    free(encrypt_req);
-
+    delete baton;
     return 0;
 }
 
@@ -306,17 +297,12 @@ Handle<Value> Encrypt(const Arguments& args) {
     String::Utf8Value salt(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
-    encrypt_request *encrypt_req = (encrypt_request *)malloc(sizeof(*encrypt_req));
-    if (!encrypt_req)
-        return ThrowException(Exception::Error(String::New("malloc in Encrypt failed.")));
+    encrypt_baton* baton = new encrypt_baton();
+    baton->callback = Persistent<Function>::New(callback);
+    baton->input = std::string(*data);
+    baton->salt = std::string(*salt);
 
-    encrypt_req->callback = Persistent<Function>::New(callback);
-    encrypt_req->input = strdup(*data);
-    encrypt_req->salt = strdup(*salt);
-    encrypt_req->output = NULL;
-    encrypt_req->error = NULL;
-
-    eio_custom(EIO_Encrypt, EIO_PRI_DEFAULT, EIO_EncryptAfter, encrypt_req);
+    eio_custom(EIO_Encrypt, EIO_PRI_DEFAULT, EIO_EncryptAfter, baton);
 
     ev_ref(EV_DEFAULT_UC);
 
@@ -335,14 +321,12 @@ Handle<Value> EncryptSync(const Arguments& args) {
 
     char bcrypted[_PASSWORD_LEN];
     bcrypt(*data, *salt, bcrypted);
-    int bcrypted_len = strlen(bcrypted);
-    Local<Value> outString = Encode(bcrypted, bcrypted_len, BINARY);
-
-    return scope.Close(outString);
+    return scope.Close(Encode(bcrypted, strlen(bcrypted), BINARY));
 }
 
 /* COMPARATOR */
-bool CompareStrings(char* s1, char* s2) {
+bool CompareStrings(const char* s1, const char* s2) {
+
     bool eq = true;
     int s1_len = strlen(s1);
     int s2_len = strlen(s2);
@@ -350,9 +334,12 @@ bool CompareStrings(char* s1, char* s2) {
     if (s1_len != s2_len) {
         eq = false;
     }
-    int max_len = (s2_len < s1_len)?s1_len:s2_len; 
 
-    for (int i = 0; i < max_len; i++) {
+    const int max_len = (s2_len < s1_len) ? s1_len : s2_len;
+
+    // to prevent timing attacks, should check entire string
+    // don't exit after found to be false
+    for (int i = 0; i < max_len; ++i) {
       if (s1_len >= i && s2_len >= i && s1[i] != s2[i]) {
         eq = false;
       }
@@ -361,20 +348,17 @@ bool CompareStrings(char* s1, char* s2) {
     return eq;
 }
 
-#if NODE_LESS_THAN 
+#if NODE_LESS_THAN
 int EIO_Compare(eio_req *req) {
 #else
 void EIO_Compare(eio_req *req) {
 #endif
-    compare_request *compare_req = (compare_request *)req->data;
+    compare_baton* baton = static_cast<compare_baton*>(req->data);
 
-    try {
-        char bcrypted[_PASSWORD_LEN];
-        bcrypt((const char *)compare_req->input, (const char *)compare_req->encrypted, bcrypted);
-        compare_req->result = CompareStrings(bcrypted, (char *)compare_req->encrypted);
-    } catch (const char *err) {
-        compare_req->error = err;
-    }
+    char bcrypted[_PASSWORD_LEN];
+    bcrypt(baton->input.c_str(), baton->encrypted.c_str(), bcrypted);
+    baton->result = CompareStrings(bcrypted, baton->encrypted.c_str());
+
 #if NODE_LESS_THAN
     return 0;
 #endif
@@ -384,33 +368,29 @@ int EIO_CompareAfter(eio_req *req) {
     HandleScope scope;
 
     ev_unref(EV_DEFAULT_UC);
-    compare_request *compare_req = (compare_request *)req->data;
+
+    compare_baton* baton = static_cast<compare_baton*>(req->data);
 
     Handle<Value> argv[2];
 
-    if (compare_req->error) {
-        argv[0] = Exception::Error(String::New(compare_req->error));
+    if (!baton->error.empty()) {
+        argv[0] = Exception::Error(String::New(baton->error.c_str()));
         argv[1] = Undefined();
     } else {
         argv[0] = Undefined();
-        if (compare_req->result) {
-          argv[1] = Boolean::New(true);
-        } else {
-          argv[1] = Boolean::New(false);
-        }
+        argv[1] = Boolean::New(baton->result);
     }
 
     TryCatch try_catch; // don't quite see the necessity of this
 
-    compare_req->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
 
     if (try_catch.HasCaught())
         FatalException(try_catch);
 
-    compare_req->callback.Dispose();
-    free(compare_req->encrypted);
-    free(compare_req->input);
-    free(compare_req);
+    // done with the baton
+    // free the memory and callback
+    delete baton;
 
     return 0;
 }
@@ -422,15 +402,12 @@ Handle<Value> Compare(const Arguments& args) {
     String::Utf8Value encrypted(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
-    compare_request *compare_req = (compare_request *)malloc(sizeof(*compare_req));
-    if (!compare_req)
-        return ThrowException(Exception::Error(String::New("malloc in Compare failed.")));
-    compare_req->callback = Persistent<Function>::New(callback);
-    compare_req->input = strdup(*input);
-    compare_req->encrypted = strdup(*encrypted);
-    compare_req->error = NULL;
+    compare_baton* baton = new compare_baton();
+    baton->callback = Persistent<Function>::New(callback);
+    baton->input = std::string(*input);
+    baton->encrypted = std::string(*encrypted);
 
-    eio_custom(EIO_Compare, EIO_PRI_DEFAULT, EIO_CompareAfter, compare_req);
+    eio_custom(EIO_Compare, EIO_PRI_DEFAULT, EIO_CompareAfter, baton);
 
     ev_ref(EV_DEFAULT_UC);
 
