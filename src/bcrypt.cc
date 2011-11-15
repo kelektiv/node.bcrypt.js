@@ -50,8 +50,6 @@
 #include <sys/types.h>
 #include <string.h>
 #include <pwd.h>
-#include <pthread.h>
-
 #include "node_blf.h"
 
 //#if !defined(__APPLE__) && !defined(__MACH__)
