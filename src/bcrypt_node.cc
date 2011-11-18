@@ -85,8 +85,6 @@ static pthread_rwlock_t* locks;
 static void crypto_lock_init(void) {
   int i, n;
 
-  printf("test");
-
   n = CRYPTO_num_locks();
   locks = new pthread_rwlock_t[n];
 
