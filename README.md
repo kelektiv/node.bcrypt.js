@@ -1,6 +1,8 @@
 node.bcrypt.js
 =============
 
+[![Build Status](https://secure.travis-ci.org/ncb000gt/node.bcrypt.js.png)](http://travis-ci.org/ncb000gt/node.bcrypt.js) 
+
 Lib to help you hash passwords.
 [bcrypt on wikipedia][bcryptwiki]
 
