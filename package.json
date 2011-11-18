@@ -3,7 +3,7 @@
   "description": "A bcrypt library for NodeJS.",
   "keywords": ["bcrypt","password","auth","authentication","encryption","crypt","crypto"],
   "main": "./bcrypt",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "Nick Campbell (http://github.com/ncb000gt)",
   "engines": { "node": ">= 0.4.0" },
   "repository": {
@@ -35,6 +35,7 @@
      "Vincent Côté-Roy <vincentcr@gmail.com> (https://github.com/vincentcr)",
      "Lloyd Hilaiel <lloyd@hilaiel.com> (https://github.com/lloyd)",
      "Roman Shtylman <shtylman@gmail.com> (https://github.com/shtylman)",
-     "Vadim Graboys <dimva13@gmail.com> (https://github.com/vadimg)"
+     "Vadim Graboys <dimva13@gmail.com> (https://github.com/vadimg)",
+     "Ben Noorduis <> (https://github.com/bnoordhuis)"
    ]
 }

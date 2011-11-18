@@ -145,8 +145,9 @@ Contributors
 * [Alfred Westerveld][alfredwesterveld] - packaging fixes
 * [Vincent Côté-Roy][vincentr] - Testing around concurrency issues
 * [Lloyd Hilaiel][lloyd] - Documentation fixes
-* [Roman Shtylman][shtylman] - Code refactoring and general rot reduction
+* [Roman Shtylman][shtylman] - Code refactoring, general rot reduction, compile options, and better memory management with delete and new.
 * [Vadim Graboys][vadimg] - Code changes to support 0.5.5+
+* [Ben Noordhuis][bnoordhuis] - Fixed a thread safety issue in nodejs that was perfectly mappable to this module.
 
 License
 ============

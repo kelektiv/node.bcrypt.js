@@ -1,3 +1,9 @@
+v0.4.1
+* Thread safety fix around OpenSSL (GH-32). (bnoordhuis - through node)
+* C++ code changes using delete and new instead of malloc and free. (shtylman)
+* Compile options for speed, zoom. (shtylman)
+* Move much of the type and variable checking to the JS. (shtylman)
+
 v0.4.0
 * Added getRounds function that will tell you the number of rounds within a hash/salt
 
