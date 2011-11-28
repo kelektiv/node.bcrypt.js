@@ -1,9 +1,8 @@
-var testCase = require('nodeunit').testCase,
-    bcrypt = require('../bcrypt');
+var bcrypt = require('../bcrypt');
 
 var EXPECTED = 2500; //number of times to iterate these tests...
 
-module.exports = testCase({
+module.exports = {
   test_salt_length: function(assert) {
     assert.expect(EXPECTED);
     var n = 0;
@@ -116,4 +115,4 @@ module.exports = testCase({
 
     next();
   }
-});
+};

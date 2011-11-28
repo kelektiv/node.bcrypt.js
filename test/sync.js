@@ -1,7 +1,6 @@
-var testCase = require('nodeunit').testCase,
-    bcrypt = require('../bcrypt');
+var bcrypt = require('../bcrypt');
 
-module.exports = testCase({
+module.exports = {
     test_salt_length: function(assert) {
         var salt = bcrypt.gen_salt_sync(10);
         assert.equals(29, salt.length, "Salt isn't the correct length.");
@@ -81,4 +80,4 @@ module.exports = testCase({
         assert.equals(9, bcrypt.get_rounds(hash), "get_rounds can't extract rounds");
         assert.done();
     }
-});
+};
