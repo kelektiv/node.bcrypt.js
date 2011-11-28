@@ -1,7 +1,6 @@
-var testCase = require('nodeunit').testCase,
-    bcrypt = require('../bcrypt');
+var bcrypt = require('../bcrypt');
 
-module.exports = testCase({
+module.exports = {
     test_salt_length: function(assert) {
         assert.expect(1);
         bcrypt.gen_salt(10, function(err, salt) {
@@ -99,4 +98,4 @@ module.exports = testCase({
             });
         });
     }
-});
+};

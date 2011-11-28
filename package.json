@@ -23,7 +23,7 @@
      "test": "make test"
    },
    "devDependencies": {
-     "nodeunit": ">=0.5.4"
+     "nodeunit": ">=0.6.4"
    },
    "contributors": [
      "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
