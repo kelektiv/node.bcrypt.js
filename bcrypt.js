@@ -107,7 +107,7 @@ module.exports.encrypt = function(data, salt, cb) {
 /// @param {String} hash expected hash
 /// @return {bool} true if hashed data matches hash
 module.exports.compare_sync = function(data, hash) {
-    if (!data || !hash) {
+    if (data == null || data == undefined || hash == null || hash == undefined) {
         throw new Error('data and hash arguments required');
     } else if (typeof data !== 'string' || typeof hash !== 'string') {
         throw new Error('data and hash must be strings');
