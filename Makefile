@@ -7,7 +7,7 @@ build: clean configure compile
 configure:
 	node-waf configure
 
-compile:
+compile: configure
 	node-waf build
 
 test: build
