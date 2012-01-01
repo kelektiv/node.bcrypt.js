@@ -1,10 +1,11 @@
 # -*- mode: python -*-
 
-import Options, Utils, sys
+import Options, Utils, sys, re, os
 
 srcdir = "."
 blddir = "build"
 VERSION = "0.0.1"
+node_version = os.popen("node --version").read()
 
 def set_options(opt):
   opt.tool_options("compiler_cxx")
@@ -38,7 +39,9 @@ def configure(conf):
 
 def build(bld):
   bcryptnode = bld.new_task_gen("cxx", "shlib", "node_addon")
-  bcryptnode.cxxflags = [ "-O3", "-DEV_MULTIPLICITY=0" ]
+  bcryptnode.cxxflags = [ "-O3" ]
+  if re.search("^v0.4", node_version):
+    bcryptnode.cxxflags.append("-DEV_MULTIPLICITY=0")
   bcryptnode.target = "bcrypt_lib"
   bcryptnode.source = """
     src/blowfish.cc
