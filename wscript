@@ -39,9 +39,7 @@ def configure(conf):
 
 def build(bld):
   bcryptnode = bld.new_task_gen("cxx", "shlib", "node_addon")
-  bcryptnode.cxxflags = [ "-O3" ]
-  if re.search("^v0.4", node_version):
-    bcryptnode.cxxflags.append("-DEV_MULTIPLICITY=0")
+  bcryptnode.cxxflags = [ "-O3", "-DEV_MULTIPLICITY=1"]
   bcryptnode.target = "bcrypt_lib"
   bcryptnode.source = """
     src/blowfish.cc
