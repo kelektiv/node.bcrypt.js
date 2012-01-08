@@ -45,15 +45,15 @@ Usage - Sync
 To hash a password:  
 
     var bcrypt = require('bcrypt');  
-    var salt = bcrypt.gen_salt_sync(10);  
-    var hash = bcrypt.encrypt_sync("B4c0/\/", salt);
+    var salt = bcrypt.genSaltSync(10);  
+    var hash = bcrypt.encryptSync("B4c0/\/", salt);
     // Store hash in your password DB.
 
 To check a password:  
 
     // Load hash from your password DB.
-    bcrypt.compare_sync("B4c0/\/", hash); // true    
-    bcrypt.compare_sync("not_bacon", hash); // false
+    bcrypt.compareSync("B4c0/\/", hash); // true    
+    bcrypt.compareSync("not_bacon", hash); // false
 
 Usage - Async
 ============
@@ -61,8 +61,8 @@ Usage - Async
 To hash a password:  
 
     var bcrypt = require('bcrypt');  
-    bcrypt.gen_salt(10, function(err, salt) {
-        bcrypt.encrypt("B4c0/\/", salt, function(err, hash) {
+    bcrypt.genSalt(10, function(err, salt) {
+        bcrypt.hash("B4c0/\/", salt, function(err, hash) {
             // Store hash in your password DB.
         });
     });
@@ -82,25 +82,25 @@ API
 
 `BCrypt.`
 
-  * `gen_salt_sync(rounds, seed_length)`
+  * `genSaltSync(rounds, seed_length)`
     * `rounds` - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
     * `seed_length` - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length. (default - 20)
-  * `gen_salt(rounds, seed_length, cb)`
+  * `genSalt(rounds, seed_length, cb)`
     * `rounds` - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
     * `seed_length` - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length. (default - 20)
     * `cb` - [REQUIRED] - a callback to be fired once the salt has been generated. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `salt` - Second parameter to the callback providing the generated salt.
-  * `encrypt_sync(data, salt)`
+  * `hashSync(data, salt)`
     * `data` - [REQUIRED] - the data to be encrypted.
     * `salt` - [REQUIRED] - the salt to be used in encryption.
-  * `encrypt(data, salt, cb)`
+  * `hash(data, salt, cb)`
     * `data` - [REQUIRED] - the data to be encrypted.
     * `salt` - [REQUIRED] - the salt to be used in encryption.
     * `cb` - [REQUIRED] - a callback to be fired once the data has been encrypted. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `encrypted` - Second parameter to the callback providing the encrypted form.
-  * `compare_sync(data, encrypted)`
+  * `compareSync(data, encrypted)`
     * `data` - [REQUIRED] - data to compare.
     * `encrypted` - [REQUIRED] - data to be compared to.
   * `compare(data, encrypted, cb)`
@@ -109,7 +109,7 @@ API
     * `cb` - [REQUIRED] - a callback to be fired once the data has been compared. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `same` - Second parameter to the callback providing whether the data and encrypted forms match [true | false].
-  * `get_rounds(encrypted)` - return the number of rounds used to encrypt a given hash
+  * `getRounds(encrypted)` - return the number of rounds used to encrypt a given hash
     * `encrypted` - [REQUIRED] - hash from which the number of rounds used should be extracted.
 
 
