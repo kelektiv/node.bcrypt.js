@@ -29,6 +29,12 @@ module.exports = {
         assert.ok(bcrypt.hashSync('password', bcrypt.genSaltSync(10)), "Shouldn't throw an Error.");
         assert.done();
     },
+    test_hash_empty_string: function(assert) {
+        assert.ok(bcrypt.hashSync('', bcrypt.genSaltSync(10)), "Shouldn't throw an Error.");
+        assert.throws(function() {bcrypt.hashSync('password', '')}, "Should have thrown an Error related to the salt.");
+        assert.throws(function() {bcrypt.hashSync('', '')}, "Should have thrown an Error related to the salt.");
+        assert.done();
+    },
     test_hash_pw_no_params: function(assert) {
         assert.throws(function() {bcrypt.hashSync();}, "Should throw an Error. No Params.");
         assert.done();
@@ -87,6 +93,12 @@ module.exports = {
     test_getRounds: function(assert) {
         var hash = bcrypt.hashSync("test", bcrypt.genSaltSync(9));
         assert.equals(9, bcrypt.getRounds(hash), "getRounds can't extract rounds");
+        assert.done();
+    },
+    test_getRounds: function(assert) {
+        var hash = bcrypt.hashSync("test", bcrypt.genSaltSync(9));
+        assert.equals(9, bcrypt.getRounds(hash), "getRounds can't extract rounds");
+        assert.throws(function() {bcrypt.getRounds(''); }, "Must pass a valid hash to getRounds");
         assert.done();
     }
 };

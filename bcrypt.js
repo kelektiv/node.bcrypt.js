@@ -89,7 +89,7 @@ module.exports.encrypt_sync = function(data, salt) {
 }
 
 module.exports.hashSync = function(data, salt) {
-    if (!data || !salt) {
+    if (data == null || data == undefined || salt == null || salt == undefined) {
         throw new Error('data and salt arguments required');
     } else if (typeof data !== 'string' || typeof salt !== 'string') {
         throw new Error('data and salt must be strings');
@@ -109,7 +109,7 @@ module.exports.encrypt = function(data, salt, cb) {
 }
 
 module.exports.hash = function(data, salt, cb) {
-    if (!data || !salt) {
+    if (data == null || data == undefined || salt == null || salt == undefined) {
         throw new Error('data and salt arguments required');
     } else if (typeof data !== 'string' || typeof salt !== 'string') {
         throw new Error('data and salt must be strings');
@@ -149,7 +149,7 @@ module.exports.compareSync = function(data, hash) {
 /// @param {String} hash expected hash
 /// @param {Function} cb callback(err, matched) - matched is true if hashed data matches hash
 module.exports.compare = function(data, hash, cb) {
-    if (!data || !hash) {
+    if (data == null || data == undefined || hash == null || hash == undefined) {
         throw new Error('data and hash arguments required');
     } else if (typeof data !== 'string' || typeof hash !== 'string') {
         throw new Error('data and hash must be strings');
@@ -173,7 +173,7 @@ module.exports.get_rounds = function(hash) {
 }
 
 module.exports.getRounds = function(hash) {
-    if (!hash) {
+    if (hash == null || hash == undefined) {
         throw new Error('hash argument required');
     } else if (typeof hash !== 'string') {
         throw new Error('hash must be a string');

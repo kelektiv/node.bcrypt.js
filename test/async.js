@@ -33,6 +33,23 @@ module.exports = {
             });
         });
     },
+    test_hash_empty_strings: function(assert) {
+        assert.expect(2);
+        bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.hash('', salt, function(err, res) {
+                assert.ok(res, "Res should be defined even with an empty pw.");
+                bcrypt.hash('', '', function(err, res) {
+                  if (err) {
+                    assert.ok(err);
+                  } else {
+                    assert.fail();
+                  }
+
+                  assert.done();
+                });
+            });
+        });
+    },
     test_hash_no_params: function(assert) {
         assert.throws(function() {bcrypt.hash();}, "Should throw an Error. No Params.");
         assert.done();
@@ -96,6 +113,18 @@ module.exports = {
                     });
                 });
             });
+        });
+    },
+    test_hash_compare_empty_strings: function(assert) {
+        assert.expect(2);
+        var hash = bcrypt.hashSync("test", bcrypt.genSaltSync(10));
+
+        bcrypt.compare("", hash, function(err, res) {
+          assert.equal(res, false, "These hashes should be equal.");
+          bcrypt.compare("", "", function(err, res) {
+            assert.equal(res, false, "These hashes should be equal.");
+            assert.done();
+          });
         });
     }
 };
