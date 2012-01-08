@@ -7,7 +7,7 @@ module.exports = {
     assert.expect(EXPECTED);
     var n = 0;
     for (var i = 0; i < EXPECTED; i++) {
-      bcrypt.gen_salt(10, function(err, salt) {
+      bcrypt.genSalt(10, function(err, salt) {
         assert.equals(29, salt.length, "Salt ("+salt+") isn't the correct length. It is: " + salt.length);
         n++;
       });
@@ -22,12 +22,12 @@ module.exports = {
     }
     setTimeout(checkVal, 100);
   },
-  test_encrypt_length: function(assert) {
+  test_hash_length: function(assert) {
     assert.expect(EXPECTED);
     var SALT = '$2a$04$TnjywYklQbbZjdjBgBoA4e';
     var n = 0;
     for (var i = 0; i < EXPECTED; i++) {
-      bcrypt.encrypt('test', SALT, function(err, crypted) {
+      bcrypt.hash('test', SALT, function(err, crypted) {
         assert.equals(60, crypted.length, "Encrypted ("+crypted+") isn't the correct length. It is: " + crypted.length);
         n++;
       });
@@ -62,9 +62,9 @@ module.exports = {
     }
     setTimeout(checkVal, 100);
   },
-  test_encrypt_and_compare: function(assert) {
+  test_hash_and_compare: function(assert) {
     assert.expect((EXPECTED-1)*3);
-    var salt = bcrypt.gen_salt_sync(4),
+    var salt = bcrypt.genSaltSync(4),
         idx = 0,
         good_done = false,
         bad_done = false;
@@ -75,7 +75,7 @@ module.exports = {
 
     function test(password) {
       idx += 1;
-      return bcrypt.encrypt(password, salt, function(err, hash) {
+      return bcrypt.hash(password, salt, function(err, hash) {
         if (err) throw err;
         //console.log('\nbcrypt iter ' + idx);
 
