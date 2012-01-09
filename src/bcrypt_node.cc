@@ -202,11 +202,7 @@ bool ValidateSalt(const char* salt) {
 }
 
 /* SALT GENERATION */
-#if NODE_LESS_THAN
-int EIO_GenSalt(eio_req *req) {
-#else
-void EIO_GenSalt(eio_req *req) {
-#endif
+void GenSaltAsync(uv_work_t* req) {
 
     salt_baton* baton = static_cast<salt_baton*>(req->data);
 
@@ -224,17 +220,13 @@ void EIO_GenSalt(eio_req *req) {
 
     delete[] salt;
     delete[] seed;
-
-#if NODE_LESS_THAN
-    return 0;
-#endif
 }
 
-int EIO_GenSaltAfter(eio_req *req) {
+void GenSaltAsyncAfter(uv_work_t* req) {
     HandleScope scope;
 
-    ev_unref(EV_DEFAULT_UC);
     salt_baton* baton = static_cast<salt_baton*>(req->data);
+    delete req;
 
     Handle<Value> argv[2];
 
@@ -255,7 +247,6 @@ int EIO_GenSaltAfter(eio_req *req) {
         FatalException(try_catch);
 
     delete baton;
-    return 0;
 }
 
 Handle<Value> GenerateSalt(const Arguments &args) {
@@ -271,9 +262,10 @@ Handle<Value> GenerateSalt(const Arguments &args) {
     baton->rand_len = rand_len;
     baton->rounds = rounds;
 
-    eio_custom(EIO_GenSalt, EIO_PRI_DEFAULT, EIO_GenSaltAfter, baton);
+    uv_work_t* req = new uv_work_t;
+    req->data = baton;
+    uv_queue_work(uv_default_loop(), req, GenSaltAsync, GenSaltAsyncAfter);
 
-    ev_ref(EV_DEFAULT_UC);
 
     return Undefined();
 }
@@ -300,20 +292,11 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
-#if NODE_LESS_THAN
-int EIO_Encrypt(eio_req *req) {
-#else
-void EIO_Encrypt(eio_req *req) {
-#endif
+void EncryptAsync(uv_work_t* req) {
     encrypt_baton* baton = static_cast<encrypt_baton*>(req->data);
 
     if (!(ValidateSalt(baton->salt.c_str()))) {
         baton->error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
-#if NODE_LESS_THAN
-        return 1;
-#else
-        return;
-#endif
     }
 
     char* bcrypted = new char[_PASSWORD_LEN];
@@ -321,17 +304,13 @@ void EIO_Encrypt(eio_req *req) {
     baton->output = std::string(bcrypted);
 
     delete[] bcrypted;
-
-#if NODE_LESS_THAN
-    return 0;
-#endif
 }
 
-int EIO_EncryptAfter(eio_req *req) {
+void EncryptAsyncAfter(uv_work_t* req) {
     HandleScope scope;
 
-    ev_unref(EV_DEFAULT_UC);
     encrypt_baton* baton = static_cast<encrypt_baton*>(req->data);
+    delete req;
 
     Handle<Value> argv[2];
 
@@ -352,7 +331,6 @@ int EIO_EncryptAfter(eio_req *req) {
         FatalException(try_catch);
 
     delete baton;
-    return 0;
 }
 
 Handle<Value> Encrypt(const Arguments& args) {
@@ -367,9 +345,9 @@ Handle<Value> Encrypt(const Arguments& args) {
     baton->input = std::string(*data);
     baton->salt = std::string(*salt);
 
-    eio_custom(EIO_Encrypt, EIO_PRI_DEFAULT, EIO_EncryptAfter, baton);
-
-    ev_ref(EV_DEFAULT_UC);
+    uv_work_t* req = new uv_work_t;
+    req->data = baton;
+    uv_queue_work(uv_default_loop(), req, EncryptAsync, EncryptAsyncAfter);
 
     return Undefined();
 }
@@ -413,28 +391,19 @@ bool CompareStrings(const char* s1, const char* s2) {
     return eq;
 }
 
-#if NODE_LESS_THAN
-int EIO_Compare(eio_req *req) {
-#else
-void EIO_Compare(eio_req *req) {
-#endif
+void CompareAsync(uv_work_t* req) {
     compare_baton* baton = static_cast<compare_baton*>(req->data);
 
     char bcrypted[_PASSWORD_LEN];
     bcrypt(baton->input.c_str(), baton->encrypted.c_str(), bcrypted);
     baton->result = CompareStrings(bcrypted, baton->encrypted.c_str());
-
-#if NODE_LESS_THAN
-    return 0;
-#endif
 }
 
-int EIO_CompareAfter(eio_req *req) {
+void CompareAsyncAfter(uv_work_t* req) {
     HandleScope scope;
 
-    ev_unref(EV_DEFAULT_UC);
-
     compare_baton* baton = static_cast<compare_baton*>(req->data);
+    delete req;
 
     Handle<Value> argv[2];
 
@@ -456,8 +425,6 @@ int EIO_CompareAfter(eio_req *req) {
     // done with the baton
     // free the memory and callback
     delete baton;
-
-    return 0;
 }
 
 Handle<Value> Compare(const Arguments& args) {
@@ -472,9 +439,9 @@ Handle<Value> Compare(const Arguments& args) {
     baton->input = std::string(*input);
     baton->encrypted = std::string(*encrypted);
 
-    eio_custom(EIO_Compare, EIO_PRI_DEFAULT, EIO_CompareAfter, baton);
-
-    ev_ref(EV_DEFAULT_UC);
+    uv_work_t* req = new uv_work_t;
+    req->data = baton;
+    uv_queue_work(uv_default_loop(), req, CompareAsync, CompareAsyncAfter);
 
     return Undefined();
 }
