@@ -12,9 +12,17 @@ Catalyst for this module: [How To Safely Store A Password][codahale]
 Version Compatability
 =============
 
-"Node Version | Bcrypt Version"
-"<= 0.4.x     | <= 0.4.x"
-">= 0.6.x     | >= 0.5.x"
+<table>
+<tr>
+<td>Node Ver</td><td>Bcrypt Version</td>
+</tr>
+<tr>
+<td>&lt;= 0.4.x</td><td>&lt;= 0.4.x</td>
+</tr>
+<tr>
+<td>&gt;= 0.6.x</td><td>&gt;= 0.5.x</td>
+</tr>
+</table>
 
 
 Security Issues/Concerns
