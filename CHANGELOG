@@ -2,6 +2,7 @@ v0.5.0
 * Fix for issue around empty string params throwing Errors.
 * Method deprecation.
 * Upgrade from libeio/ev to libuv. (shtylman)
+** --- NOTE --- Breaks 0.4.x compatability
 * EV_MULTIPLICITY compile flag.
 
 v0.4.1
