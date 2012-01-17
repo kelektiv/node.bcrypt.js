@@ -62,7 +62,7 @@ To hash a password:
 
     var bcrypt = require('bcrypt');  
     var salt = bcrypt.genSaltSync(10);  
-    var hash = bcrypt.encryptSync("B4c0/\/", salt);
+    var hash = bcrypt.hashSync("B4c0/\/", salt);
     // Store hash in your password DB.
 
 To check a password:  
