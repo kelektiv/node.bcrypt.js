@@ -9,11 +9,9 @@ node_version = os.popen("node --version").read()
 
 def set_options(opt):
   opt.tool_options("compiler_cxx")
-  opt.tool_options("compiler_cc")
 
 def configure(conf):
   conf.check_tool("compiler_cxx")
-  conf.check_tool("compiler_cc")
   conf.check_tool("node_addon")
   o = Options.options
 
