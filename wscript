@@ -17,14 +17,18 @@ def configure(conf):
   conf.check_tool("node_addon")
   o = Options.options
 
+  nodepath = 'NODE_PATH' in os.environ and os.environ['NODE_PATH'] or None
+
   libpath = ['/lib', '/usr/lib', '/usr/local/lib', '/opt/local/lib', '/usr/sfw/lib']
+  if nodepath:
+    libpath.append(nodepath)
   includes = ['/usr/include', '/usr/includes', '/usr/local/includes', '/opt/local/includes', '/usr/sfw/lib'];
 
   libssl = conf.check(lib="ssl",
           header_name='openssl/rand.h',
-          function_name='RAND_bytes',
           includes=includes,
           libpath=libpath,
+          mandatory=True,
           uselib_store='OPENSSL')
 
   if sys.platform == "cygwin":
