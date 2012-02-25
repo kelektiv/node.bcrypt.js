@@ -1,0 +1,60 @@
+﻿Build started 2012/02/25 04:21:25 PM.
+     1>Project "C:\Development\node.bcrypt.js\win32\bcrypt.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\bcrypt_lib.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "Debug\bcrypt_lib.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D BCRYPT_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\src\bcrypt.cc ..\src\bcrypt_node.cc ..\src\blowfish.cc
+         blowfish.cc
+         bcrypt_node.cc
+     1>c:\development\libraries\node\src\node_object_wrap.h(57): warning C4251: 'node::ObjectWrap::handle_' : class 'v8::Persistent<T>' needs to have dll-interface to be used by clients of class 'node::ObjectWrap'
+                 with
+                 [
+                     T=v8::Object
+                 ]
+         bcrypt.cc
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(139): warning C4996: '_snprintf': This function or variable may be unsafe. Consider using _snprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(363) : see declaration of '_snprintf'
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(181): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(194): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(205): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(212): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(217): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(225): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(105) : see declaration of 'strcpy'
+     1>c:\development\node.bcrypt.js\src\bcrypt.cc(270): warning C4996: '_snprintf': This function or variable may be unsafe. Consider using _snprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\stdio.h(363) : see declaration of '_snprintf'
+         Generating Code...
+       ManifestResourceCompile:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\bcrypt_lib.node.embed.manifest.res" Debug\bcrypt_lib_manifest.rc 
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.node" /INCREMENTAL /NOLOGO /LIBPATH:C:\Development\libraries\node\Debug node.lib http_parser.lib openssl.lib uv.lib v8_base.lib v8_nosnapshot.lib v8_snapshot.lib zlib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:LIBCMTD /MANIFEST /ManifestFile:"Debug\bcrypt_lib.node.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Development\node.bcrypt.js\build\default\bcrypt_lib.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.lib" /MACHINE:X86 /DLL Debug\bcrypt_lib.node.embed.manifest.res
+         Debug\bcrypt.obj
+         Debug\bcrypt_node.obj
+         Debug\blowfish.obj
+            Creating library C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.lib and object C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.exp
+       Manifest:
+         Deleting file "Debug\bcrypt_lib.node.embed.manifest".
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\bcrypt_lib.node.embed.manifest" /manifest Debug\bcrypt_lib.node.intermediate.manifest
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\bcrypt_lib.node.embed.manifest.res" Debug\bcrypt_lib_manifest.rc 
+       LinkEmbedManifest:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.node" /INCREMENTAL /NOLOGO /LIBPATH:C:\Development\libraries\node\Debug node.lib http_parser.lib openssl.lib uv.lib v8_base.lib v8_nosnapshot.lib v8_snapshot.lib zlib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:LIBCMTD /MANIFEST /ManifestFile:"Debug\bcrypt_lib.node.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Development\node.bcrypt.js\build\default\bcrypt_lib.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.lib" /MACHINE:X86 /DLL Debug\bcrypt_lib.node.embed.manifest.res
+         Debug\bcrypt.obj
+         Debug\bcrypt_node.obj
+         Debug\blowfish.obj
+            Creating library C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.lib and object C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.exp
+         bcrypt.vcxproj -> C:\Development\node.bcrypt.js\win32\..\build\default\bcrypt_lib.node
+       FinalizeBuildStatus:
+         Deleting file "Debug\bcrypt_lib.unsuccessfulbuild".
+         Touching "Debug\bcrypt_lib.lastbuildstate".
+     1>Done Building Project "C:\Development\node.bcrypt.js\win32\bcrypt.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.35
