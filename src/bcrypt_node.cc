@@ -68,9 +68,9 @@ static void crypto_lock_init(void) {
 
 static void crypto_lock_cb(int mode, int n, const char* file, int line) {
   if (mode & CRYPTO_LOCK)
-    WaitForSingleObject(locks[type], INFINITE);
+    WaitForSingleObject(locks[n], INFINITE);
   else
-    ReleaseMutex(locks[type]);
+    ReleaseMutex(locks[n]);
 }
 
 static unsigned long crypto_id_cb(void) {
@@ -201,6 +201,22 @@ bool ValidateSalt(const char* salt) {
     return true;
 }
 
+Local<Value> EncodeBinary(const void *buf, size_t len) {
+	HandleScope scope;
+
+	if (!len) return scope.Close(String::Empty());
+
+	const unsigned char *cbuf = static_cast<const unsigned char*>(buf);
+	uint16_t * twobytebuf = new uint16_t[len];
+	for (size_t i = 0; i < len; i++) {
+		// XXX is the following line platform independent?
+		twobytebuf[i] = cbuf[i];
+	}
+	Local<String> chunk = String::New(twobytebuf, len);
+	delete [] twobytebuf; // TODO use ExternalTwoByteString?
+	return scope.Close(chunk);
+}
+
 /* SALT GENERATION */
 void GenSaltAsync(uv_work_t* req) {
 
@@ -236,7 +252,7 @@ void GenSaltAsyncAfter(uv_work_t* req) {
     }
     else {
         argv[0] = Undefined();
-        argv[1] = Encode(baton->salt.c_str(), baton->salt.size(), BINARY);
+        argv[1] = EncodeBinary(baton->salt.c_str(), baton->salt.size());
     }
 
     TryCatch try_catch; // don't quite see the necessity of this
@@ -288,7 +304,7 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     bcrypt_gensalt(rounds, seed, salt);
     delete[] seed;
 
-    return scope.Close(Encode(salt, strlen(salt), BINARY));
+    return scope.Close(EncodeBinary(salt, strlen(salt)));
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
@@ -320,7 +336,7 @@ void EncryptAsyncAfter(uv_work_t* req) {
     }
     else {
         argv[0] = Undefined();
-        argv[1] = Encode(baton->output.c_str(), baton->output.size(), BINARY);
+        argv[1] = EncodeBinary(baton->output.c_str(), baton->output.size());
     }
 
     TryCatch try_catch; // don't quite see the necessity of this
@@ -364,7 +380,7 @@ Handle<Value> EncryptSync(const Arguments& args) {
 
     char bcrypted[_PASSWORD_LEN];
     bcrypt(*data, *salt, bcrypted);
-    return scope.Close(Encode(bcrypted, strlen(bcrypted), BINARY));
+    return scope.Close(EncodeBinary(bcrypted, strlen(bcrypted)));
 }
 
 /* COMPARATOR */
@@ -488,3 +504,4 @@ extern "C" void init(Handle<Object> target) {
     NODE_SET_METHOD(target, "compare", Compare);
 };
 
+NODE_MODULE(bcrypt_lib, init);

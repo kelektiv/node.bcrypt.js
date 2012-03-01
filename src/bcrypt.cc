@@ -49,8 +49,11 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
-#include <pwd.h>
 #include "node_blf.h"
+
+#ifdef _WIN32 
+#define snprintf _snprintf
+#endif
 
 //#if !defined(__APPLE__) && !defined(__MACH__)
 //#include "bsd/stdlib.h"
