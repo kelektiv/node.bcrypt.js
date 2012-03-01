@@ -1,0 +1,1 @@
+To build for windows, read readme in the tools folder.
