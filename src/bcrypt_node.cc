@@ -82,12 +82,11 @@ static unsigned long crypto_id_cb(void) {
 static pthread_rwlock_t* locks;
 
 static void crypto_lock_init(void) {
-  int i, n;
 
-  n = CRYPTO_num_locks();
+  const int n = CRYPTO_num_locks();
   locks = new pthread_rwlock_t[n];
 
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     if (pthread_rwlock_init(locks + i, NULL))
       abort();
 }
@@ -138,20 +137,13 @@ struct compare_baton : baton_base {
 };
 
 int GetSeed(uint8_t* seed, int size) {
-    switch (RAND_bytes((unsigned char *)seed, size)) {
-        case -1:
-        case 0:
-            switch (RAND_pseudo_bytes(seed, size)) {
-                case -1:
-                    return -1;
-                case 0:
-                    return 0;
-                default:
-                    return 1;
-            }
-        default:
-            return 1;
+
+    // try to get good random bytes first
+    if (RAND_bytes((unsigned char *)seed, size) > 0) {
+        return 1;
     }
+
+    return RAND_pseudo_bytes(seed, size);
 }
 
 bool ValidateSalt(const char* salt) {
@@ -206,20 +198,17 @@ void GenSaltAsync(uv_work_t* req) {
 
     salt_baton* baton = static_cast<salt_baton*>(req->data);
 
-    char* salt = new char[_SALT_LEN];
-    uint8_t* seed = new uint8_t[baton->rand_len];
-    switch(GetSeed(seed, baton->rand_len)) {
+    std::auto_ptr<uint8_t> seed (new uint8_t[baton->rand_len]);
+    switch(GetSeed(seed.get(), baton->rand_len)) {
         case -1:
             baton->error = "Rand operation not supported.";
         case 0:
             baton->error = "Rand operation did not generate a cryptographically sound seed.";
     }
 
-    bcrypt_gensalt(baton->rounds, seed, salt);
+    char salt[_SALT_LEN];
+    bcrypt_gensalt(baton->rounds, seed.get(), salt);
     baton->salt = std::string(salt);
-
-    delete[] salt;
-    delete[] seed;
 }
 
 void GenSaltAsyncAfter(uv_work_t* req) {
@@ -276,8 +265,8 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     const ssize_t rounds = args[0]->Int32Value();
     const int size = args[1]->Int32Value();
 
-    uint8_t* seed = new uint8_t[size];
-    switch(GetSeed(seed, size)) {
+    std::auto_ptr<uint8_t> seed (new uint8_t[size]);
+    switch(GetSeed(seed.get(), size)) {
         case -1:
             return ThrowException(Exception::Error(String::New("Rand operation not supported.")));
         case 0:
@@ -285,8 +274,7 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     }
 
     char salt[_SALT_LEN];
-    bcrypt_gensalt(rounds, seed, salt);
-    delete[] seed;
+    bcrypt_gensalt(rounds, seed.get(), salt);
 
     return scope.Close(Encode(salt, strlen(salt), BINARY));
 }
@@ -299,11 +287,9 @@ void EncryptAsync(uv_work_t* req) {
         baton->error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
     }
 
-    char* bcrypted = new char[_PASSWORD_LEN];
+    char bcrypted[_PASSWORD_LEN];
     bcrypt(baton->input.c_str(), baton->salt.c_str(), bcrypted);
     baton->output = std::string(bcrypted);
-
-    delete[] bcrypted;
 }
 
 void EncryptAsyncAfter(uv_work_t* req) {
