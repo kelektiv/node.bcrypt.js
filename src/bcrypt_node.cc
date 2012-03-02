@@ -33,6 +33,7 @@
 
 #include <string>
 #include <cstring>
+#include <memory>
 
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
