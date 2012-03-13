@@ -35,8 +35,8 @@
 #include <cstring>
 #include <memory>
 
-#include <openssl/rand.h>
-#include <openssl/crypto.h>
+#include "openssl/rand.h"
+#include "openssl/crypto.h"
 #include "node_blf.h"
 
 //pulled from node commit - 97cada0
