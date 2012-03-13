@@ -19,7 +19,6 @@
      "url" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
    },
    "scripts": {
-     "install": "make build",
      "test": "make test"
    },
    "devDependencies": {
