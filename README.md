@@ -49,11 +49,12 @@ npm install bcrypt
 From Source
 ============
 
-Assuming you've already built node, you can run the waf script:  
+Assuming you've already built node, you can compile the module with `node-gyp`:
 
-    node-waf configure
-    node-waf build
-    npm link
+    git clone git://github.com/ncb000gt/node.bcrypt.js.git
+    cd node.bcrypt.js
+    node-gyp configure
+    node-gyp build
 
 Usage - Sync
 ============
