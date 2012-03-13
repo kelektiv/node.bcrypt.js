@@ -5,18 +5,17 @@ all: test
 build: clean configure compile
 
 configure:
-	node-waf configure
+	node-gyp configure
 
 compile: configure
-	node-waf build
+	node-gyp build
 
-test: build
+test:
 	@./node_modules/nodeunit/bin/nodeunit \
 		$(TESTS)
 
 clean:
-	rm -f bcrypt_lib.node
-	rm -Rf build
+	node-gyp clean
 
 
 .PHONY: clean test build
