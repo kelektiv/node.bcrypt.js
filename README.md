@@ -56,6 +56,8 @@ Assuming you've already built node, you can compile the module with `node-gyp`:
     node-gyp configure
     node-gyp build
 
+Note: if you do not have node-gyp installed, install it using: `npm install -g node-gyp`
+
 Usage - Sync
 ============
 
