@@ -38,7 +38,7 @@ Dependencies
 =============
 
 * NodeJS
-* OpenSSL
+* OpenSSL (Development Libraries (header files) for compilation)
 
 From NPM
 ============
