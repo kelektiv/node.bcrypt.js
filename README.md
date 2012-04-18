@@ -194,3 +194,4 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [lloyd]:https://github.com/lloyd
 [shtylman]:https://github.com/shtylman
 [vadimg]:https://github.com/vadimg
+[bnoordhuis]:https://github.com/bnoordhuis
