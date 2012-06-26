@@ -10,7 +10,7 @@ configure:
 compile: configure
 	node-gyp build
 
-test:
+test: build
 	@./node_modules/nodeunit/bin/nodeunit \
 		$(TESTS)
 
