@@ -91,8 +91,12 @@ module.exports.encrypt_sync = function(data, salt) {
 module.exports.hashSync = function(data, salt) {
     if (data == null || data == undefined || salt == null || salt == undefined) {
         throw new Error('data and salt arguments required');
-    } else if (typeof data !== 'string' || typeof salt !== 'string') {
-        throw new Error('data and salt must be strings');
+    } else if (typeof data !== 'string' && (typeof salt !== 'string' || typeof salt !== 'number')) {
+        throw new Error('data must be a string and salt must either be a salt string or a number of rounds');
+    }
+
+    if (typeof salt === 'number') {
+      salt = module.exports.genSaltSync(salt);
     }
 
     return bindings.encrypt_sync(data, salt);
@@ -111,14 +115,18 @@ module.exports.encrypt = function(data, salt, cb) {
 module.exports.hash = function(data, salt, cb) {
     if (data == null || data == undefined || salt == null || salt == undefined) {
         throw new Error('data and salt arguments required');
-    } else if (typeof data !== 'string' || typeof salt !== 'string') {
-        throw new Error('data and salt must be strings');
+    } else if (typeof data !== 'string' && (typeof salt !== 'string' || typeof salt !== 'number')) {
+        throw new Error('data must be a string and salt must either be a salt string or a number of rounds');
     }
 
     if (!cb) {
         throw new Error('callback required for async compare');
     } else if (typeof cb !== 'function') {
         throw new Error('callback must be a function');
+    }
+
+    if (typeof salt === 'number') {
+      salt = module.exports.genSaltSync(salt);
     }
 
     return bindings.encrypt(data, salt, cb);
