@@ -126,10 +126,12 @@ module.exports.hash = function(data, salt, cb) {
     }
 
     if (typeof salt === 'number') {
-      salt = module.exports.genSaltSync(salt);
+      return module.exports.genSalt(salt, function(err, salt) {
+        return bindings.encrypt(data, salt, cb);
+      });
+    } else {
+      return bindings.encrypt(data, salt, cb);
     }
-
-    return bindings.encrypt(data, salt, cb);
 };
 
 /// compare raw data to hash
