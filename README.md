@@ -74,6 +74,10 @@ To check a password:
     bcrypt.compareSync("B4c0/\/", hash); // true    
     bcrypt.compareSync("not_bacon", hash); // false
 
+Auto-gen a salt and hash:
+
+    var hash = bcrypt.hashSync('bacon', 8)
+
 Usage - Async
 ============
 
@@ -96,6 +100,11 @@ To check a password:
         // res = false
     });
 
+Auto-gen a salt and hash:
+
+    bcrypt.hash('bacon', 8, function(err, hash) {
+    });
+
 API
 ============
 
@@ -115,7 +124,7 @@ API
     * `salt` - [REQUIRED] - the salt to be used in encryption.
   * `hash(data, salt, cb)`
     * `data` - [REQUIRED] - the data to be encrypted.
-    * `salt` - [REQUIRED] - the salt to be used in encryption.
+    * `salt` - [REQUIRED] - the salt to be used to hash the password. if specified as a number then a salt will be generated and used (see examples).
     * `cb` - [REQUIRED] - a callback to be fired once the data has been encrypted. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `encrypted` - Second parameter to the callback providing the encrypted form.
