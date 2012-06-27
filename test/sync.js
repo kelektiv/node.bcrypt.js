@@ -29,6 +29,11 @@ module.exports = {
         assert.ok(bcrypt.hashSync('password', bcrypt.genSaltSync(10)), "Shouldn't throw an Error.");
         assert.done();
     },
+    test_hash_rounds: function(assert) {
+        var hash = bcrypt.hashSync('password', 8);
+        assert.equals(bcrypt.getRounds(hash), 8, "Number of rounds should equal 8.");
+        assert.done();
+    },
     test_hash_empty_string: function(assert) {
         assert.ok(bcrypt.hashSync('', bcrypt.genSaltSync(10)), "Shouldn't throw an Error.");
         assert.throws(function() {bcrypt.hashSync('password', '')}, "Should have thrown an Error related to the salt.");
@@ -44,7 +49,7 @@ module.exports = {
         assert.done();
     },
     test_hash_pw_not_hash_str: function(assert) {
-        assert.throws(function() {bcrypt.hashSync('password', 1);}, "Should throw an Error. hash should be a string.");
+        assert.throws(function() {bcrypt.hashSync('password', {});}, "Should throw an Error. hash should be a string or number.");
         assert.done();
     },
     test_hash_salt_validity: function(assert) {

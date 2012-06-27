@@ -33,6 +33,13 @@ module.exports = {
             });
         });
     },
+    test_hash_rounds: function(assert) {
+        assert.expect(1);
+        bcrypt.hash('bacon', 8, function(err, hash) {
+          assert.equals(bcrypt.getRounds(hash), 8, "Number of rounds should be that specified in the function call.");
+          assert.done();
+        });
+    },
     test_hash_empty_strings: function(assert) {
         assert.expect(2);
         bcrypt.genSalt(10, function(err, salt) {
