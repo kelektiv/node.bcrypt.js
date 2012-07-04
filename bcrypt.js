@@ -1,9 +1,4 @@
-try {
-  var bindings = require('./build/default/bcrypt_lib');
-} catch(e) {
-  //update for v0.5.5+
-  var bindings = require('./build/Release/bcrypt_lib');
-}
+var bindings = require('bindings')('bcrypt_lib');
 
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)

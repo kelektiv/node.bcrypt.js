@@ -21,6 +21,9 @@
    "scripts": {
      "test": "make test"
    },
+   "dependencies": {
+     "bindings": "1.0.0"
+   },
    "devDependencies": {
      "nodeunit": ">=0.6.4"
    },
