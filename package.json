@@ -19,7 +19,7 @@
      "url" : "http://github.com/ncb000gt/node.bcrypt.js/issues"
    },
    "scripts": {
-     "test": "make test"
+     "test": "node-gyp configure build && nodeunit test"
    },
    "dependencies": {
      "bindings": "1.0.0"
