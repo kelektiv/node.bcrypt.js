@@ -24,6 +24,8 @@ Version Compatability
 </tr>
 </table>
 
+Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.
+
 
 Security Issues/Concerns
 =============
@@ -51,10 +53,12 @@ From Source
 
 Assuming you've already built node, you can compile the module with `node-gyp`:
 
-    git clone git://github.com/ncb000gt/node.bcrypt.js.git
-    cd node.bcrypt.js
-    node-gyp configure
-    node-gyp build
+```
+git clone git://github.com/ncb000gt/node.bcrypt.js.git
+cd node.bcrypt.js
+node-gyp configure
+node-gyp build
+```
 
 Note: if you do not have node-gyp installed, install it using: `npm install -g node-gyp`
 
@@ -63,47 +67,59 @@ Usage - Sync
 
 To hash a password:  
 
-    var bcrypt = require('bcrypt');  
-    var salt = bcrypt.genSaltSync(10);  
-    var hash = bcrypt.hashSync("B4c0/\/", salt);
-    // Store hash in your password DB.
+```javascript
+var bcrypt = require('bcrypt');
+var salt = bcrypt.genSaltSync(10);
+var hash = bcrypt.hashSync("B4c0/\/", salt);
+// Store hash in your password DB.
+```
 
 To check a password:  
 
-    // Load hash from your password DB.
-    bcrypt.compareSync("B4c0/\/", hash); // true    
-    bcrypt.compareSync("not_bacon", hash); // false
+```javascript
+// Load hash from your password DB.
+bcrypt.compareSync("B4c0/\/", hash); // true
+bcrypt.compareSync("not_bacon", hash); // false
+```
 
 Auto-gen a salt and hash:
 
-    var hash = bcrypt.hashSync('bacon', 8)
+```javascript
+var hash = bcrypt.hashSync('bacon', 8);
+```
 
 Usage - Async
 ============
 
 To hash a password:  
 
-    var bcrypt = require('bcrypt');  
-    bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash("B4c0/\/", salt, function(err, hash) {
-            // Store hash in your password DB.
-        });
+```javascript
+var bcrypt = require('bcrypt');
+bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash("B4c0/\/", salt, function(err, hash) {
+        // Store hash in your password DB.
     });
+});
+```
 
 To check a password:  
 
-    // Load hash from your password DB.
-    bcrypt.compare("B4c0/\/", hash, function(err, res) {
-        // res == true    
-    });
-    bcrypt.compare("not_bacon", hash, function(err, res) {
-        // res = false
-    });
+```javascript
+// Load hash from your password DB.
+bcrypt.compare("B4c0/\/", hash, function(err, res) {
+    // res == true
+});
+bcrypt.compare("not_bacon", hash, function(err, res) {
+    // res = false
+});
+```
 
 Auto-gen a salt and hash:
 
-    bcrypt.hash('bacon', 8, function(err, hash) {
-    });
+```javascript
+bcrypt.hash('bacon', 8, function(err, hash) {
+});
+```
 
 API
 ============
@@ -149,10 +165,10 @@ The characters that comprise the resultant hash are `./ABCDEFGHIJKLMNOPQRSTUVWXY
 Testing
 ============
 
-I am using nodeunit. I like the way you write tests with it and I like the default output. As such you'll need it to run the tests. I suspect my tests would run on an older version, but these were written and worked against 0.5.1
+If you create a pull request, tests better pass :)
 
-    npm install nodeunit@0.5.1
-    nodeunit test/
+    npm install
+    npm test
 
 Credits
 ============
