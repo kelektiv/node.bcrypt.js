@@ -69,9 +69,9 @@ static void crypto_lock_init(void) {
 
 static void crypto_lock_cb(int mode, int n, const char* file, int line) {
   if (mode & CRYPTO_LOCK)
-    WaitForSingleObject(locks[type], INFINITE);
+    WaitForSingleObject(locks[n], INFINITE);
   else
-    ReleaseMutex(locks[type]);
+    ReleaseMutex(locks[n]);
 }
 
 static unsigned long crypto_id_cb(void) {
@@ -475,3 +475,4 @@ extern "C" void init(Handle<Object> target) {
     NODE_SET_METHOD(target, "compare", Compare);
 };
 
+NODE_MODULE(bcrypt_lib, init);
