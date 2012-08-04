@@ -195,6 +195,7 @@ Contributors
 * [Roman Shtylman][shtylman] - Code refactoring, general rot reduction, compile options, better memory management with delete and new, and an upgrade to libuv over eio/ev.
 * [Vadim Graboys][vadimg] - Code changes to support 0.5.5+
 * [Ben Noordhuis][bnoordhuis] - Fixed a thread safety issue in nodejs that was perfectly mappable to this module.
+* [Nate Rajlich][tootallnate] - Bindings and build process.
 * [Sean McArthur][seanmonstar] - Windows Support
 * [Fanie Oosthuysen][weareu] - Windows Support
 
@@ -223,5 +224,6 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [shtylman]:https://github.com/shtylman
 [vadimg]:https://github.com/vadimg
 [bnoordhuis]:https://github.com/bnoordhuis
+[tootallnate]:https://github.com/tootallnate
 [seanmonstar]:https://github.com/seanmonstar
 [weareu]:https://github.com/weareu
