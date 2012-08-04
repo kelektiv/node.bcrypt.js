@@ -41,6 +41,7 @@ Dependencies
 
 * NodeJS
 * OpenSSL (Development Libraries (header files) for compilation)
+ * For Windows you'll need http://slproweb.com/products/Win32OpenSSL.html installed to the default location of `C:\OpenSSL-Win32`
 
 From NPM
 ============
@@ -194,6 +195,8 @@ Contributors
 * [Roman Shtylman][shtylman] - Code refactoring, general rot reduction, compile options, better memory management with delete and new, and an upgrade to libuv over eio/ev.
 * [Vadim Graboys][vadimg] - Code changes to support 0.5.5+
 * [Ben Noordhuis][bnoordhuis] - Fixed a thread safety issue in nodejs that was perfectly mappable to this module.
+* [Sean McArthur][seanmonstar] - Windows Support
+* [Fanie Oosthuysen][weareu] - Windows Support
 
 License
 ============
@@ -220,3 +223,5 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [shtylman]:https://github.com/shtylman
 [vadimg]:https://github.com/vadimg
 [bnoordhuis]:https://github.com/bnoordhuis
+[seanmonstar]:https://github.com/seanmonstar
+[weareu]:https://github.com/weareu
