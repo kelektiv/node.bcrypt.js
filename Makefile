@@ -9,6 +9,7 @@ configure:
 
 compile: configure
 	node-gyp build
+	npm install .
 
 test: build
 	@./node_modules/nodeunit/bin/nodeunit \
