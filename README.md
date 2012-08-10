@@ -40,8 +40,10 @@ Dependencies
 =============
 
 * NodeJS
+* Python 2.x
 * OpenSSL (Development Libraries (header files) for compilation)
  * For Windows you'll need http://slproweb.com/products/Win32OpenSSL.html installed to the default location of `C:\OpenSSL-Win32`
+ * Also on Windows, you will need the install options for c# and c++ or you will get an error that cl.exe could not be found (cl.exe is the Visual Studio compiler)
 
 From NPM
 ============
