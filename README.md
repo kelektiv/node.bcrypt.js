@@ -42,8 +42,10 @@ Dependencies
 * NodeJS
 * OpenSSL (Development Libraries (header files) for compilation)
  * For Windows you'll need http://slproweb.com/products/Win32OpenSSL.html installed to the default location of `C:\OpenSSL-Win32`
-* Windows users will need the options for c# and c++ installed with their visual studio instance.
-* Python 2.x
+* `node-gyp`
+ * Please check the dependencies for this tool at: https://github.com/TooTallNate/node-gyp/
+  * Windows users will need the options for c# and c++ installed with their visual studio instance.
+  * Python 2.x
 
 From NPM
 ============
