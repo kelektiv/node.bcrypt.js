@@ -8,6 +8,11 @@ Lib to help you hash passwords.
 
 Catalyst for this module: [How To Safely Store A Password][codahale]
 
+If You Are Submitting Bugs/Issues
+=============
+
+Because we can't magically know what you are doing to create an issue, it is best if you provide a snippet of code. This snippet need not include your secret sauce, but it must replicate the issue you are describing. The issues that get closed without resolution tend to be the ones without code examples. Thanks.
+
 
 Version Compatability
 =============
