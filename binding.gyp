@@ -1,8 +1,4 @@
 {
-  'variables': {
-    # The default install location of OpenSSL-Win32
-    'openssl_Root': 'C:/OpenSSL-Win32'
-  },
   'targets': [
     {
       'target_name': 'bcrypt_lib',
@@ -13,16 +9,28 @@
       ],
       'conditions': [
         [ 'OS=="win"', {
+          'conditions': [
+            # "openssl_root" is the directory on Windows of the OpenSSL files
+            ['target_arch=="x64"', {
+              'variables': {
+                'openssl_root%': 'C:/OpenSSL-Win64'
+              },
+            }, {
+              'variables': {
+                'openssl_root%': 'C:/OpenSSL-Win32'
+              },
+            }],
+          ],
           'defines': [
             'uint=unsigned int',
             # we need to use node's preferred "win32" rather than gyp's preferred "win"
             'PLATFORM="win32"',
           ],
           'libraries': [ 
-            '-l<(openssl_Root)/lib/libeay32.lib',
+            '-l<(openssl_root)/lib/libeay32.lib',
           ],
           'include_dirs': [
-            '<(openssl_Root)/include',
+            '<(openssl_root)/include',
           ],
         }, {
           'include_dirs': [
