@@ -23,8 +23,6 @@
           ],
           'defines': [
             'uint=unsigned int',
-            # we need to use node's preferred "win32" rather than gyp's preferred "win"
-            'PLATFORM="win32"',
           ],
           'libraries': [ 
             '-l<(openssl_root)/lib/libeay32.lib',
@@ -32,8 +30,9 @@
           'include_dirs': [
             '<(openssl_root)/include',
           ],
-        }, {
+        }, { # OS!="win"
           'include_dirs': [
+            # use node's bundled openssl headers on Unix platforms
             '<(node_root_dir)/deps/openssl/openssl/include'
           ],
         }],
