@@ -47,6 +47,7 @@ Dependencies
 * NodeJS
 * OpenSSL (Development Libraries (header files) for compilation)
  * For Windows you'll need http://slproweb.com/products/Win32OpenSSL.html installed to the default location of `C:\OpenSSL-Win32`
+  * Please note that for this to build properly you'll need the Normal version of OpenSSL-Win<arch>, not the Light version. The reason for this is that we need to be able to compile the code using the header files that exist in the Normal version.
   * For 64 bit use the 64 bit version and install to `C:\OpenSSL-Win64`
 * `node-gyp`
  * Please check the dependencies for this tool at: https://github.com/TooTallNate/node-gyp/
