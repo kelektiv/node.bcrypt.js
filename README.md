@@ -57,7 +57,7 @@ Dependencies
 From NPM
 ============
 
-npm install bcrypt
+    npm install bcrypt
 
 
 From Source
@@ -65,12 +65,11 @@ From Source
 
 Assuming you've already built node, you can compile the module with `node-gyp`:
 
-```
-git clone git://github.com/ncb000gt/node.bcrypt.js.git
-cd node.bcrypt.js
-node-gyp configure
-node-gyp build
-```
+    git clone git://github.com/ncb000gt/node.bcrypt.js.git
+    cd node.bcrypt.js
+    node-gyp configure
+    node-gyp build
+
 
 Note: if you do not have node-gyp installed, install it using: `npm install -g node-gyp`
 
