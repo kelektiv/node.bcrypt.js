@@ -30,6 +30,7 @@ Version Compatability
 </table>
 
 Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.
+Windows 64bit users should make sure to have version >= 0.7.2 of this module.
 
 
 Security Issues/Concerns
@@ -48,7 +49,7 @@ Dependencies
 * OpenSSL (Development Libraries (header files) for compilation)
  * For Windows you'll need http://slproweb.com/products/Win32OpenSSL.html installed to the default location of `C:\OpenSSL-Win32`
   * Please note that for this to build properly you'll need the Normal version of OpenSSL-Win<arch>, not the Light version. The reason for this is that we need to be able to compile the code using the header files that exist in the Normal version.
-  * For 64 bit use the 64 bit version and install to `C:\OpenSSL-Win64`
+  * For 64 bit use the 64 bit version and install to `C:\OpenSSL-Win64`. Also make sure to have version >= 0.7.2 of this module
 * `node-gyp`
  * Please check the dependencies for this tool at: https://github.com/TooTallNate/node-gyp/
   * Windows users will need the options for c# and c++ installed with their visual studio instance.
