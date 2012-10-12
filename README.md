@@ -29,7 +29,7 @@ Version Compatability
 </tr>
 </table>
 
-Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.
+Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.  
 `node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
 
     gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --nodedir flag instead
