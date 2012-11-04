@@ -33,7 +33,7 @@
 
 #include <string>
 #include <cstring>
-#include <memory>
+#include <vector>
 
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
@@ -199,8 +199,8 @@ void GenSaltAsync(uv_work_t* req) {
 
     salt_baton* baton = static_cast<salt_baton*>(req->data);
 
-    std::auto_ptr<uint8_t> seed (new uint8_t[baton->rand_len]);
-    switch(GetSeed(seed.get(), baton->rand_len)) {
+    std::vector<uint8_t> seed(baton->rand_len);
+    switch(GetSeed(&seed[0], baton->rand_len)) {
         case -1:
             baton->error = "Rand operation not supported.";
         case 0:
@@ -208,7 +208,7 @@ void GenSaltAsync(uv_work_t* req) {
     }
 
     char salt[_SALT_LEN];
-    bcrypt_gensalt(baton->rounds, seed.get(), salt);
+    bcrypt_gensalt(baton->rounds, &seed[0], salt);
     baton->salt = std::string(salt);
 }
 
@@ -266,8 +266,8 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     const ssize_t rounds = args[0]->Int32Value();
     const int size = args[1]->Int32Value();
 
-    std::auto_ptr<uint8_t> seed (new uint8_t[size]);
-    switch(GetSeed(seed.get(), size)) {
+    std::vector<uint8_t> seed(size);
+    switch(GetSeed(&seed[0], size)) {
         case -1:
             return ThrowException(Exception::Error(String::New("Rand operation not supported.")));
         case 0:
@@ -275,7 +275,7 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     }
 
     char salt[_SALT_LEN];
-    bcrypt_gensalt(rounds, seed.get(), salt);
+    bcrypt_gensalt(rounds, &seed[0], salt);
 
     return scope.Close(Encode(salt, strlen(salt), BINARY));
 }
