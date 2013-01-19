@@ -254,8 +254,7 @@ Handle<Value> GenerateSalt(const Arguments &args) {
 
     uv_work_t* req = new uv_work_t;
     req->data = baton;
-    uv_queue_work(uv_default_loop(), req, GenSaltAsync, GenSaltAsyncAfter);
-
+    uv_queue_work(uv_default_loop(), req, GenSaltAsync, (uv_after_work_cb)GenSaltAsyncAfter);
 
     return Undefined();
 }
@@ -334,7 +333,7 @@ Handle<Value> Encrypt(const Arguments& args) {
 
     uv_work_t* req = new uv_work_t;
     req->data = baton;
-    uv_queue_work(uv_default_loop(), req, EncryptAsync, EncryptAsyncAfter);
+    uv_queue_work(uv_default_loop(), req, EncryptAsync, (uv_after_work_cb)EncryptAsyncAfter);
 
     return Undefined();
 }
@@ -428,7 +427,7 @@ Handle<Value> Compare(const Arguments& args) {
 
     uv_work_t* req = new uv_work_t;
     req->data = baton;
-    uv_queue_work(uv_default_loop(), req, CompareAsync, CompareAsyncAfter);
+    uv_queue_work(uv_default_loop(), req, CompareAsync, (uv_after_work_cb)CompareAsyncAfter);
 
     return Undefined();
 }
