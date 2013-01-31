@@ -220,7 +220,7 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 
 
 
-[bcryptwiki]: http://en.wikipedia.org/wiki/Crypt_(Unix)#Blowfish-based_scheme  
+[bcryptwiki]: http://en.wikipedia.org/wiki/Bcrypt  
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 [codahale]: http://codahale.com/how-to-safely-store-a-password/
 [gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
