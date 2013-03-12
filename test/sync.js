@@ -95,6 +95,18 @@ module.exports = {
         assert.ok(!(bcrypt.compareSync("password", "")), "These hashes should not be equal.");
         assert.done();
     },
+    test_hash_compare_invalid_strings: function(assert) {
+      var fullString = 'envy1362987212538';
+      var hash = '$2a$10$XOPbrlUPQdwdJUpSrIF6X.LbE14qsMmKGhM1A8W9iqaG3vv1BD7WC';
+      var wut = ':';
+      bcrypt.compareSync(fullString, hash, function(err, res) {
+        assert.ok(res);
+      });
+      bcrypt.compareSync(fullString, wut, function(err, res) {
+        assert.ok(!res)
+      });
+      assert.done();
+    },
     test_getRounds: function(assert) {
         var hash = bcrypt.hashSync("test", bcrypt.genSaltSync(9));
         assert.equals(9, bcrypt.getRounds(hash), "getRounds can't extract rounds");

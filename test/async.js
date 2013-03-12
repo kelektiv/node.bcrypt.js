@@ -133,5 +133,17 @@ module.exports = {
             assert.done();
           });
         });
+    },
+    test_hash_compare_invalid_strings: function(assert) {
+      var fullString = 'envy1362987212538';
+      var hash = '$2a$10$XOPbrlUPQdwdJUpSrIF6X.LbE14qsMmKGhM1A8W9iqaG3vv1BD7WC';
+      var wut = ':';
+      bcrypt.compare(fullString, hash, function(err, res) {
+        assert.ok(res);
+        bcrypt.compare(fullString, wut, function(err, res) {
+          assert.ok(!res);
+          assert.done();
+        });
+      });
     }
 };

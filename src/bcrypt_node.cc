@@ -361,7 +361,7 @@ bool CompareStrings(const char* s1, const char* s2) {
     int s2_len = strlen(s2);
 
     if (s1_len != s2_len) {
-        eq = false;
+        return false;
     }
 
     const int max_len = (s2_len < s1_len) ? s1_len : s2_len;
@@ -381,8 +381,10 @@ void CompareAsync(uv_work_t* req) {
     compare_baton* baton = static_cast<compare_baton*>(req->data);
 
     char bcrypted[_PASSWORD_LEN];
-    bcrypt(baton->input.c_str(), baton->encrypted.c_str(), bcrypted);
-    baton->result = CompareStrings(bcrypted, baton->encrypted.c_str());
+    if (ValidateSalt(baton->encrypted.c_str())) {
+        bcrypt(baton->input.c_str(), baton->encrypted.c_str(), bcrypted);
+        baton->result = CompareStrings(bcrypted, baton->encrypted.c_str());
+    }
 }
 
 void CompareAsyncAfter(uv_work_t* req) {
@@ -439,8 +441,12 @@ Handle<Value> CompareSync(const Arguments& args) {
     String::Utf8Value hash(args[1]->ToString());
 
     char bcrypted[_PASSWORD_LEN];
-    bcrypt(*pw, *hash, bcrypted);
-    return Boolean::New(CompareStrings(bcrypted, *hash));
+    if (ValidateSalt(*hash)) {
+        bcrypt(*pw, *hash, bcrypted);
+        return Boolean::New(CompareStrings(bcrypted, *hash));
+    } else {
+        return Boolean::New(false);
+    }
 }
 
 Handle<Value> GetRounds(const Arguments& args) {
