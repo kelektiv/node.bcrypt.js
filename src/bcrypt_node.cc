@@ -361,7 +361,7 @@ bool CompareStrings(const char* s1, const char* s2) {
     int s2_len = strlen(s2);
 
     if (s1_len != s2_len) {
-        return false;
+        eq = false;
     }
 
     const int max_len = (s2_len < s1_len) ? s1_len : s2_len;
