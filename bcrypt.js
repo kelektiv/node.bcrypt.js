@@ -1,6 +1,6 @@
 var bindings = require('bindings')('bcrypt_lib');
 
-module.bind_to_domain = function(cb) {
+var bind_to_domain = function(cb) {
     if (process.domain) {
         cb = process.domain.bind(cb);
     }
@@ -78,7 +78,7 @@ module.exports.genSalt = function(rounds, seed_length, cb) {
         throw new Error('callback required for gen_salt');
     }
 
-    cb = module.bind_to_domain(cb);
+    cb = bind_to_domain(cb);
 
     return bindings.gen_salt(rounds, seed_length, cb);
 };
@@ -136,7 +136,7 @@ module.exports.hash = function(data, salt, cb) {
       });
     }
 
-    cb = module.bind_to_domain(cb);
+    cb = bind_to_domain(cb);
 
     return bindings.encrypt(data, salt, cb);
 };
@@ -178,7 +178,7 @@ module.exports.compare = function(data, hash, cb) {
         throw new Error('callback must be a function');
     }
 
-    cb = module.bind_to_domain(cb);
+    cb = bind_to_domain(cb);
 
     return bindings.compare(data, hash, cb);
 };
