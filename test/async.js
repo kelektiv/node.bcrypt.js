@@ -8,21 +8,21 @@ module.exports = {
             assert.done();
         });
     },
-    test_salt_no_params: function(assert) {
-        assert.throws(function() {bcrypt.genSalt();}, "Should throw an Error. genSalt requires a callback.");
-        assert.done();
-    },
     test_salt_only_cb: function(assert) {
         assert.doesNotThrow(function() {bcrypt.genSalt(function(err, salt) {});}, "Should not throw an Error. Rounds and seed length are optional.");
         assert.done();
     },
     test_salt_rounds_is_string_number: function(assert) {
-        assert.throws(function() {bcrypt.genSalt('10');}, "Should throw an Error. No params.");
-        assert.done();
+        bcrypt.genSalt('10', void 0, function (err, salt) {
+            assert.ok((err instanceof Error), "Should be an Error. genSalt requires round to be of type number.");
+            assert.done();
+        });
     },
-    test_salt_rounds_is_NaN: function(assert) {
-        assert.throws(function() {bcrypt.genSalt('b');}, "Should throw an Error. genSalt requires rounds to be a number.");
-        assert.done();
+    test_salt_rounds_is_string_non_number: function(assert) {
+        bcrypt.genSalt('b', function (err, salt) {
+            assert.ok((err instanceof Error), "Should throw an Error. genSalt requires rounds to of type number.");
+            assert.done();
+        });
     },
     test_hash: function(assert) {
         assert.expect(1);
@@ -58,15 +58,21 @@ module.exports = {
         });
     },
     test_hash_no_params: function(assert) {
-        assert.throws(function() {bcrypt.hash();}, "Should throw an Error. No Params.");
-        assert.done();
+        bcrypt.hash(function (err, hash) {
+            assert.ok(err, "Should be an error. No params.");
+            assert.done();
+        });
     },
     test_hash_one_param: function(assert) {
-        assert.throws(function() {bcrypt.hash('password');}, "Should throw an Error. No salt.");
-        assert.done();
+        bcrypt.hash('password', function (err, hash) {
+            assert.ok(err, "Should be an Error. No salt.");
+            assert.done();
+        });
     },
     test_hash_not_hash_str: function(assert) {
-        assert.throws(function() {bcrypt.hash('password', 1);}, "Should throw an Error. hash should be a string.");
+        bcrypt.hash('password', 1, function (err, hash) {
+            assert.ok(err, "Should be an Error. hash should be a string.")
+        });
         assert.done();
     },
     test_hash_salt_validity: function(assert) {
