@@ -69,12 +69,6 @@ module.exports = {
             assert.done();
         });
     },
-    test_hash_not_hash_str: function(assert) {
-        bcrypt.hash('password', 1, function (err, hash) {
-            assert.ok(err, "Should be an Error. hash should be a string.")
-        });
-        assert.done();
-    },
     test_hash_salt_validity: function(assert) {
         assert.expect(3);
         bcrypt.hash('password', '$2a$10$somesaltyvaluertsetrse', function(err, enc) {
