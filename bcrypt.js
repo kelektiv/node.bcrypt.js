@@ -56,18 +56,18 @@ module.exports.genSalt = function(rounds, seed_length, cb) {
     if (!rounds) {
         rounds = 10;
     } else if (typeof rounds !== 'number') {
-        throw new Error('rounds must be a number');
+        return cb(new Error('rounds must be a number'));
     }
 
     // default length 20
     if (!seed_length) {
         seed_length = 20;
     } else if (typeof seed_length !== 'number') {
-        throw new Error('seed_length must be a number');
+        return cb(new Error('seed_length must be a number'));
     }
 
     if (!cb) {
-        throw new Error('callback required for gen_salt');
+        return;
     }
 
     return bindings.gen_salt(rounds, seed_length, cb);
@@ -108,16 +108,22 @@ module.exports.encrypt = function(data, salt, cb) {
 }
 
 module.exports.hash = function(data, salt, cb) {
+    if (typeof data === 'function') {
+        return data(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+    }
+    if (typeof salt === 'function') {
+        return salt(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+    }
     if (data == null || data == undefined || salt == null || salt == undefined) {
-        throw new Error('data and salt arguments required');
+        return cb(new Error('data and salt arguments required'));
     } else if (typeof data !== 'string' && (typeof salt !== 'string' || typeof salt !== 'number')) {
-        throw new Error('data must be a string and salt must either be a salt string or a number of rounds');
+        return cb(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
     }
 
     if (!cb) {
-        throw new Error('callback required for async compare');
+        return;
     } else if (typeof cb !== 'function') {
-        throw new Error('callback must be a function');
+        return;
     }
 
     if (typeof salt === 'number') {
@@ -155,15 +161,15 @@ module.exports.compareSync = function(data, hash) {
 /// @param {Function} cb callback(err, matched) - matched is true if hashed data matches hash
 module.exports.compare = function(data, hash, cb) {
     if (data == null || data == undefined || hash == null || hash == undefined) {
-        throw new Error('data and hash arguments required');
+        return cb(new Error('data and hash arguments required'));
     } else if (typeof data !== 'string' || typeof hash !== 'string') {
-        throw new Error('data and hash must be strings');
+        return cb(new Error('data and hash must be strings'));
     }
 
     if (!cb) {
-        throw new Error('callback required for async compare');
+        return;
     } else if (typeof cb !== 'function') {
-        throw new Error('callback must be a function');
+        return;
     }
 
     return bindings.compare(data, hash, cb);
