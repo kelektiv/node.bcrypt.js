@@ -120,9 +120,7 @@ module.exports.hash = function(data, salt, cb) {
         return cb(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
     }
 
-    if (!cb) {
-        return;
-    } else if (typeof cb !== 'function') {
+    if (!cb || typeof cb !== 'function') {
         return;
     }
 
@@ -166,9 +164,7 @@ module.exports.compare = function(data, hash, cb) {
         return cb(new Error('data and hash must be strings'));
     }
 
-    if (!cb) {
-        return;
-    } else if (typeof cb !== 'function') {
+    if (!cb || typeof cb !== 'function') {
         return;
     }
 
