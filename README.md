@@ -1,5 +1,4 @@
-node.bcrypt.js
-=============
+# node.bcrypt.js
 
 [![Build Status](https://secure.travis-ci.org/ncb000gt/node.bcrypt.js.png)](http://travis-ci.org/#!/ncb000gt/node.bcrypt.js) 
 
@@ -8,14 +7,12 @@ Lib to help you hash passwords.
 
 Catalyst for this module: [How To Safely Store A Password][codahale]
 
-If You Are Submitting Bugs/Issues
-=============
+## If You Are Submitting Bugs/Issues
 
 Because we can't magically know what you are doing to expose an issue, it is best if you provide a snippet of code. This snippet need not include your secret sauce, but it must replicate the issue you are describing. The issues that get closed without resolution tend to be the ones without code examples. Thanks.
 
 
-Version Compatability
-=============
+## Version Compatability
 
 <table>
 <tr>
@@ -36,8 +33,7 @@ Windows users should make sure to have at least node 0.8.5 installed and version
 
 
 
-Security Issues/Concerns
-=============
+## Security Issues/Concerns
 
 As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code- please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
 
@@ -45,8 +41,7 @@ To make it easier for people using this tool to analyze what has been surveyed, 
 
 * An [issue with passwords][jtr] was found with a version of the Blowfish algorithm developed for John the Ripper. This is not present in the OpenBSD version and is thus not a problem for this module. HT [zooko][zooko].
 
-Dependencies
-=============
+## Dependencies
 
 * NodeJS
 * OpenSSL (Development Libraries (header files) for compilation)
@@ -59,55 +54,16 @@ Dependencies
   * Windows users will need the options for c# and c++ installed with their visual studio instance.
   * Python 2.x
 
-From NPM
-============
-
-    npm install bcrypt
-
-
-From Source
-============
-
-Assuming you've already built node, you can compile the module with `node-gyp`:
-
-    git clone git://github.com/ncb000gt/node.bcrypt.js.git
-    cd node.bcrypt.js
-    node-gyp configure
-    node-gyp build
-
-
-Note: if you do not have node-gyp installed, install it using: `npm install -g node-gyp`
-
-Usage - Sync
-============
-
-To hash a password:  
-
-```javascript
-var bcrypt = require('bcrypt');
-var salt = bcrypt.genSaltSync(10);
-var hash = bcrypt.hashSync("B4c0/\/", salt);
-// Store hash in your password DB.
+## Install via NPM
+```
+npm install bcrypt
 ```
 
-To check a password:  
+## Usage
 
-```javascript
-// Load hash from your password DB.
-bcrypt.compareSync("B4c0/\/", hash); // true
-bcrypt.compareSync("not_bacon", hash); // false
-```
+### async (recommended)
 
-Auto-gen a salt and hash:
-
-```javascript
-var hash = bcrypt.hashSync('bacon', 8);
-```
-
-Usage - Async
-============
-
-To hash a password:  
+To hash a password:
 
 ```javascript
 var bcrypt = require('bcrypt');
@@ -118,7 +74,7 @@ bcrypt.genSalt(10, function(err, salt) {
 });
 ```
 
-To check a password:  
+To check a password:
 
 ```javascript
 // Load hash from your password DB.
@@ -137,8 +93,33 @@ bcrypt.hash('bacon', 8, function(err, hash) {
 });
 ```
 
-API
-============
+
+### sync
+
+To hash a password:
+
+```javascript
+var bcrypt = require('bcrypt');
+var salt = bcrypt.genSaltSync(10);
+var hash = bcrypt.hashSync("B4c0/\/", salt);
+// Store hash in your password DB.
+```
+
+To check a password:
+
+```javascript
+// Load hash from your password DB.
+bcrypt.compareSync("B4c0/\/", hash); // true
+bcrypt.compareSync("not_bacon", hash); // false
+```
+
+Auto-gen a salt and hash:
+
+```javascript
+var hash = bcrypt.hashSync('bacon', 8);
+```
+
+## API
 
 `BCrypt.`
 
@@ -173,21 +154,20 @@ API
     * `encrypted` - [REQUIRED] - hash from which the number of rounds used should be extracted.
 
 
-Hash Info
-============
+## Hash Info
 
 The characters that comprise the resultant hash are `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$`.
 
-Testing
-============
+## Testing
 
 If you create a pull request, tests better pass :)
 
-    npm install
-    npm test
+```
+npm install
+npm test
+```
 
-Credits
-============
+## Credits
 
 The code for this comes from a few sources:
 
@@ -196,8 +176,7 @@ The code for this comes from a few sources:
 * bcrypt::gen_salt - [gen_salt inclusion to bcrypt][bcryptgs]
 * bcrypt_node.cc - me
 
-Contributors
-============
+## Contributors
 
 * [Antonio Salazar Cardozo][shadowfiend] - Early MacOS X support (when we used libbsd)
 * [Ben Glow][pixelglow] - Fixes for thread safety with async calls
@@ -214,14 +193,10 @@ Contributors
 * [Sean McArthur][seanmonstar] - Windows Support
 * [Fanie Oosthuysen][weareu] - Windows Support
 
-License
-============
-
+## License
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
 
-
-
-[bcryptwiki]: http://en.wikipedia.org/wiki/Bcrypt  
+[bcryptwiki]: http://en.wikipedia.org/wiki/Bcrypt
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 [codahale]: http://codahale.com/how-to-safely-store-a-password/
 [gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
