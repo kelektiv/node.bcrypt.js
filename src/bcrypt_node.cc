@@ -123,6 +123,8 @@ struct salt_baton : baton_base {
     std::string salt;
     int rand_len;
     ssize_t rounds;
+
+    salt_baton() : salt(), rand_len(0), rounds(0) {}
 };
 
 struct encrypt_baton : baton_base {
@@ -135,6 +137,8 @@ struct compare_baton : baton_base {
     std::string input;
     std::string encrypted;
     bool result;
+
+    compare_baton(): input(), encrypted(), result(false) {}
 };
 
 int GetSeed(uint8_t* seed, int size) {
