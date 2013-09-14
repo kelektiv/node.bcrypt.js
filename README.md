@@ -59,6 +59,8 @@ To make it easier for people using this tool to analyze what has been surveyed, 
 npm install bcrypt
 ```
 
+***Note:*** OS X users using Xcode 4.3.1 or above may need to run the following command in their terminal prior to installing if errors occur regarding xcodebuild: ```sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer```
+
 ## Usage
 
 ### async (recommended)
