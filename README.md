@@ -14,17 +14,10 @@ Because we can't magically know what you are doing to expose an issue, it is bes
 
 ## Version Compatability
 
-<table>
-<tr>
-<td>Node Ver</td><td>Bcrypt Version</td>
-</tr>
-<tr>
-<td>&lt;= 0.4.x</td><td>&lt;= 0.4.x</td>
-</tr>
-<tr>
-<td>&gt;= 0.6.x</td><td>&gt;= 0.5.x</td>
-</tr>
-</table>
+| Node Version | Bcrypt Version |
+| ---- | ---- |
+| <= 0.4.x | <= 0.4.x |
+| >= 0.6.x | >= 0.5.x |
 
 Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.  
 `node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
