@@ -52,7 +52,26 @@ To make it easier for people using this tool to analyze what has been surveyed, 
 npm install bcrypt
 ```
 
-***Note:*** OS X users using Xcode 4.3.1 or above may need to run the following command in their terminal prior to installing if errors occur regarding xcodebuild: ```sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer```
+You will also need to install:
+
+  * On Unix:
+    * `python` (`v2.7` recommended, `v3.x.x` is __*not*__ supported)
+    * `make`
+    * A proper C/C++ compiler toolchain, like GCC
+  * On Windows:
+    * [Python][windows-python] ([`v2.7.3`][windows-python-v2.7.3] recommended, `v3.x.x` is __*not*__ supported)
+    * Windows XP/Vista/7:
+      * Microsoft Visual Studio C++ 2010 ([Express][msvc2010] version works well)
+      * For 64-bit builds of node and native modules you will _**also**_ need the [Windows 7 64-bit SDK][win7sdk]
+        * If the install fails, try uninstalling any C++ 2010 x64&x86 Redistributable that you have installed first.
+      * If you get errors that the 64-bit compilers are not installed you may also need the [compiler update for the Windows SDK 7.1]
+    * Windows 7/8:
+      * Microsoft Visual Studio C++ 2012 for Windows Desktop ([Express][msvc2012] version works well)
+
+***Note:***  OS X is just a flavour of Unix and so needs `python`, `make`, and C/C++.
+An easy way to obtain these is to install XCode from Apple,
+and then use it to install the command line tools (under Preferences -> Downloads).
+OS X users using Xcode 4.3.1 or above may need to run the following command in their terminal prior to installing if errors occur regarding xcodebuild: ```sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer```
 
 ## Usage
 
