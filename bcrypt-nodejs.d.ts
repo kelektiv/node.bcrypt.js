@@ -1,4 +1,4 @@
-declare module "bcrypt" {
+declare module "bcrypt-nodejs" {
     export function genSaltSync(rounds?: number, seed_length?: number):string;
     export function genSalt(rounds: number, seed_length: number, callback: (err: any, salt: string) => void);
     export function genSalt(callback: (err: any, salt: string) => void);
