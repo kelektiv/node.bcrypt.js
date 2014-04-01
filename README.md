@@ -14,7 +14,7 @@ First, make sure that the version of node you are using is a _stable_ version. Y
 If you are on a stable version of node, we can't magically know what you are doing to expose an issue, it is best if you provide a snippet of code or log files if you're having an install issue. This snippet need not include your secret sauce, but it must replicate the issue you are describing. The issues that get closed without resolution tend to be the ones that don't help us help you. Thanks.
 
 
-## Version Compatability
+## Version Compatibility
 
 | Node Version | Bcrypt Version |
 | ---- | ---- |
