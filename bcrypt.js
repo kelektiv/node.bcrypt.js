@@ -2,9 +2,8 @@ var bindings = require('bindings')('bcrypt_lib');
 
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
-/// @param {Number} [seed_length] number of random bytes (default 20)
 /// @return {String} salt
-module.exports.genSaltSync = function(rounds, seed_length) {
+module.exports.genSaltSync = function(rounds) {
     // default 10 rounds
     if (!rounds) {
         rounds = 10;
@@ -12,32 +11,22 @@ module.exports.genSaltSync = function(rounds, seed_length) {
         throw new Error('rounds must be a number');
     }
 
-    // default length 20
-    if (!seed_length) {
-        seed_length = 20;
-    } else if (typeof seed_length !== 'number') {
-        throw new Error('seed_length must be a number');
-    }
-
-    return bindings.gen_salt_sync(rounds, seed_length);
+    return bindings.gen_salt_sync(rounds);
 };
 
 /// generate a salt
 /// @param {Number} [rounds] number of rounds (default 10)
-/// @param {Number} [seed_length] number of random bytes (default 20)
 /// @param {Function} cb callback(err, salt)
-module.exports.genSalt = function(rounds, seed_length, cb) {
+module.exports.genSalt = function(rounds, ignore, cb) {
     // if callback is first argument, then use defaults for others
     if (typeof arguments[0] === 'function') {
         // have to set callback first otherwise arguments are overriden
         cb = arguments[0];
         rounds = 10;
-        seed_length = 20;
     // callback is second argument
     } else if (typeof arguments[1] === 'function') {
         // have to set callback first otherwise arguments are overriden
         cb = arguments[1];
-        seed_length = 20;
     }
 
     // default 10 rounds
@@ -47,18 +36,11 @@ module.exports.genSalt = function(rounds, seed_length, cb) {
         return cb(new Error('rounds must be a number'));
     }
 
-    // default length 20
-    if (!seed_length) {
-        seed_length = 20;
-    } else if (typeof seed_length !== 'number') {
-        return cb(new Error('seed_length must be a number'));
-    }
-
     if (!cb) {
         return;
     }
 
-    return bindings.gen_salt(rounds, seed_length, cb);
+    return bindings.gen_salt(rounds, cb);
 };
 
 /// hash data using a salt
