@@ -121,10 +121,9 @@ struct baton_base {
 
 struct salt_baton : baton_base {
     std::string salt;
-    int rand_len;
     ssize_t rounds;
 
-    salt_baton() : salt(), rand_len(0), rounds(0) {}
+    salt_baton() : salt(), rounds(0) {}
 };
 
 struct encrypt_baton : baton_base {
@@ -203,8 +202,8 @@ void GenSaltAsync(uv_work_t* req) {
 
     salt_baton* baton = static_cast<salt_baton*>(req->data);
 
-    std::vector<uint8_t> seed(baton->rand_len);
-    switch(GetSeed(&seed[0], baton->rand_len)) {
+    std::vector<uint8_t> seed(BCRYPT_MAXSALT);
+    switch(GetSeed(&seed[0], BCRYPT_MAXSALT)) {
         case -1:
             baton->error = "Rand operation not supported.";
         case 0:
@@ -247,13 +246,11 @@ Handle<Value> GenerateSalt(const Arguments &args) {
     HandleScope scope;
 
     const ssize_t rounds = args[0]->Int32Value();
-    const int rand_len = args[1]->Int32Value();
-    Local<Function> callback = Local<Function>::Cast(args[2]);
+    Local<Function> callback = Local<Function>::Cast(args[1]);
 
     salt_baton* baton = new salt_baton();
 
     baton->callback = Persistent<Function>::New(callback);
-    baton->rand_len = rand_len;
     baton->rounds = rounds;
 
     uv_work_t* req = new uv_work_t;
@@ -267,10 +264,9 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     HandleScope scope;
 
     const ssize_t rounds = args[0]->Int32Value();
-    const int size = args[1]->Int32Value();
 
-    std::vector<uint8_t> seed(size);
-    switch(GetSeed(&seed[0], size)) {
+    std::vector<uint8_t> seed(BCRYPT_MAXSALT);
+    switch(GetSeed(&seed[0], BCRYPT_MAXSALT)) {
         case -1:
             return ThrowException(Exception::Error(String::New("Rand operation not supported.")));
         case 0:

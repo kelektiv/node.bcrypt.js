@@ -120,12 +120,10 @@ var hash = bcrypt.hashSync('bacon', 8);
 
 `BCrypt.`
 
-  * `genSaltSync(rounds, seed_length)`
+  * `genSaltSync(rounds)`
     * `rounds` - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
-    * `seed_length` - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length. (default - 20)
-  * `genSalt(rounds, seed_length, cb)`
+  * `genSalt(rounds, cb)`
     * `rounds` - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
-    * `seed_length` - [OPTIONAL] - RAND_bytes wants a length. to make that a bit flexible, you can specify a seed_length. (default - 20)
     * `cb` - [REQUIRED] - a callback to be fired once the salt has been generated. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `salt` - Second parameter to the callback providing the generated salt.
