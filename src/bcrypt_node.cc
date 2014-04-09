@@ -30,83 +30,18 @@
 
 #include <node.h>
 #include <node_version.h>
+#include <node_buffer.h>
 
 #include <string>
 #include <cstring>
 #include <vector>
 
-#include <openssl/rand.h>
-#include <openssl/crypto.h>
 #include "node_blf.h"
-
-//pulled from node commit - 97cada0
-#ifdef _WIN32
-# include <windows.h>
-#else
-# include <pthread.h>
-#endif
 
 #define NODE_LESS_THAN (!(NODE_VERSION_AT_LEAST(0, 5, 4)))
 
 using namespace v8;
 using namespace node;
-
-#ifdef _WIN32
-
-static HANDLE* locks;
-
-
-static void crypto_lock_init(void) {
-  int i, n;
-
-  n = CRYPTO_num_locks();
-  locks = new HANDLE[n];
-
-  for (i = 0; i < n; i++)
-    if (!(locks[i] = CreateMutex(NULL, FALSE, NULL)))
-      abort();
-}
-
-static void crypto_lock_cb(int mode, int n, const char* file, int line) {
-  if (mode & CRYPTO_LOCK)
-    WaitForSingleObject(locks[n], INFINITE);
-  else
-    ReleaseMutex(locks[n]);
-}
-
-static unsigned long crypto_id_cb(void) {
-  return (unsigned long) GetCurrentThreadId();
-}
-
-#else /* !_WIN32 */
-
-static pthread_rwlock_t* locks;
-
-static void crypto_lock_init(void) {
-
-  const int n = CRYPTO_num_locks();
-  locks = new pthread_rwlock_t[n];
-
-  for (int i = 0; i < n; i++)
-    if (pthread_rwlock_init(locks + i, NULL))
-      abort();
-}
-
-static void crypto_lock_cb(int mode, int n, const char* file, int line) {
-  if (mode & CRYPTO_LOCK) {
-    if (mode & CRYPTO_READ) pthread_rwlock_rdlock(locks + n);
-    if (mode & CRYPTO_WRITE) pthread_rwlock_wrlock(locks + n);
-  } else {
-    pthread_rwlock_unlock(locks + n);
-  }
-}
-
-
-static unsigned long crypto_id_cb(void) {
-  return (unsigned long) pthread_self();
-}
-
-#endif /* !_WIN32 */
 
 namespace {
 
@@ -120,6 +55,7 @@ struct baton_base {
 };
 
 struct salt_baton : baton_base {
+    std::string seed;
     std::string salt;
     ssize_t rounds;
 
@@ -139,16 +75,6 @@ struct compare_baton : baton_base {
 
     compare_baton(): input(), encrypted(), result(false) {}
 };
-
-int GetSeed(uint8_t* seed, int size) {
-
-    // try to get good random bytes first
-    if (RAND_bytes((unsigned char *)seed, size) > 0) {
-        return 1;
-    }
-
-    return RAND_pseudo_bytes(seed, size);
-}
 
 bool ValidateSalt(const char* salt) {
 
@@ -202,16 +128,8 @@ void GenSaltAsync(uv_work_t* req) {
 
     salt_baton* baton = static_cast<salt_baton*>(req->data);
 
-    std::vector<uint8_t> seed(BCRYPT_MAXSALT);
-    switch(GetSeed(&seed[0], BCRYPT_MAXSALT)) {
-        case -1:
-            baton->error = "Rand operation not supported.";
-        case 0:
-            baton->error = "Rand operation did not generate a cryptographically sound seed.";
-    }
-
     char salt[_SALT_LEN];
-    bcrypt_gensalt(baton->rounds, &seed[0], salt);
+    bcrypt_gensalt(baton->rounds, (u_int8_t *)&baton->seed[0], salt);
     baton->salt = std::string(salt);
 }
 
@@ -245,11 +163,17 @@ void GenSaltAsyncAfter(uv_work_t* req) {
 Handle<Value> GenerateSalt(const Arguments &args) {
     HandleScope scope;
 
+    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
+        return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
+    }
+
     const ssize_t rounds = args[0]->Int32Value();
-    Local<Function> callback = Local<Function>::Cast(args[1]);
+    Local<Value> seed = args[1];
+    Local<Function> callback = Local<Function>::Cast(args[2]);
 
     salt_baton* baton = new salt_baton();
 
+    baton->seed = std::string(Buffer::Data(seed), 16);
     baton->callback = Persistent<Function>::New(callback);
     baton->rounds = rounds;
 
@@ -263,18 +187,15 @@ Handle<Value> GenerateSalt(const Arguments &args) {
 Handle<Value> GenerateSaltSync(const Arguments& args) {
     HandleScope scope;
 
-    const ssize_t rounds = args[0]->Int32Value();
-
-    std::vector<uint8_t> seed(BCRYPT_MAXSALT);
-    switch(GetSeed(&seed[0], BCRYPT_MAXSALT)) {
-        case -1:
-            return ThrowException(Exception::Error(String::New("Rand operation not supported.")));
-        case 0:
-            return ThrowException(Exception::Error(String::New("Rand operation did not generate a cryptographically sound seed.")));
+    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
+        return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
     }
 
+    const ssize_t rounds = args[0]->Int32Value();
+    u_int8_t* seed = (u_int8_t*)Buffer::Data(args[1]);
+
     char salt[_SALT_LEN];
-    bcrypt_gensalt(rounds, &seed[0], salt);
+    bcrypt_gensalt(rounds, seed, salt);
 
     return scope.Close(Encode(salt, strlen(salt), BINARY));
 }
@@ -466,10 +387,6 @@ Handle<Value> GetRounds(const Arguments& args) {
 // bind the bcrypt module
 extern "C" void init(Handle<Object> target) {
     HandleScope scope;
-
-    crypto_lock_init();
-    CRYPTO_set_locking_callback(crypto_lock_cb);
-    CRYPTO_set_id_callback(crypto_id_cb);
 
     NODE_SET_METHOD(target, "gen_salt_sync", GenerateSaltSync);
     NODE_SET_METHOD(target, "encrypt_sync", EncryptSync);
