@@ -1,4 +1,5 @@
 var bindings = require('bindings')('bcrypt_lib');
+var crypto = require('crypto');
 
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
@@ -11,7 +12,7 @@ module.exports.genSaltSync = function(rounds) {
         throw new Error('rounds must be a number');
     }
 
-    return bindings.gen_salt_sync(rounds);
+    return bindings.gen_salt_sync(rounds, crypto.randomBytes(16));
 };
 
 /// generate a salt
@@ -40,7 +41,7 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         return;
     }
 
-    return bindings.gen_salt(rounds, cb);
+    return bindings.gen_salt(rounds, crypto.randomBytes(16), cb);
 };
 
 /// hash data using a salt
