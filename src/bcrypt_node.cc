@@ -35,6 +35,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <stdlib.h> // atoi
 
 #include "node_blf.h"
 
@@ -163,12 +164,16 @@ void GenSaltAsyncAfter(uv_work_t* req) {
 Handle<Value> GenerateSalt(const Arguments &args) {
     HandleScope scope;
 
-    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
+    if (args.Length() < 3) {
+        return ThrowException(Exception::TypeError(String::New("3 arguments expected")));
+    }
+
+    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1].As<Object>()) != 16) {
         return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
     }
 
     const ssize_t rounds = args[0]->Int32Value();
-    Local<Value> seed = args[1];
+    Local<Object> seed = args[1].As<Object>();
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
     salt_baton* baton = new salt_baton();
@@ -187,12 +192,16 @@ Handle<Value> GenerateSalt(const Arguments &args) {
 Handle<Value> GenerateSaltSync(const Arguments& args) {
     HandleScope scope;
 
-    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
+    if (args.Length() < 2) {
+        return ThrowException(Exception::TypeError(String::New("2 arguments expected")));
+    }
+
+    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1].As<Object>()) != 16) {
         return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
     }
 
     const ssize_t rounds = args[0]->Int32Value();
-    u_int8_t* seed = (u_int8_t*)Buffer::Data(args[1]);
+    u_int8_t* seed = (u_int8_t*)Buffer::Data(args[1].As<Object>());
 
     char salt[_SALT_LEN];
     bcrypt_gensalt(rounds, seed, salt);
@@ -243,6 +252,10 @@ void EncryptAsyncAfter(uv_work_t* req) {
 Handle<Value> Encrypt(const Arguments& args) {
     HandleScope scope;
 
+    if (args.Length() < 3) {
+        return ThrowException(Exception::TypeError(String::New("3 arguments expected")));
+    }
+
     String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
@@ -261,6 +274,10 @@ Handle<Value> Encrypt(const Arguments& args) {
 
 Handle<Value> EncryptSync(const Arguments& args) {
     HandleScope scope;
+
+    if (args.Length() < 2) {
+        return ThrowException(Exception::TypeError(String::New("2 arguments expected")));
+    }
 
     String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
@@ -339,6 +356,10 @@ void CompareAsyncAfter(uv_work_t* req) {
 Handle<Value> Compare(const Arguments& args) {
     HandleScope scope;
 
+    if (args.Length() < 3) {
+        return ThrowException(Exception::TypeError(String::New("3 arguments expected")));
+    }
+
     String::Utf8Value input(args[0]->ToString());
     String::Utf8Value encrypted(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
@@ -358,6 +379,10 @@ Handle<Value> Compare(const Arguments& args) {
 Handle<Value> CompareSync(const Arguments& args) {
     HandleScope scope;
 
+    if (args.Length() < 2) {
+        return ThrowException(Exception::TypeError(String::New("2 arguments expected")));
+    }
+
     String::Utf8Value pw(args[0]->ToString());
     String::Utf8Value hash(args[1]->ToString());
 
@@ -372,6 +397,10 @@ Handle<Value> CompareSync(const Arguments& args) {
 
 Handle<Value> GetRounds(const Arguments& args) {
     HandleScope scope;
+
+    if (args.Length() < 1) {
+        return ThrowException(Exception::TypeError(String::New("1 argument expected")));
+    }
 
     String::Utf8Value hash(args[0]->ToString());
     u_int32_t rounds;
