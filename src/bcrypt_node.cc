@@ -35,6 +35,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <stdlib.h> // atoi
 
 #include "node_blf.h"
 
