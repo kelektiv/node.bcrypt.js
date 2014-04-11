@@ -36,6 +36,8 @@
 #include <cstring>
 #include <vector>
 
+#include <nan.h>
+
 #include "node_blf.h"
 
 #define NODE_LESS_THAN (!(NODE_VERSION_AT_LEAST(0, 5, 4)))
@@ -46,11 +48,11 @@ using namespace node;
 namespace {
 
 struct baton_base {
-    v8::Persistent<v8::Function> callback;
+    NanCallback * callback;
     std::string error;
 
     virtual ~baton_base() {
-        callback.Dispose();
+        delete callback;
     }
 };
 
@@ -134,7 +136,7 @@ void GenSaltAsync(uv_work_t* req) {
 }
 
 void GenSaltAsyncAfter(uv_work_t* req) {
-    HandleScope scope;
+    NanScope();
 
     salt_baton* baton = static_cast<salt_baton*>(req->data);
     delete req;
@@ -152,7 +154,7 @@ void GenSaltAsyncAfter(uv_work_t* req) {
 
     TryCatch try_catch; // don't quite see the necessity of this
 
-    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    baton->callback->Call(2, argv);
 
     if (try_catch.HasCaught())
         FatalException(try_catch);
@@ -160,35 +162,35 @@ void GenSaltAsyncAfter(uv_work_t* req) {
     delete baton;
 }
 
-Handle<Value> GenerateSalt(const Arguments &args) {
-    HandleScope scope;
+NAN_METHOD(GenerateSalt) {
+    NanScope();
 
     if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
-        return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
+        return NanThrowError(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
     }
 
     const ssize_t rounds = args[0]->Int32Value();
     Local<Value> seed = args[1];
-    Local<Function> callback = Local<Function>::Cast(args[2]);
+    Local<Function> callback = args[2].As<Function>();
 
     salt_baton* baton = new salt_baton();
 
     baton->seed = std::string(Buffer::Data(seed), 16);
-    baton->callback = Persistent<Function>::New(callback);
+    baton->callback = new NanCallback(callback);
     baton->rounds = rounds;
 
-    uv_work_t* req = new uv_work_t;
+    uv_work_t* req = new uv_work_t();
     req->data = baton;
     uv_queue_work(uv_default_loop(), req, GenSaltAsync, (uv_after_work_cb)GenSaltAsyncAfter);
 
-    return Undefined();
+    NanReturnUndefined();
 }
 
-Handle<Value> GenerateSaltSync(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(GenerateSaltSync) {
+    NanScope();
 
     if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
-        return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
+        return NanThrowError(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
     }
 
     const ssize_t rounds = args[0]->Int32Value();
@@ -197,7 +199,7 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
     char salt[_SALT_LEN];
     bcrypt_gensalt(rounds, seed, salt);
 
-    return scope.Close(Encode(salt, strlen(salt), BINARY));
+    NanReturnValue(Encode(salt, strlen(salt), BINARY));
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
@@ -214,7 +216,7 @@ void EncryptAsync(uv_work_t* req) {
 }
 
 void EncryptAsyncAfter(uv_work_t* req) {
-    HandleScope scope;
+    NanScope();
 
     encrypt_baton* baton = static_cast<encrypt_baton*>(req->data);
     delete req;
@@ -232,7 +234,7 @@ void EncryptAsyncAfter(uv_work_t* req) {
 
     TryCatch try_catch; // don't quite see the necessity of this
 
-    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    baton->callback->Call(2, argv);
 
     if (try_catch.HasCaught())
         FatalException(try_catch);
@@ -240,38 +242,38 @@ void EncryptAsyncAfter(uv_work_t* req) {
     delete baton;
 }
 
-Handle<Value> Encrypt(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(Encrypt) {
+    NanScope();
 
     String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
     encrypt_baton* baton = new encrypt_baton();
-    baton->callback = Persistent<Function>::New(callback);
+    baton->callback = new NanCallback(callback);
     baton->input = std::string(*data);
     baton->salt = std::string(*salt);
 
-    uv_work_t* req = new uv_work_t;
+    uv_work_t* req = new uv_work_t();
     req->data = baton;
     uv_queue_work(uv_default_loop(), req, EncryptAsync, (uv_after_work_cb)EncryptAsyncAfter);
 
-    return Undefined();
+    NanReturnUndefined();
 }
 
-Handle<Value> EncryptSync(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(EncryptSync) {
+    NanScope();
 
     String::Utf8Value data(args[0]->ToString());
     String::Utf8Value salt(args[1]->ToString());
 
     if (!(ValidateSalt(*salt))) {
-        return ThrowException(Exception::Error(String::New("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue")));
+        return NanThrowError(Exception::Error(String::New("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue")));
     }
 
     char bcrypted[_PASSWORD_LEN];
     bcrypt(*data, *salt, bcrypted);
-    return scope.Close(Encode(bcrypted, strlen(bcrypted), BINARY));
+    NanReturnValue(Encode(bcrypted, strlen(bcrypted), BINARY));
 }
 
 /* COMPARATOR */
@@ -309,7 +311,7 @@ void CompareAsync(uv_work_t* req) {
 }
 
 void CompareAsyncAfter(uv_work_t* req) {
-    HandleScope scope;
+    NanScope();
 
     compare_baton* baton = static_cast<compare_baton*>(req->data);
     delete req;
@@ -326,7 +328,7 @@ void CompareAsyncAfter(uv_work_t* req) {
 
     TryCatch try_catch; // don't quite see the necessity of this
 
-    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    baton->callback->Call(2, argv);
 
     if (try_catch.HasCaught())
         FatalException(try_catch);
@@ -336,27 +338,27 @@ void CompareAsyncAfter(uv_work_t* req) {
     delete baton;
 }
 
-Handle<Value> Compare(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(Compare) {
+    NanScope();
 
     String::Utf8Value input(args[0]->ToString());
     String::Utf8Value encrypted(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
     compare_baton* baton = new compare_baton();
-    baton->callback = Persistent<Function>::New(callback);
+    baton->callback = new NanCallback(callback);
     baton->input = std::string(*input);
     baton->encrypted = std::string(*encrypted);
 
-    uv_work_t* req = new uv_work_t;
+    uv_work_t* req = new uv_work_t();
     req->data = baton;
     uv_queue_work(uv_default_loop(), req, CompareAsync, (uv_after_work_cb)CompareAsyncAfter);
 
-    return Undefined();
+    NanReturnUndefined();
 }
 
-Handle<Value> CompareSync(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(CompareSync) {
+    NanScope();
 
     String::Utf8Value pw(args[0]->ToString());
     String::Utf8Value hash(args[1]->ToString());
@@ -364,29 +366,29 @@ Handle<Value> CompareSync(const Arguments& args) {
     char bcrypted[_PASSWORD_LEN];
     if (ValidateSalt(*hash)) {
         bcrypt(*pw, *hash, bcrypted);
-        return Boolean::New(CompareStrings(bcrypted, *hash));
+        NanReturnValue(Boolean::New(CompareStrings(bcrypted, *hash)));
     } else {
-        return Boolean::New(false);
+        NanReturnValue(Boolean::New(false));
     }
 }
 
-Handle<Value> GetRounds(const Arguments& args) {
-    HandleScope scope;
+NAN_METHOD(GetRounds) {
+    NanScope();
 
     String::Utf8Value hash(args[0]->ToString());
     u_int32_t rounds;
     if (!(rounds = bcrypt_get_rounds(*hash))) {
-        return ThrowException(Exception::Error(String::New("invalid hash provided")));
+        NanThrowError(Exception::Error(String::New("invalid hash provided")));
     }
 
-    return Integer::New(rounds);
+    NanReturnValue(Integer::New(rounds));
 }
 
 } // anonymous namespace
 
 // bind the bcrypt module
 extern "C" void init(Handle<Object> target) {
-    HandleScope scope;
+    NanScope();
 
     NODE_SET_METHOD(target, "gen_salt_sync", GenerateSaltSync);
     NODE_SET_METHOD(target, "encrypt_sync", EncryptSync);

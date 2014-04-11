@@ -32,7 +32,8 @@
     "test": "node-gyp configure build && nodeunit test"
   },
   "dependencies": {
-    "bindings": "1.0.0"
+    "bindings": "1.0.0",
+    "nan": "~0.8.0"
   },
   "devDependencies": {
     "nodeunit": ">=0.6.4"
