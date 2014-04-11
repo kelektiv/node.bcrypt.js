@@ -168,12 +168,12 @@ Handle<Value> GenerateSalt(const Arguments &args) {
         return ThrowException(Exception::TypeError(String::New("3 arguments expected")));
     }
 
-    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
+    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1].As<Object>()) != 16) {
         return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
     }
 
     const ssize_t rounds = args[0]->Int32Value();
-    Local<Value> seed = args[1];
+    Local<Object> seed = args[1].As<Object>();
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
     salt_baton* baton = new salt_baton();
@@ -196,12 +196,12 @@ Handle<Value> GenerateSaltSync(const Arguments& args) {
         return ThrowException(Exception::TypeError(String::New("2 arguments expected")));
     }
 
-    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1]) != 16) {
+    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1].As<Object>()) != 16) {
         return ThrowException(Exception::TypeError(String::New("Second argument must be a 16 byte Buffer")));
     }
 
     const ssize_t rounds = args[0]->Int32Value();
-    u_int8_t* seed = (u_int8_t*)Buffer::Data(args[1]);
+    u_int8_t* seed = (u_int8_t*)Buffer::Data(args[1].As<Object>());
 
     char salt[_SALT_LEN];
     bcrypt_gensalt(rounds, seed, salt);
