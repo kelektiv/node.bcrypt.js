@@ -49,7 +49,7 @@ module.exports.genSalt = function(rounds, ignore, cb) {
 /// @param {String} salt the salt to use when hashing
 /// @return {String} hash
 module.exports.hashSync = function(data, salt) {
-    if (data == null || data == undefined || salt == null || salt == undefined) {
+    if (data == null || salt == null) {
         throw new Error('data and salt arguments required');
     } else if (typeof data !== 'string' && (typeof salt !== 'string' || typeof salt !== 'number')) {
         throw new Error('data must be a string and salt must either be a salt string or a number of rounds');
@@ -73,7 +73,7 @@ module.exports.hash = function(data, salt, cb) {
     if (typeof salt === 'function') {
         return salt(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
     }
-    if (data == null || data == undefined || salt == null || salt == undefined) {
+    if (data == null || salt == null) {
         return cb(new Error('data and salt arguments required'));
     } else if (typeof data !== 'string' && (typeof salt !== 'string' || typeof salt !== 'number')) {
         return cb(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
@@ -97,7 +97,7 @@ module.exports.hash = function(data, salt, cb) {
 /// @param {String} hash expected hash
 /// @return {bool} true if hashed data matches hash
 module.exports.compareSync = function(data, hash) {
-    if (data == null || data == undefined || hash == null || hash == undefined) {
+    if (data == null || hash == null) {
         throw new Error('data and hash arguments required');
     } else if (typeof data !== 'string' || typeof hash !== 'string') {
         throw new Error('data and hash must be strings');
@@ -111,7 +111,7 @@ module.exports.compareSync = function(data, hash) {
 /// @param {String} hash expected hash
 /// @param {Function} cb callback(err, matched) - matched is true if hashed data matches hash
 module.exports.compare = function(data, hash, cb) {
-    if (data == null || data == undefined || hash == null || hash == undefined) {
+    if (data == null || hash == null) {
         return cb(new Error('data and hash arguments required'));
     } else if (typeof data !== 'string' || typeof hash !== 'string') {
         return cb(new Error('data and hash must be strings'));
@@ -127,7 +127,7 @@ module.exports.compare = function(data, hash, cb) {
 /// @param {String} hash extract rounds from this hash
 /// @return {Number} the number of rounds used to encrypt a given hash
 module.exports.getRounds = function(hash) {
-    if (hash == null || hash == undefined) {
+    if (hash == null) {
         throw new Error('hash argument required');
     } else if (typeof hash !== 'string') {
         throw new Error('hash must be a string');
