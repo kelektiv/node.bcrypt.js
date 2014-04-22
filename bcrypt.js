@@ -56,7 +56,7 @@ module.exports.hashSync = function(data, salt) {
     }
 
     if (typeof salt === 'number') {
-      salt = module.exports.genSaltSync(salt);
+        salt = module.exports.genSaltSync(salt);
     }
 
     return bindings.encrypt_sync(data, salt);
@@ -84,9 +84,9 @@ module.exports.hash = function(data, salt, cb) {
     }
 
     if (typeof salt === 'number') {
-      return module.exports.genSalt(salt, function(err, salt) {
-        return bindings.encrypt(data, salt, cb);
-      });
+        return module.exports.genSalt(salt, function(err, salt) {
+            return bindings.encrypt(data, salt, cb);
+        });
     }
 
     return bindings.encrypt(data, salt, cb);
@@ -135,4 +135,3 @@ module.exports.getRounds = function(hash) {
 
     return bindings.get_rounds(hash);
 };
-
