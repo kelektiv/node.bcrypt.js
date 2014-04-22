@@ -55,7 +55,7 @@ module.exports.hashSync = function(data, salt) {
         throw new Error('data and salt arguments required');
     }
 
-    if (typeof data !== 'string' && (typeof salt !== 'string' || typeof salt !== 'number')) {
+    if (typeof data !== 'string' || (typeof salt !== 'string' && typeof salt !== 'number')) {
         throw new Error('data must be a string and salt must either be a salt string or a number of rounds');
     }
 
@@ -83,7 +83,7 @@ module.exports.hash = function(data, salt, cb) {
         return cb(new Error('data and salt arguments required'));
     }
 
-    if (typeof data !== 'string' && (typeof salt !== 'string' || typeof salt !== 'number')) {
+    if (typeof data !== 'string' || (typeof salt !== 'string' && typeof salt !== 'number')) {
         return cb(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
     }
 
