@@ -1,3 +1,5 @@
+'use strict';
+
 var bindings = require('bindings')('bcrypt_lib');
 var crypto = require('crypto');
 
