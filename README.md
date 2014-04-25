@@ -43,6 +43,7 @@ To make it easier for people using this tool to analyze what has been surveyed, 
  * Please check the dependencies for this tool at: https://github.com/TooTallNate/node-gyp/
   * Windows users will need the options for c# and c++ installed with their visual studio instance.
   * Python 2.x
+* `OpenSSL` - This is only required to build the `bcrypt` project if you are using versions <= 0.7.7. Otherwise, we're using the builtin node crypto bindings for seed data (which use the same OpenSSL code paths we were, but don't have the external dependency).
 
 ## Install via NPM
 ```
