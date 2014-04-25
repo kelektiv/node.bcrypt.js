@@ -43,17 +43,16 @@ To make it easier for people using this tool to analyze what has been surveyed, 
  * Please check the dependencies for this tool at: https://github.com/TooTallNate/node-gyp/
   * Windows users will need the options for c# and c++ installed with their visual studio instance.
   * Python 2.x
+* OpenSSL
+ * Default folder can be changed by adding the `--openssl-root="OpenSSLDir"` option to the npm install command.
+ * On Windows the default folder `C:\OpenSSL-Win32` or `C:\OpenSSL-Win64` is searched
 
 ## Install via NPM
 ```
 npm install bcrypt
 ```
-Depends on OpenSSL!
 
 ***Note:*** OS X users using Xcode 4.3.1 or above may need to run the following command in their terminal prior to installing if errors occur regarding xcodebuild: ```sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer```
-
-***Note:*** For OpenSSL on Windows the default folder `C:\OpenSSL-Win32` or `C:\OpenSSL-Win64` is searched.
-It can be changed by adding the `--openssl-root="OpenSSLDir"` option to the npm install command.
 
 ## Usage
 
