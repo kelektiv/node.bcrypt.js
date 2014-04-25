@@ -48,8 +48,12 @@ To make it easier for people using this tool to analyze what has been surveyed, 
 ```
 npm install bcrypt
 ```
+Depends on OpenSSL!
 
 ***Note:*** OS X users using Xcode 4.3.1 or above may need to run the following command in their terminal prior to installing if errors occur regarding xcodebuild: ```sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer```
+
+***Note:*** For OpenSSL on Windows the default folder `C:\OpenSSL-Win32` or `C:\OpenSSL-Win64` is searched.
+It can be changed by adding the `--openssl-root="OpenSSLDir"` option to the npm install command.
 
 ## Usage
 
