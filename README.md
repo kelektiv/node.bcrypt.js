@@ -75,7 +75,7 @@ bcrypt.compare("B4c0/\/", hash, function(err, res) {
     // res == true
 });
 bcrypt.compare("not_bacon", hash, function(err, res) {
-    // res = false
+    // res == false
 });
 ```
 
