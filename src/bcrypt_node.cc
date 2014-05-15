@@ -52,6 +52,7 @@ struct baton_base {
 
     virtual ~baton_base() {
         callback.Dispose();
+        callback.Clear();
     }
 };
 
@@ -151,12 +152,10 @@ void GenSaltAsyncAfter(uv_work_t* req) {
         argv[1] = Encode(baton->salt.c_str(), baton->salt.size(), BINARY);
     }
 
-    TryCatch try_catch; // don't quite see the necessity of this
-
-    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
-
-    if (try_catch.HasCaught())
-        FatalException(try_catch);
+    node::MakeCallback(Context::GetCurrent()->Global(),
+      baton->callback,
+      2,
+      argv);
 
     delete baton;
 }
@@ -239,12 +238,10 @@ void EncryptAsyncAfter(uv_work_t* req) {
         argv[1] = Encode(baton->output.c_str(), baton->output.size(), BINARY);
     }
 
-    TryCatch try_catch; // don't quite see the necessity of this
-
-    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
-
-    if (try_catch.HasCaught())
-        FatalException(try_catch);
+    node::MakeCallback(Context::GetCurrent()->Global(),
+      baton->callback,
+      2,
+      argv);
 
     delete baton;
 }
@@ -341,12 +338,10 @@ void CompareAsyncAfter(uv_work_t* req) {
         argv[1] = Boolean::New(baton->result);
     }
 
-    TryCatch try_catch; // don't quite see the necessity of this
-
-    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
-
-    if (try_catch.HasCaught())
-        FatalException(try_catch);
+    node::MakeCallback(Context::GetCurrent()->Global(),
+      baton->callback,
+      2,
+      argv);
 
     // done with the baton
     // free the memory and callback

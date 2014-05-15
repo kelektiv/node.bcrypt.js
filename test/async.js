@@ -145,5 +145,21 @@ module.exports = {
           assert.done();
         });
       });
+    },
+    test_domains_catch_errors: function(assert) {
+      var domain = require('domain');
+      var d = domain.create();
+      var message = 'should be caught by domain';
+
+      d.on('error', function (e) {
+        assert.equal(message, e.message);
+        assert.done();
+      });
+
+      d.run(function () {
+        bcrypt.genSalt(10, function() {
+          throw new Error(message);
+        });
+      });
     }
 };
