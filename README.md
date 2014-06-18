@@ -117,9 +117,9 @@ var hash = bcrypt.hashSync('bacon', 8);
 `BCrypt.`
 
   * `genSaltSync(rounds)`
-    * `rounds` - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
+    * `rounds` - [OPTIONAL] - the cost of processing the data. (default - 10)
   * `genSalt(rounds, cb)`
-    * `rounds` - [OPTIONAL] - the number of rounds to process the data for. (default - 10)
+    * `rounds` - [OPTIONAL] - the cost of processing the data. (default - 10)
     * `cb` - [REQUIRED] - a callback to be fired once the salt has been generated. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `salt` - Second parameter to the callback providing the generated salt.
@@ -143,6 +143,17 @@ var hash = bcrypt.hashSync('bacon', 8);
       * `same` - Second parameter to the callback providing whether the data and encrypted forms match [true | false].
   * `getRounds(encrypted)` - return the number of rounds used to encrypt a given hash
     * `encrypted` - [REQUIRED] - hash from which the number of rounds used should be extracted.
+
+## A Note on Rounds
+
+A note about the cost. When you are hashing your data the module will go through a series of rounds to give you a secure hash. The value you submit there is not just the number of rounds that the module will go through to hash your data. The module will use the value you enter and go through `2*log(rounds)` iterations of processing.
+
+From @garthk, on a 2GHz core you can roughly expect:
+
+    cost=10: ~10 hashes/sec
+    cost=13: ~1 sec/hash
+    cost=25: ~1 hour/hash
+    cost=31: 2-3 days/hash
 
 
 ## Hash Info
