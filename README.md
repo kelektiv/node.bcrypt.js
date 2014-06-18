@@ -150,10 +150,10 @@ A note about the cost. When you are hashing your data the module will go through
 
 From @garthk, on a 2GHz core you can roughly expect:
 
-    cost=10: ~10 hashes/sec
-    cost=13: ~1 sec/hash
-    cost=25: ~1 hour/hash
-    cost=31: 2-3 days/hash
+    rounds=10: ~10 hashes/sec
+    rounds=13: ~1 sec/hash
+    rounds=25: ~1 hour/hash
+    rounds=31: 2-3 days/hash
 
 
 ## Hash Info
