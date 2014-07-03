@@ -146,7 +146,7 @@ var hash = bcrypt.hashSync('bacon', 8);
 
 ## A Note on Rounds
 
-A note about the cost. When you are hashing your data the module will go through a series of rounds to give you a secure hash. The value you submit there is not just the number of rounds that the module will go through to hash your data. The module will use the value you enter and go through `2*log(rounds)` iterations of processing.
+A note about the cost. When you are hashing your data the module will go through a series of rounds to give you a secure hash. The value you submit there is not just the number of rounds that the module will go through to hash your data. The module will use the value you enter and go through `2^rounds` iterations of processing.
 
 From @garthk, on a 2GHz core you can roughly expect:
 
