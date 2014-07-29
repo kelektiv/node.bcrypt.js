@@ -44,40 +44,6 @@ using namespace node;
 
 namespace {
 
-struct baton_base {
-    NanCallback* callback;
-    std::string error;
-
-    virtual ~baton_base() {
-        if (callback != NULL) {
-            delete callback;
-            callback = NULL;
-        }
-    }
-};
-
-struct salt_baton : baton_base {
-    std::string seed;
-    std::string salt;
-    ssize_t rounds;
-
-    salt_baton() : salt(), rounds(0) {}
-};
-
-struct encrypt_baton : baton_base {
-    std::string salt;
-    std::string input;
-    std::string output;
-};
-
-struct compare_baton : baton_base {
-    std::string input;
-    std::string encrypted;
-    bool result;
-
-    compare_baton(): input(), encrypted(), result(false) {}
-};
-
 bool ValidateSalt(const char* salt) {
 
     if (!salt || *salt != '$') {
@@ -126,41 +92,35 @@ bool ValidateSalt(const char* salt) {
 }
 
 /* SALT GENERATION */
-void GenSaltAsync(uv_work_t* req) {
 
-    salt_baton* baton = static_cast<salt_baton*>(req->data);
-
-    char salt[_SALT_LEN];
-    bcrypt_gensalt(baton->rounds, (u_int8_t *)&baton->seed[0], salt);
-    baton->salt = std::string(salt);
-}
-
-void GenSaltAsyncAfter(uv_work_t* req) {
-    NanScope();
-
-    salt_baton* baton = static_cast<salt_baton*>(req->data);
-    delete req;
-
-    Handle<Value> argv[2];
-
-    if (!baton->error.empty()) {
-        argv[0] = Exception::Error(NanNew(baton->error.c_str()));
-        argv[1] = NanUndefined();
+class SaltAsyncWorker : public NanAsyncWorker {
+  public:
+    SaltAsyncWorker(NanCallback *callback, std::string seed, ssize_t rounds)
+        : NanAsyncWorker(callback), seed(seed), rounds(rounds) {
     }
-    else {
+
+    ~SaltAsyncWorker() {}
+
+    void Execute() {
+        char salt[_SALT_LEN];
+        bcrypt_gensalt(rounds, (u_int8_t *)&seed[0], salt);
+        this->salt = std::string(salt);
+    }
+
+    void HandleOKCallback() {
+        NanScope();
+
+        Handle<Value> argv[2];
         argv[0] = NanUndefined();
-        argv[1] = Encode(baton->salt.c_str(), baton->salt.size(), BINARY);
+        argv[1] = Encode(salt.c_str(), salt.size(), BINARY);
+        callback->Call(2, argv);
     }
 
-    TryCatch try_catch; // don't quite see the necessity of this
-
-    baton->callback->Call(2, argv);
-
-    if (try_catch.HasCaught())
-        FatalException(try_catch);
-
-    delete baton;
-}
+  private:
+    std::string seed;
+    std::string salt;
+    ssize_t rounds;
+};
 
 NAN_METHOD(GenerateSalt) {
     NanScope();
@@ -179,15 +139,10 @@ NAN_METHOD(GenerateSalt) {
     Local<Object> seed = args[1].As<Object>();
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
-    salt_baton* baton = new salt_baton();
+    SaltAsyncWorker* saltWorker = new SaltAsyncWorker(new NanCallback(callback),
+        std::string(Buffer::Data(seed), 16), rounds);
 
-    baton->seed = std::string(Buffer::Data(seed), 16);
-    baton->callback = new NanCallback(callback);
-    baton->rounds = rounds;
-
-    uv_work_t* req = new uv_work_t;
-    req->data = baton;
-    uv_queue_work(uv_default_loop(), req, GenSaltAsync, (uv_after_work_cb)GenSaltAsyncAfter);
+    NanAsyncQueueWorker(saltWorker);
 
     NanReturnUndefined();
 }
@@ -215,44 +170,47 @@ NAN_METHOD(GenerateSaltSync) {
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
-void EncryptAsync(uv_work_t* req) {
-    encrypt_baton* baton = static_cast<encrypt_baton*>(req->data);
 
-    if (!(ValidateSalt(baton->salt.c_str()))) {
-        baton->error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
+class EncryptAsyncWorker : public NanAsyncWorker {
+  public:
+    EncryptAsyncWorker(NanCallback *callback, std::string input, std::string salt)
+        : NanAsyncWorker(callback), input(input), salt(salt) {
     }
 
-    char bcrypted[_PASSWORD_LEN];
-    bcrypt(baton->input.c_str(), baton->salt.c_str(), bcrypted);
-    baton->output = std::string(bcrypted);
-}
+    ~EncryptAsyncWorker() {}
 
-void EncryptAsyncAfter(uv_work_t* req) {
-    NanScope();
+    void Execute() {
+        if (!(ValidateSalt(salt.c_str()))) {
+            error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
+        }
 
-    encrypt_baton* baton = static_cast<encrypt_baton*>(req->data);
-    delete req;
-
-    Handle<Value> argv[2];
-
-    if (!baton->error.empty()) {
-        argv[0] = Exception::Error(NanNew(baton->error.c_str()));
-        argv[1] = NanUndefined();
-    }
-    else {
-        argv[0] = NanUndefined();
-        argv[1] = Encode(baton->output.c_str(), baton->output.size(), BINARY);
+        char bcrypted[_PASSWORD_LEN];
+        bcrypt(input.c_str(), salt.c_str(), bcrypted);
+        output = std::string(bcrypted);
     }
 
-    TryCatch try_catch; // don't quite see the necessity of this
+    void HandleOKCallback() {
+        NanScope();
 
-    baton->callback->Call(2, argv);
+        Handle<Value> argv[2];
 
-    if (try_catch.HasCaught())
-        FatalException(try_catch);
+        if (!error.empty()) {
+            argv[0] = Exception::Error(NanNew(error.c_str()));
+            argv[1] = NanUndefined();
+        } else {
+            argv[0] = NanUndefined();
+            argv[1] = Encode(output.c_str(), output.size(), BINARY);
+        }
 
-    delete baton;
-}
+        callback->Call(2, argv);
+    }
+
+  private:
+    std::string input;
+    std::string salt;
+    std::string error;
+    std::string output;
+};
 
 NAN_METHOD(Encrypt) {
     NanScope();
@@ -266,14 +224,10 @@ NAN_METHOD(Encrypt) {
     String::Utf8Value salt(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
-    encrypt_baton* baton = new encrypt_baton();
-    baton->callback = new NanCallback(callback);
-    baton->input = std::string(*data);
-    baton->salt = std::string(*salt);
+    EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(new NanCallback(callback),
+        std::string(*data), std::string(*salt));
 
-    uv_work_t* req = new uv_work_t;
-    req->data = baton;
-    uv_queue_work(uv_default_loop(), req, EncryptAsync, (uv_after_work_cb)EncryptAsyncAfter);
+    NanAsyncQueueWorker(encryptWorker);
 
     NanReturnUndefined();
 }
@@ -300,7 +254,8 @@ NAN_METHOD(EncryptSync) {
 }
 
 /* COMPARATOR */
-bool CompareStrings(const char* s1, const char* s2) {
+
+NAN_INLINE bool CompareStrings(const char* s1, const char* s2) {
 
     bool eq = true;
     int s1_len = strlen(s1);
@@ -323,43 +278,38 @@ bool CompareStrings(const char* s1, const char* s2) {
     return eq;
 }
 
-void CompareAsync(uv_work_t* req) {
-    compare_baton* baton = static_cast<compare_baton*>(req->data);
+class CompareAsyncWorker : public NanAsyncWorker {
+  public:
+    CompareAsyncWorker(NanCallback *callback, std::string input, std::string encrypted)
+        : NanAsyncWorker(callback), input(input), encrypted(encrypted) {
 
-    char bcrypted[_PASSWORD_LEN];
-    if (ValidateSalt(baton->encrypted.c_str())) {
-        bcrypt(baton->input.c_str(), baton->encrypted.c_str(), bcrypted);
-        baton->result = CompareStrings(bcrypted, baton->encrypted.c_str());
+        result = false;
     }
-}
 
-void CompareAsyncAfter(uv_work_t* req) {
-    NanScope();
+    ~CompareAsyncWorker() {}
 
-    compare_baton* baton = static_cast<compare_baton*>(req->data);
-    delete req;
+    void Execute() {
+        char bcrypted[_PASSWORD_LEN];
+        if (ValidateSalt(encrypted.c_str())) {
+            bcrypt(input.c_str(), encrypted.c_str(), bcrypted);
+            result = CompareStrings(bcrypted, encrypted.c_str());
+        }
+    }
 
-    Handle<Value> argv[2];
+    void HandleOKCallback() {
+        NanScope();
 
-    if (!baton->error.empty()) {
-        argv[0] = Exception::Error(NanNew(baton->error.c_str()));
-        argv[1] = NanUndefined();
-    } else {
+        Handle<Value> argv[2];
         argv[0] = NanUndefined();
-        argv[1] = NanNew<Boolean>(baton->result);
+        argv[1] = NanNew<Boolean>(result);
+        callback->Call(2, argv);
     }
 
-    TryCatch try_catch; // don't quite see the necessity of this
-
-    baton->callback->Call(2, argv);
-
-    if (try_catch.HasCaught())
-        FatalException(try_catch);
-
-    // done with the baton
-    // free the memory and callback
-    delete baton;
-}
+  private:
+    std::string input;
+    std::string encrypted;
+    bool result;
+};
 
 NAN_METHOD(Compare) {
     NanScope();
@@ -373,14 +323,10 @@ NAN_METHOD(Compare) {
     String::Utf8Value encrypted(args[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(args[2]);
 
-    compare_baton* baton = new compare_baton();
-    baton->callback = new NanCallback(callback);
-    baton->input = std::string(*input);
-    baton->encrypted = std::string(*encrypted);
+    CompareAsyncWorker* compareWorker = new CompareAsyncWorker(new NanCallback(callback),
+        std::string(*input), std::string(*encrypted));
 
-    uv_work_t* req = new uv_work_t;
-    req->data = baton;
-    uv_queue_work(uv_default_loop(), req, CompareAsync, (uv_after_work_cb)CompareAsyncAfter);
+    NanAsyncQueueWorker(compareWorker);
 
     NanReturnUndefined();
 }
