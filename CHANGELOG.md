@@ -1,4 +1,4 @@
-# UNRELEASED
+# 0.8.0 (2014-08-03)
   * migrate to NAN for bindings
 
 # v0.5.0
