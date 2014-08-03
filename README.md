@@ -1,6 +1,6 @@
 # node.bcrypt.js
 
-[![Build Status](https://secure.travis-ci.org/ncb000gt/node.bcrypt.js.png)](http://travis-ci.org/#!/ncb000gt/node.bcrypt.js) 
+[![Build Status](https://secure.travis-ci.org/ncb000gt/node.bcrypt.js.svg)](http://travis-ci.org/#!/ncb000gt/node.bcrypt.js)
 
 Lib to help you hash passwords.
 [bcrypt on wikipedia][bcryptwiki]
@@ -21,12 +21,13 @@ If you are on a stable version of node, we can't magically know what you are doi
 | <= 0.4.x | <= 0.4.x |
 | >= 0.6.x | >= 0.5.x |
 
-Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.  
+Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.
+
 `node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
 
-    gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --nodedir flag instead
-
-
+```
+gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --nodedir flag instead
+```
 
 ## Security Issues/Concerns
 
