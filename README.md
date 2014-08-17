@@ -162,6 +162,8 @@ From @garthk, on a 2GHz core you can roughly expect:
 
 The characters that comprise the resultant hash are `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$`.
 
+Resultant hashes will be 60 characters long.
+
 ## Testing
 
 If you create a pull request, tests better pass :)
