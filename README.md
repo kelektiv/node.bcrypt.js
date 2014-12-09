@@ -63,7 +63,7 @@ To hash a password:
 ```javascript
 var bcrypt = require('bcrypt');
 bcrypt.genSalt(10, function(err, salt) {
-    bcrypt.hash("B4c0/\/", salt, function(err, hash) {
+    bcrypt.hash('B4c0/\/', salt, function(err, hash) {
         // Store hash in your password DB.
     });
 });
@@ -73,10 +73,10 @@ To check a password:
 
 ```javascript
 // Load hash from your password DB.
-bcrypt.compare("B4c0/\/", hash, function(err, res) {
+bcrypt.compare('B4c0/\/', hash, function(err, res) {
     // res == true
 });
-bcrypt.compare("not_bacon", hash, function(err, res) {
+bcrypt.compare('not_bacon', hash, function(err, res) {
     // res == false
 });
 ```
@@ -96,7 +96,7 @@ To hash a password:
 ```javascript
 var bcrypt = require('bcrypt');
 var salt = bcrypt.genSaltSync(10);
-var hash = bcrypt.hashSync("B4c0/\/", salt);
+var hash = bcrypt.hashSync('B4c0/\/', salt);
 // Store hash in your password DB.
 ```
 
@@ -104,8 +104,8 @@ To check a password:
 
 ```javascript
 // Load hash from your password DB.
-bcrypt.compareSync("B4c0/\/", hash); // true
-bcrypt.compareSync("not_bacon", hash); // false
+bcrypt.compareSync('B4c0/\/', hash); // true
+bcrypt.compareSync('not_bacon', hash); // false
 ```
 
 Auto-gen a salt and hash:
