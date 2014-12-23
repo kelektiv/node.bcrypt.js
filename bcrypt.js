@@ -36,7 +36,10 @@ module.exports.genSalt = function(rounds, ignore, cb) {
     if (!rounds) {
         rounds = 10;
     } else if (typeof rounds !== 'number') {
-        return cb(new Error('rounds must be a number'));
+        // callback error asynchronously
+        return process.nextTick(function() {
+            cb(new Error('rounds must be a number'));
+        });
     }
 
     if (!cb) {
@@ -72,19 +75,27 @@ module.exports.hashSync = function(data, salt) {
 /// @param {Function} cb callback(err, hash)
 module.exports.hash = function(data, salt, cb) {
     if (typeof data === 'function') {
-        return data(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+        return process.nextTick(function() {
+            data(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+        });
     }
 
     if (typeof salt === 'function') {
-        return salt(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+        return process.nextTick(function() {
+            salt(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+        });
     }
 
     if (data == null || salt == null) {
-        return cb(new Error('data and salt arguments required'));
+        return process.nextTick(function() {
+            cb(new Error('data and salt arguments required'));
+        });
     }
 
     if (typeof data !== 'string' || (typeof salt !== 'string' && typeof salt !== 'number')) {
-        return cb(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+        return process.nextTick(function() {
+            cb(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
+        });
     }
 
     if (!cb || typeof cb !== 'function') {
@@ -122,11 +133,15 @@ module.exports.compareSync = function(data, hash) {
 /// @param {Function} cb callback(err, matched) - matched is true if hashed data matches hash
 module.exports.compare = function(data, hash, cb) {
     if (data == null || hash == null) {
-        return cb(new Error('data and hash arguments required'));
+        return process.nextTick(function() {
+            cb(new Error('data and hash arguments required'));
+        });
     }
 
     if (typeof data !== 'string' || typeof hash !== 'string') {
-        return cb(new Error('data and hash must be strings'));
+        return process.nextTick(function() {
+            cb(new Error('data and hash must be strings'));
+        });
     }
 
     if (!cb || typeof cb !== 'function') {
