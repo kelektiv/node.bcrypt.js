@@ -18,9 +18,11 @@ If you are on a stable version of node, we can't magically know what you are doi
 
 | Node Version | Bcrypt Version |
 | ---- | ---- |
-| <= 0.4.x | <= 0.4.x |
-| >= 0.6.x | >= 0.5.x |
-| >= 0.11.x | >= 0.8.x |
+| 0.4.x | <= 0.4.x |
+| 0.6.x | >= 0.5.x |
+| 0.8.x | >= 0.5.x |
+| 0.10.x | >= 0.5.x |
+| 0.11.x | >= 0.8.x |
 
 Windows users should make sure to have at least node 0.8.5 installed and version >= 0.7.1 of this module.
 
