@@ -1,3 +1,6 @@
+# UNRELEASED
+  * update NaN to 1.5.0 for iojs support
+
 # 0.8.0 (2014-08-03)
   * migrate to NAN for bindings
 
