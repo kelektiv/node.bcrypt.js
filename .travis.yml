@@ -3,3 +3,6 @@ node_js:
   - "0.8"
   - "0.10"
   - "0.12"
+
+before_script:
+  - npm update -g npm
