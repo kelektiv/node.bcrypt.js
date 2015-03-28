@@ -46,7 +46,14 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         return;
     }
 
-    return bindings.gen_salt(rounds, crypto.randomBytes(16), cb);
+    crypto.randomBytes(16, function(error, randomBytes) {
+        if (error) {
+            cb(error);
+            return;
+        }
+
+        bindings.gen_salt(rounds, randomBytes, cb);
+    });
 };
 
 /// hash data using a salt
