@@ -1,3 +1,7 @@
+# UNRELEASED
+
+  * always use callback for generating random bytes to avoid blocking
+
 # 0.8.1 (2015-01-18)
   * update NaN to 1.5.0 for iojs support
 
