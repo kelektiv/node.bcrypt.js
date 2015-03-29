@@ -1,4 +1,4 @@
-# UNRELEASED
+# 0.8.2 (2015-03-28)
 
   * always use callback for generating random bytes to avoid blocking
 
