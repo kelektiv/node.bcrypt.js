@@ -1,5 +1,7 @@
 # node.bcrypt.js
 
+[![Join the chat at https://gitter.im/ncb000gt/node.bcrypt.js](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ncb000gt/node.bcrypt.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://secure.travis-ci.org/ncb000gt/node.bcrypt.js.svg)](http://travis-ci.org/#!/ncb000gt/node.bcrypt.js)
 
 Lib to help you hash passwords.
