@@ -5,5 +5,7 @@ node_js:
   - "0.12"
   - "iojs-v2"
 
+sudo: false
+
 before_install:
   - npm install -g npm@2.7.3
