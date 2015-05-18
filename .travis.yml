@@ -8,4 +8,4 @@ node_js:
 sudo: false
 
 before_install:
-  - npm install -g npm@2.7.3
+  - npm install -g npm@latest
