@@ -32,7 +32,7 @@
     "nan": "1.8.4"
   },
   "devDependencies": {
-    "nodeunit": ">=0.6.4"
+    "nodeunit": "~0.9.1"
   },
   "contributors": [
     "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
