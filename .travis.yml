@@ -3,8 +3,9 @@ node_js:
   - "0.8"
   - "0.10"
   - "0.12"
+  - "iojs-v2"
 
 sudo: false
 
 before_install:
-  - npm install -g npm@2.7.3
+  - if [ "$TRAVIS_NODE_VERSION" = "0.8" ]; then npm install -g npm@2.7.3; fi;
