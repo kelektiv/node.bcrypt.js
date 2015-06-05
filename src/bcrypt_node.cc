@@ -82,7 +82,7 @@ class SaltAsyncWorker : public NanAsyncWorker {
 
         Handle<Value> argv[2];
         argv[0] = NanUndefined();
-        argv[1] = Encode(salt.c_str(), salt.size(), BINARY);
+        argv[1] = NanEncode(salt.c_str(), salt.size(), Nan::BINARY);
         callback->Call(2, argv);
     }
 
@@ -136,7 +136,7 @@ NAN_METHOD(GenerateSaltSync) {
     char salt[_SALT_LEN];
     bcrypt_gensalt(rounds, seed, salt);
 
-    NanReturnValue(Encode(salt, strlen(salt), BINARY));
+    NanReturnValue(NanEncode(salt, strlen(salt), Nan::BINARY));
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
@@ -169,7 +169,7 @@ class EncryptAsyncWorker : public NanAsyncWorker {
             argv[1] = NanUndefined();
         } else {
             argv[0] = NanUndefined();
-            argv[1] = Encode(output.c_str(), output.size(), BINARY);
+            argv[1] = NanEncode(output.c_str(), output.size(), Nan::BINARY);
         }
 
         callback->Call(2, argv);
@@ -220,7 +220,7 @@ NAN_METHOD(EncryptSync) {
 
     char bcrypted[_PASSWORD_LEN];
     bcrypt(*data, *salt, bcrypted);
-    NanReturnValue(Encode(bcrypted, strlen(bcrypted), BINARY));
+    NanReturnValue(NanEncode(bcrypted, strlen(bcrypted), Nan::BINARY));
 }
 
 /* COMPARATOR */
