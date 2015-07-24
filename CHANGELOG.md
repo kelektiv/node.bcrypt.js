@@ -1,4 +1,4 @@
-# UNRELEASED
+# 0.8.4 (2015-07-24)
 
   * fix deprecation warning for the Encode API
 
