@@ -63,10 +63,10 @@ bool ValidateSalt(const char* salt) {
 
 /* SALT GENERATION */
 
-class SaltAsyncWorker : public NanAsyncWorker {
-  public:
-    SaltAsyncWorker(NanCallback *callback, std::string seed, ssize_t rounds)
-        : NanAsyncWorker(callback), seed(seed), rounds(rounds) {
+class SaltAsyncWorker : public Nan::AsyncWorker {
+public:
+    SaltAsyncWorker(Nan::Callback *callback, std::string seed, ssize_t rounds)
+        : Nan::AsyncWorker(callback), seed(seed), rounds(rounds) {
     }
 
     ~SaltAsyncWorker() {}
@@ -78,73 +78,71 @@ class SaltAsyncWorker : public NanAsyncWorker {
     }
 
     void HandleOKCallback() {
-        NanScope();
+        Nan::HandleScope scope;
 
-        Handle<Value> argv[2];
-        argv[0] = NanUndefined();
-        argv[1] = NanEncode(salt.c_str(), salt.size(), Nan::BINARY);
+        Local<Value> argv[2];
+        argv[0] = Nan::Undefined();
+        argv[1] = Nan::Encode(salt.c_str(), salt.size(), Nan::BINARY);
         callback->Call(2, argv);
     }
 
-  private:
+private:
     std::string seed;
     std::string salt;
     ssize_t rounds;
 };
 
 NAN_METHOD(GenerateSalt) {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 3) {
-        NanThrowError(Exception::TypeError(NanNew("3 arguments expected")));
-        NanReturnUndefined();
+    if (info.Length() < 3) {
+        Nan::ThrowTypeError("3 arguments expected");
+        return;
     }
 
-    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1].As<Object>()) != 16) {
-        NanThrowError(Exception::TypeError(NanNew("Second argument must be a 16 byte Buffer")));
-        NanReturnUndefined();
+    if (!Buffer::HasInstance(info[1]) || Buffer::Length(info[1].As<Object>()) != 16) {
+        Nan::ThrowTypeError("Second argument must be a 16 byte Buffer");
+        return;
     }
 
-    const ssize_t rounds = args[0]->Int32Value();
-    Local<Object> seed = args[1].As<Object>();
-    Local<Function> callback = Local<Function>::Cast(args[2]);
+    const ssize_t rounds = info[0]->Int32Value();
+    Local<Object> seed = info[1].As<Object>();
+    Local<Function> callback = Local<Function>::Cast(info[2]);
 
-    SaltAsyncWorker* saltWorker = new SaltAsyncWorker(new NanCallback(callback),
+    SaltAsyncWorker* saltWorker = new SaltAsyncWorker(new Nan::Callback(callback),
         std::string(Buffer::Data(seed), 16), rounds);
 
-    NanAsyncQueueWorker(saltWorker);
-
-    NanReturnUndefined();
+    Nan::AsyncQueueWorker(saltWorker);
 }
 
 NAN_METHOD(GenerateSaltSync) {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 2) {
-        NanThrowError(Exception::TypeError(NanNew("2 arguments expected")));
-        NanReturnUndefined();
+    if (info.Length() < 2) {
+        Nan::ThrowTypeError("2 arguments expected");
+        return;
     }
 
-    if (!Buffer::HasInstance(args[1]) || Buffer::Length(args[1].As<Object>()) != 16) {
-        NanThrowError(Exception::TypeError(NanNew("Second argument must be a 16 byte Buffer")));
-        NanReturnUndefined();
+    if (!Buffer::HasInstance(info[1]) || Buffer::Length(info[1].As<Object>()) != 16) {
+        Nan::ThrowTypeError("Second argument must be a 16 byte Buffer");
+        return;
     }
 
-    const ssize_t rounds = args[0]->Int32Value();
-    u_int8_t* seed = (u_int8_t*)Buffer::Data(args[1].As<Object>());
+    const ssize_t rounds = info[0]->Int32Value();
+    u_int8_t* seed = (u_int8_t*)Buffer::Data(info[1].As<Object>());
 
     char salt[_SALT_LEN];
     bcrypt_gensalt(rounds, seed, salt);
 
-    NanReturnValue(NanEncode(salt, strlen(salt), Nan::BINARY));
+    info.GetReturnValue().Set(Nan::Encode(salt, strlen(salt), Nan::BINARY));
 }
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
 
-class EncryptAsyncWorker : public NanAsyncWorker {
+class EncryptAsyncWorker : public Nan::AsyncWorker {
   public:
-    EncryptAsyncWorker(NanCallback *callback, std::string input, std::string salt)
-        : NanAsyncWorker(callback), input(input), salt(salt) {
+    EncryptAsyncWorker(Nan::Callback *callback, std::string input, std::string salt)
+        : Nan::AsyncWorker(callback), input(input), salt(salt) {
     }
 
     ~EncryptAsyncWorker() {}
@@ -160,16 +158,16 @@ class EncryptAsyncWorker : public NanAsyncWorker {
     }
 
     void HandleOKCallback() {
-        NanScope();
+        Nan::HandleScope scope;
 
-        Handle<Value> argv[2];
+        Local<Value> argv[2];
 
         if (!error.empty()) {
-            argv[0] = Exception::Error(NanNew(error.c_str()));
-            argv[1] = NanUndefined();
+            argv[0] = Nan::Error(error.c_str());
+            argv[1] = Nan::Undefined();
         } else {
-            argv[0] = NanUndefined();
-            argv[1] = NanEncode(output.c_str(), output.size(), Nan::BINARY);
+            argv[0] = Nan::Undefined();
+            argv[1] = Nan::Encode(output.c_str(), output.size(), Nan::BINARY);
         }
 
         callback->Call(2, argv);
@@ -183,44 +181,44 @@ class EncryptAsyncWorker : public NanAsyncWorker {
 };
 
 NAN_METHOD(Encrypt) {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 3) {
-        NanThrowError(Exception::TypeError(NanNew("3 arguments expected")));
-        NanReturnUndefined();
+    if (info.Length() < 3) {
+        Nan::ThrowTypeError("3 arguments expected");
+        return;
     }
 
-    String::Utf8Value data(args[0]->ToString());
-    String::Utf8Value salt(args[1]->ToString());
-    Local<Function> callback = Local<Function>::Cast(args[2]);
+    String::Utf8Value data(info[0]->ToString());
+    String::Utf8Value salt(info[1]->ToString());
+    Local<Function> callback = Local<Function>::Cast(info[2]);
 
-    EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(new NanCallback(callback),
+    EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(new Nan::Callback(callback),
         std::string(*data), std::string(*salt));
 
-    NanAsyncQueueWorker(encryptWorker);
-
-    NanReturnUndefined();
+    Nan::AsyncQueueWorker(encryptWorker);
 }
 
 NAN_METHOD(EncryptSync) {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 2) {
-        NanThrowError(Exception::TypeError(NanNew("2 arguments expected")));
-        NanReturnUndefined();
+    if (info.Length() < 2) {
+        Nan::ThrowTypeError("2 arguments expected");
+        info.GetReturnValue().Set(Nan::Undefined());
+        return;
     }
 
-    String::Utf8Value data(args[0]->ToString());
-    String::Utf8Value salt(args[1]->ToString());
+    String::Utf8Value data(info[0]->ToString());
+    String::Utf8Value salt(info[1]->ToString());
 
     if (!(ValidateSalt(*salt))) {
-        NanThrowError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
-        NanReturnUndefined();
+        Nan::ThrowError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+        info.GetReturnValue().Set(Nan::Undefined());
+        return;
     }
 
     char bcrypted[_PASSWORD_LEN];
     bcrypt(*data, *salt, bcrypted);
-    NanReturnValue(NanEncode(bcrypted, strlen(bcrypted), Nan::BINARY));
+    info.GetReturnValue().Set(Nan::Encode(bcrypted, strlen(bcrypted), Nan::BINARY));
 }
 
 /* COMPARATOR */
@@ -248,10 +246,10 @@ NAN_INLINE bool CompareStrings(const char* s1, const char* s2) {
     return eq;
 }
 
-class CompareAsyncWorker : public NanAsyncWorker {
+class CompareAsyncWorker : public Nan::AsyncWorker {
   public:
-    CompareAsyncWorker(NanCallback *callback, std::string input, std::string encrypted)
-        : NanAsyncWorker(callback), input(input), encrypted(encrypted) {
+    CompareAsyncWorker(Nan::Callback *callback, std::string input, std::string encrypted)
+        : Nan::AsyncWorker(callback), input(input), encrypted(encrypted) {
 
         result = false;
     }
@@ -267,11 +265,11 @@ class CompareAsyncWorker : public NanAsyncWorker {
     }
 
     void HandleOKCallback() {
-        NanScope();
+        Nan::HandleScope scope;
 
-        Handle<Value> argv[2];
-        argv[0] = NanUndefined();
-        argv[1] = NanNew<Boolean>(result);
+        Local<Value> argv[2];
+        argv[0] = Nan::Undefined();
+        argv[1] = Nan::New<Boolean>(result);
         callback->Call(2, argv);
     }
 
@@ -282,76 +280,74 @@ class CompareAsyncWorker : public NanAsyncWorker {
 };
 
 NAN_METHOD(Compare) {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 3) {
-        NanThrowError(Exception::TypeError(NanNew("3 arguments expected")));
-        NanReturnUndefined();
+    if (info.Length() < 3) {
+        Nan::ThrowTypeError("3 arguments expected");
+        return;
     }
 
-    String::Utf8Value input(args[0]->ToString());
-    String::Utf8Value encrypted(args[1]->ToString());
-    Local<Function> callback = Local<Function>::Cast(args[2]);
+    String::Utf8Value input(info[0]->ToString());
+    String::Utf8Value encrypted(info[1]->ToString());
+    Local<Function> callback = Local<Function>::Cast(info[2]);
 
-    CompareAsyncWorker* compareWorker = new CompareAsyncWorker(new NanCallback(callback),
+    CompareAsyncWorker* compareWorker = new CompareAsyncWorker(new Nan::Callback(callback),
         std::string(*input), std::string(*encrypted));
 
-    NanAsyncQueueWorker(compareWorker);
-
-    NanReturnUndefined();
+    Nan::AsyncQueueWorker(compareWorker);
 }
 
 NAN_METHOD(CompareSync) {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 2) {
-        NanThrowError(Exception::TypeError(NanNew("2 arguments expected")));
-        NanReturnUndefined();
+    if (info.Length() < 2) {
+        Nan::ThrowTypeError("2 arguments expected");
+        info.GetReturnValue().Set(Nan::Undefined());
+        return;
     }
 
-    String::Utf8Value pw(args[0]->ToString());
-    String::Utf8Value hash(args[1]->ToString());
+    String::Utf8Value pw(info[0]->ToString());
+    String::Utf8Value hash(info[1]->ToString());
 
     char bcrypted[_PASSWORD_LEN];
     if (ValidateSalt(*hash)) {
         bcrypt(*pw, *hash, bcrypted);
-        NanReturnValue(NanNew<Boolean>(CompareStrings(bcrypted, *hash)));
+        info.GetReturnValue().Set(Nan::New<Boolean>(CompareStrings(bcrypted, *hash)));
     } else {
-        NanReturnValue(NanFalse());
+        info.GetReturnValue().Set(Nan::False());
     }
 }
 
 NAN_METHOD(GetRounds) {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 1) {
-        NanThrowError(Exception::TypeError(NanNew("1 argument expected")));
-        NanReturnUndefined();
+    if (info.Length() < 1) {
+        Nan::ThrowTypeError("1 argument expected");
+        info.GetReturnValue().Set(Nan::Undefined());
+        return;
     }
 
-    String::Utf8Value hash(args[0]->ToString());
+    String::Utf8Value hash(info[0]->ToString());
     u_int32_t rounds;
     if (!(rounds = bcrypt_get_rounds(*hash))) {
-        NanThrowError("invalid hash provided");
-        NanReturnUndefined();
+        Nan::ThrowError("invalid hash provided");
+        info.GetReturnValue().Set(Nan::Undefined());
+        return;
     }
 
-    NanReturnValue(NanNew(rounds));
+    info.GetReturnValue().Set(Nan::New(rounds));
 }
 
 } // anonymous namespace
 
-// bind the bcrypt module
-extern "C" void init(Handle<Object> target) {
-    NanScope();
-
-    NODE_SET_METHOD(target, "gen_salt_sync", GenerateSaltSync);
-    NODE_SET_METHOD(target, "encrypt_sync", EncryptSync);
-    NODE_SET_METHOD(target, "compare_sync", CompareSync);
-    NODE_SET_METHOD(target, "get_rounds", GetRounds);
-    NODE_SET_METHOD(target, "gen_salt", GenerateSalt);
-    NODE_SET_METHOD(target, "encrypt", Encrypt);
-    NODE_SET_METHOD(target, "compare", Compare);
+NAN_MODULE_INIT(init) {
+    Nan::Export(target, "gen_salt_sync", GenerateSaltSync);
+    Nan::Export(target, "encrypt_sync", EncryptSync);
+    Nan::Export(target, "compare_sync", CompareSync);
+    Nan::Export(target, "get_rounds", GetRounds);
+    Nan::Export(target, "gen_salt", GenerateSalt);
+    Nan::Export(target, "encrypt", Encrypt);
+    Nan::Export(target, "compare", Compare);
 };
 
 NODE_MODULE(bcrypt_lib, init);
