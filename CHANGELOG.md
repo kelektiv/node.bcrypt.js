@@ -1,3 +1,7 @@
+# UNRELEASED
+
+  * update to nan v2 (adds support for iojs 3)
+
 # 0.8.4 (2015-07-24)
 
   * fix deprecation warning for the Encode API
