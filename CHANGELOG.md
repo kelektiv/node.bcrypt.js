@@ -1,4 +1,4 @@
-# UNRELEASED
+# 0.8.5 (2015-08-12)
 
   * update to nan v2 (adds support for iojs 3)
 
