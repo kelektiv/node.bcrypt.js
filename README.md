@@ -36,6 +36,8 @@ gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --node
 
 ## Security Issues/Concerns
 
+> Per bcrypt implementation, only the first 72 characters of a string are used. Any extra characters are ignored when matching passwords.
+
 As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code- please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
 
 To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
