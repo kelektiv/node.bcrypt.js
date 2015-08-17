@@ -105,7 +105,7 @@ NAN_METHOD(GenerateSalt) {
         return;
     }
 
-    const ssize_t rounds = info[0]->Int32Value();
+    const int32_t rounds = Nan::To<int32_t>(info[0]).FromMaybe(0);
     Local<Object> seed = info[1].As<Object>();
     Local<Function> callback = Local<Function>::Cast(info[2]);
 
@@ -128,7 +128,7 @@ NAN_METHOD(GenerateSaltSync) {
         return;
     }
 
-    const ssize_t rounds = info[0]->Int32Value();
+    const int32_t rounds = Nan::To<int32_t>(info[0]).FromMaybe(0);
     u_int8_t* seed = (u_int8_t*)Buffer::Data(info[1].As<Object>());
 
     char salt[_SALT_LEN];
