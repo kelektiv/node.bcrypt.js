@@ -105,7 +105,7 @@ NAN_METHOD(GenerateSalt) {
         return;
     }
 
-    const ssize_t rounds = info[0]->Int32Value();
+    const int32_t rounds = Nan::To<int32_t>(info[0]).FromMaybe(0);
     Local<Object> seed = info[1].As<Object>();
     Local<Function> callback = Local<Function>::Cast(info[2]);
 
@@ -128,7 +128,7 @@ NAN_METHOD(GenerateSaltSync) {
         return;
     }
 
-    const ssize_t rounds = info[0]->Int32Value();
+    const int32_t rounds = Nan::To<int32_t>(info[0]).FromMaybe(0);
     u_int8_t* seed = (u_int8_t*)Buffer::Data(info[1].As<Object>());
 
     char salt[_SALT_LEN];
@@ -188,8 +188,8 @@ NAN_METHOD(Encrypt) {
         return;
     }
 
-    String::Utf8Value data(info[0]->ToString());
-    String::Utf8Value salt(info[1]->ToString());
+    Nan::Utf8String data(info[0]->ToString());
+    Nan::Utf8String salt(info[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(info[2]);
 
     EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(new Nan::Callback(callback),
@@ -207,8 +207,8 @@ NAN_METHOD(EncryptSync) {
         return;
     }
 
-    String::Utf8Value data(info[0]->ToString());
-    String::Utf8Value salt(info[1]->ToString());
+    Nan::Utf8String data(info[0]->ToString());
+    Nan::Utf8String salt(info[1]->ToString());
 
     if (!(ValidateSalt(*salt))) {
         Nan::ThrowError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
@@ -287,8 +287,8 @@ NAN_METHOD(Compare) {
         return;
     }
 
-    String::Utf8Value input(info[0]->ToString());
-    String::Utf8Value encrypted(info[1]->ToString());
+    Nan::Utf8String input(info[0]->ToString());
+    Nan::Utf8String encrypted(info[1]->ToString());
     Local<Function> callback = Local<Function>::Cast(info[2]);
 
     CompareAsyncWorker* compareWorker = new CompareAsyncWorker(new Nan::Callback(callback),
@@ -306,8 +306,8 @@ NAN_METHOD(CompareSync) {
         return;
     }
 
-    String::Utf8Value pw(info[0]->ToString());
-    String::Utf8Value hash(info[1]->ToString());
+    Nan::Utf8String pw(info[0]->ToString());
+    Nan::Utf8String hash(info[1]->ToString());
 
     char bcrypted[_PASSWORD_LEN];
     if (ValidateSalt(*hash)) {
@@ -327,7 +327,7 @@ NAN_METHOD(GetRounds) {
         return;
     }
 
-    String::Utf8Value hash(info[0]->ToString());
+    Nan::Utf8String hash(info[0]->ToString());
     u_int32_t rounds;
     if (!(rounds = bcrypt_get_rounds(*hash))) {
         Nan::ThrowError("invalid hash provided");
