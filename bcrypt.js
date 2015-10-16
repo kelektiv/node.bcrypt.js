@@ -1,6 +1,6 @@
 'use strict';
 
-var bindings = require('bindings')('bcrypt_lib');
+var bindings = require('bindings')({ bindings: 'bcrypt_lib', module_root: __dirname });
 var crypto = require('crypto');
 
 /// generate a salt (sync)
