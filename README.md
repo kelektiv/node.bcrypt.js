@@ -67,7 +67,7 @@ npm install bcrypt
 ```javascript
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
-const somePlaintextPassword = 's0/\/\P4$$w0rD';
+const myPlaintextPassword = 's0/\/\P4$$w0rD';
 const someOtherPlaintextPassword = 'not_bacon';
 ```
 
@@ -77,7 +77,7 @@ Technique 1 (generate a salt and hash on separate function calls):
 
 ```javascript
 bcrypt.genSalt(saltRounds, function(err, salt) {
-    bcrypt.hash(somePlaintextPassword, salt, function(err, hash) {
+    bcrypt.hash(myPlaintextPassword, salt, function(err, hash) {
         // Store hash in your password DB.
     });
 });
@@ -86,7 +86,7 @@ bcrypt.genSalt(saltRounds, function(err, salt) {
 Technique 2 (auto-gen a salt and hash):
 
 ```javascript
-bcrypt.hash(somePlaintextPassword, saltRounds, function(err, hash) {
+bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
   // Store hash in your password DB.
 });
 ```
@@ -97,7 +97,7 @@ Note that both techniques achieve the same end-result.
 
 ```javascript
 // Load hash from your password DB.
-bcrypt.compare(somePlaintextPassword, hash, function(err, res) {
+bcrypt.compare(myPlaintextPassword, hash, function(err, res) {
     // res == true
 });
 bcrypt.compare(someOtherPlaintextPassword, hash, function(err, res) {
@@ -111,7 +111,7 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, res) {
 ```javascript
 var bcrypt = require('bcrypt');
 const saltRounds = 10;
-const somePlaintextPassword = 's0/\/\P4$$w0rD';
+const myPlaintextPassword = 's0/\/\P4$$w0rD';
 const someOtherPlaintextPassword = 'not_bacon';
 ```
 
@@ -121,14 +121,14 @@ Technique 1 (generate a salt and hash on separate function calls):
 
 ```javascript
 var salt = bcrypt.genSaltSync(saltRounds);
-var hash = bcrypt.hashSync(somePlaintextPassword, salt);
+var hash = bcrypt.hashSync(myPlaintextPassword, salt);
 // Store hash in your password DB.
 ```
 
 Technique 2 (auto-gen a salt and hash):
 
 ```javascript
-var hash = bcrypt.hashSync(somePlaintextPassword, saltRounds);
+var hash = bcrypt.hashSync(myPlaintextPassword, saltRounds);
 // Store hash in your password DB.
 ```
 
@@ -138,7 +138,7 @@ As with async, both techniques achieve the same end-result.
 
 ```javascript
 // Load hash from your password DB.
-bcrypt.compareSync(somePlaintextPassword, hash); // true
+bcrypt.compareSync(myPlaintextPassword, hash); // true
 bcrypt.compareSync(someOtherPlaintextPassword, hash); // false
 ```
 
