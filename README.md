@@ -64,60 +64,82 @@ npm install bcrypt
 
 ### async (recommended)
 
-To hash a password:
-
 ```javascript
 var bcrypt = require('bcrypt');
-bcrypt.genSalt(10, function(err, salt) {
-    bcrypt.hash('B4c0/\/', salt, function(err, hash) {
+const saltRounds = 10;
+const myPlaintextPassword = 's0/\/\P4$$w0rD';
+const someOtherPlaintextPassword = 'not_bacon';
+```
+
+#### To hash a password:
+
+Technique 1 (generate a salt and hash on separate function calls):
+
+```javascript
+bcrypt.genSalt(saltRounds, function(err, salt) {
+    bcrypt.hash(myPlaintextPassword, salt, function(err, hash) {
         // Store hash in your password DB.
     });
 });
 ```
 
-To check a password:
+Technique 2 (auto-gen a salt and hash):
 
 ```javascript
-// Load hash from your password DB.
-bcrypt.compare('B4c0/\/', hash, function(err, res) {
-    // res == true
-});
-bcrypt.compare('not_bacon', hash, function(err, res) {
-    // res == false
+bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
+  // Store hash in your password DB.
 });
 ```
 
-Auto-gen a salt and hash:
+Note that both techniques achieve the same end-result.
+
+#### To check a password:
 
 ```javascript
-bcrypt.hash('bacon', 8, function(err, hash) {
+// Load hash from your password DB.
+bcrypt.compare(myPlaintextPassword, hash, function(err, res) {
+    // res == true
+});
+bcrypt.compare(someOtherPlaintextPassword, hash, function(err, res) {
+    // res == false
 });
 ```
 
 
 ### sync
 
-To hash a password:
-
 ```javascript
 var bcrypt = require('bcrypt');
-var salt = bcrypt.genSaltSync(10);
-var hash = bcrypt.hashSync('B4c0/\/', salt);
+const saltRounds = 10;
+const myPlaintextPassword = 's0/\/\P4$$w0rD';
+const someOtherPlaintextPassword = 'not_bacon';
+```
+
+#### To hash a password:
+
+Technique 1 (generate a salt and hash on separate function calls):
+
+```javascript
+var salt = bcrypt.genSaltSync(saltRounds);
+var hash = bcrypt.hashSync(myPlaintextPassword, salt);
 // Store hash in your password DB.
 ```
 
-To check a password:
+Technique 2 (auto-gen a salt and hash):
+
+```javascript
+var hash = bcrypt.hashSync(myPlaintextPassword, saltRounds);
+// Store hash in your password DB.
+```
+
+As with async, both techniques achieve the same end-result.
+
+#### To check a password:
 
 ```javascript
 // Load hash from your password DB.
-bcrypt.compareSync('B4c0/\/', hash); // true
-bcrypt.compareSync('not_bacon', hash); // false
-```
-
-Auto-gen a salt and hash:
-
-```javascript
-var hash = bcrypt.hashSync('bacon', 8);
+bcrypt.compareSync(myPlaintextPassword, hash); // true
+bcrypt.compareSync(someOtherPlaintextPassword, hash); // false
 ```
 
 ## API
@@ -133,10 +155,10 @@ var hash = bcrypt.hashSync('bacon', 8);
       * `salt` - Second parameter to the callback providing the generated salt.
   * `hashSync(data, salt)`
     * `data` - [REQUIRED] - the data to be encrypted.
-    * `salt` - [REQUIRED] - the salt to be used in encryption.
+    * `salt` - [REQUIRED] - the salt to be used to hash the password. if specified as a number then a salt will be generated with the specified number of rounds and used (see example under **Usage**).
   * `hash(data, salt, cb)`
     * `data` - [REQUIRED] - the data to be encrypted.
-    * `salt` - [REQUIRED] - the salt to be used to hash the password. if specified as a number then a salt will be generated and used (see examples).
+    * `salt` - [REQUIRED] - the salt to be used to hash the password. if specified as a number then a salt will be generated with the specified number of rounds and used (see example under **Usage**).
     * `cb` - [REQUIRED] - a callback to be fired once the data has been encrypted. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `encrypted` - Second parameter to the callback providing the encrypted form.
