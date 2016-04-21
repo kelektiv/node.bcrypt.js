@@ -1,3 +1,7 @@
+# 0.8.6 (2016-04-20)
+
+  * update nan for node v6 support
+
 # 0.8.5 (2015-08-12)
 
   * update to nan v2 (adds support for iojs 3)
