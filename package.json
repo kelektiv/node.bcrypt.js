@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "bindings": "1.2.1",
-    "nan": "2.2.1"
+    "nan": "2.3.5"
   },
   "devDependencies": {
     "nodeunit": "~0.9.1"
