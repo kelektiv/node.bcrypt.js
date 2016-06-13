@@ -1,3 +1,7 @@
+# 0.8.7 (2016-04-20)
+
+  * update nan to 2.3.5 for improved node v6 support
+
 # 0.8.6 (2016-04-20)
 
   * update nan for node v6 support
