@@ -14,3 +14,5 @@ Once you have done the above and are still confident that the issue is with the 
 * If you find a bug, please write a failing test.
 
 Thanks!
+
+P.S. If it doesn't look like you read the above then your issue will likely be closed without further explanation. Sorry, but there are just too many issues opened with no useful information or questions which have been previously addressed.
