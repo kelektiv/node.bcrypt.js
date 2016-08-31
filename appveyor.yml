@@ -1,0 +1,44 @@
+environment:
+  matrix:
+  - nodejs_version: "0.10"
+    platform: x64
+  - nodejs_version: "0.10"
+    platform: x86
+  - nodejs_version: "0.12"
+    platform: x64
+  - nodejs_version: "0.12"
+    platform: x86
+  - nodejs_version: "4"
+    platform: x64
+  - nodejs_version: "4"
+    platform: x86
+  - nodejs_version: "5"
+    platform: x64
+  - nodejs_version: "5"
+    platform: x86
+  - nodejs_version: "6"
+    platform: x64
+  - nodejs_version: "6"
+    platform: x86
+
+install:
+  - where npm
+  - where node
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - for /f "delims=" %%a in ('where npm') do cd %%a\.. && npm install npm@latest
+  - for /f "delims=" %%a in ('where npm') do cd %%a\.. && npm install node-pre-gyp@latest
+  - 'if "%nodejs_version%_%platform%" == "4_x86" (npm config set -g cafile=package.json && npm config set -g strict-ssl=false)'
+
+build: off
+
+artifacts:
+  - path: 'build/stage/**/bcrypt*.tar.gz'
+  - path: package.json
+
+test_script:
+  - node --version
+  - npm --version
+  - npm test
+
+after_test:
+  - node-pre-gyp package
