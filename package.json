@@ -25,11 +25,13 @@
     "url": "https://github.com/ncb000gt/node.bcrypt.js/issues"
   },
   "scripts": {
-    "test": "node-gyp configure build && nodeunit test"
+    "test": "npm install --build-from-source && nodeunit test",
+    "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
     "bindings": "1.2.1",
-    "nan": "2.3.5"
+    "nan": "2.3.5",
+    "node-pre-gyp": "0.6.30"
   },
   "devDependencies": {
     "nodeunit": "~0.9.1"
@@ -49,5 +51,11 @@
     "Nate Rajlich <nathan@tootallnate.net> (https://github.com/tootallnate)",
     "Sean McArthur <sean.monstar@gmail.com> (https://github.com/seanmonstar)",
     "Fanie Oosthuysen <fanie.oosthuysen@gmail.com> (https://github.com/weareu)"
-  ]
+  ],
+  "binary": {
+    "module_name": "bcrypt_lib",
+    "module_path": "./lib/binding/",
+    "host": "https://github.com",
+    "remote_path": "/ncb000gt/node.bcrypt.js/releases/download/v{version}/"
+  }
 }
