@@ -2,21 +2,18 @@ TESTS = test/*.js
 
 all: test
 
-build: clean configure compile
+build: clean compile
 
-configure:
-	node-gyp configure
-
-compile: configure
-	node-gyp build
+compile:
 	npm install .
+	npm run install
 
 test: build
 	@./node_modules/nodeunit/bin/nodeunit \
 		$(TESTS)
 
 clean:
-	node-gyp clean
+	rm -Rf lib/bindings/
 
 
 .PHONY: clean test build
