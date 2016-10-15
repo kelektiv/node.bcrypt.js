@@ -149,10 +149,10 @@ If you are using bcrypt on a simple script, using the sync mode is perfectly fin
 
   * `genSaltSync(rounds, seed)`
     * `rounds` - [OPTIONAL] - number of rounds, the cost of processing the data. (default - 10)
-    * `seed` - [OPTIONAL] - 16-byte buffer with random seed (default - crypto.randomBytes(16))
+    * `saltbase` - [OPTIONAL] - 16-byte Buffer with unencoded salt as base (default - `crypto.randomBytes(16)`)
   * `genSalt(rounds, seed, cb)`
     * `rounds` - [OPTIONAL] - number of rounds, the cost of processing the data. (default - 10)
-    * `seed` - [OPTIONAL] - 16-byte buffer with random seed (default - crypto.randomBytes(16))
+    * `saltbase` - [OPTIONAL] - 16-byte Buffer with unencoded salt as base (default - `crypto.randomBytes(16)`)
     * `cb` - [REQUIRED] - a callback to be fired once the salt has been generated. uses eio making it asynchronous.
       * `err` - First parameter to the callback detailing any errors.
       * `salt` - Second parameter to the callback providing the generated salt.
@@ -235,7 +235,7 @@ The code for this comes from a few sources:
 * [Nate Rajlich][tootallnate] - Bindings and build process.
 * [Sean McArthur][seanmonstar] - Windows Support
 * [Fanie Oosthuysen][weareu] - Windows Support
-* [Tino Lange][coldcoff] - seed support for genSalt, genSaltSync
+* [Tino Lange][coldcoff] - saltbase support for genSalt, genSaltSync
 
 ## License
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.

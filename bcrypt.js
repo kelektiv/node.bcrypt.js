@@ -9,9 +9,9 @@ var crypto = require('crypto');
 
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
-/// @param {Buffer} [seed] random seed (default crypto.randomBytes(16))
+/// @param {Buffer} [saltbase] 16-byte Buffer with unencoded salt as base (default crypto.randomBytes(16))
 /// @return {String} salt
-module.exports.genSaltSync = function(rounds, seed) {
+module.exports.genSaltSync = function(rounds, saltbase) {
     // default 10 rounds
     if (!rounds) {
         rounds = 10;
@@ -19,19 +19,19 @@ module.exports.genSaltSync = function(rounds, seed) {
         throw new Error('rounds must be a number');
     }
     // seed default is random data
-    if (!seed) {
-	seed = crypto.randomBytes(16);
-    } else if (!Buffer.isBuffer(seed) || seed.length != 16) {
-        throw new Error('seed must be a 16 byte Buffer');
+    if (!saltbase) {
+        saltbase = crypto.randomBytes(16);
+    } else if (!Buffer.isBuffer(saltbase) || saltbase.length !== 16) {
+        throw new Error('saltbase must be a 16-byte Buffer');
     }
-    return bindings.gen_salt_sync(rounds, seed);
+    return bindings.gen_salt_sync(rounds, saltbase);
 };
 
 /// generate a salt
 /// @param {Number} [rounds] number of rounds (default 10)
-/// @param {Buffer} [seed] random seed (default crypto.randomBytes(16))
+/// @param {Buffer} [saltbase] 16-byte Buffer with unencoded salt as base (default crypto.randomBytes(16))
 /// @param {Function} cb callback(err, salt)
-module.exports.genSalt = function(rounds, seed, cb) {
+module.exports.genSalt = function(rounds, saltbase, cb) {
     // if callback is first argument, then use defaults for others
     if (typeof arguments[0] === 'function') {
         // have to set callback first otherwise arguments are overriden
@@ -41,7 +41,7 @@ module.exports.genSalt = function(rounds, seed, cb) {
     } else if (typeof arguments[1] === 'function') {
         // have to set callback first otherwise arguments are overriden
         cb = arguments[1];
-	seed = undefined;
+        saltbase = undefined;
     }
 
     if (!cb) {
@@ -58,21 +58,21 @@ module.exports.genSalt = function(rounds, seed, cb) {
         });
     }
 
-    if (!seed) {
-	crypto.randomBytes(16, function(error, randomBytes) {
+    if (!saltbase) {
+        crypto.randomBytes(16, function(error, randomBytes) {
             if (error) {
-		cb(error);
-		return;
+                cb(error);
+                return;
             }
             bindings.gen_salt(rounds, randomBytes, cb);
-	});
-    } else if (!Buffer.isBuffer(seed) || seed.length != 16) {
+        });
+    } else if (!Buffer.isBuffer(saltbase) || saltbase.length !== 16) {
         // callback error asynchronously
         return process.nextTick(function() {
-	    cb(new Error('seed must be a 16 byte Buffer'));
-	});
+            cb(new Error('saltbase must be a 16-byte Buffer'));
+        });
     } else {
-        bindings.gen_salt(rounds, seed, cb);
+        bindings.gen_salt(rounds, saltbase, cb);
     }
 };
 
