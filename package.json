@@ -18,11 +18,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ncb000gt/node.bcrypt.js.git"
+    "url": "https://github.com/kelektiv/node.bcrypt.js.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ncb000gt/node.bcrypt.js/issues"
+    "url": "https://github.com/kelektiv/node.bcrypt.js/issues"
   },
   "scripts": {
     "test": "npm install --build-from-source && nodeunit test",
@@ -56,6 +56,6 @@
     "module_name": "bcrypt_lib",
     "module_path": "./lib/binding/",
     "host": "https://github.com",
-    "remote_path": "/ncb000gt/node.bcrypt.js/releases/download/v{version}/"
+    "remote_path": "/kelektiv/node.bcrypt.js/releases/download/v{version}/"
   }
 }
