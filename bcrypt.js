@@ -202,7 +202,15 @@ function _promise(f,args) {
     if(typeof Promise === 'undefined')
         return;
     //just polyfill here (for 0.12)
-    var _from = Array.from || Array.prototype.slice.call;
+    //this just wont work on node 0.12
+    //var _from = Array.from || [].slice.call;    
+
+    //for node 0.12 stupidity
+    var _from = Array.from;
+    if(!_from)
+    _from = function(args) {
+        return [].slice.call(args);    
+    };
     
     if(typeof args !== 'Array')
         args = _from(args);
