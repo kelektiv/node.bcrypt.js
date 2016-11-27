@@ -36,8 +36,8 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         cb = arguments[1];
     }
 
-    if(!cb) {
-        return _promise(this.genSalt,arguments);
+    if (!cb) {
+        return _promise(this.genSalt, arguments);
     }
 
     // default 10 rounds
@@ -103,8 +103,8 @@ module.exports.hash = function(data, salt, cb) {
         return _reject(new Error('cb must be a function or null to return a Promise'));
     }
 
-    if(!cb) {
-        return _promise(this.hash,arguments);
+    if (!cb) {
+        return _promise(this.hash, arguments);
     }
 
     if (data == null || salt == null) {
@@ -170,8 +170,8 @@ module.exports.compare = function(data, hash, cb) {
         return _reject(new Error('cb must be a function or null to return a Promise'));
     }
 
-    if(!cb) {
-        return _promise(this.compare,arguments);
+    if (!cb) {
+        return _promise(this.compare, arguments);
     }
 
     return bindings.compare(data, hash, cb);
@@ -191,53 +191,64 @@ module.exports.getRounds = function(hash) {
     return bindings.get_rounds(hash);
 };
 
-/// convert a node style callback function
-/// to one returning a promise
-/// @param {f} function to be encapsulated
-/// @param {args} Array like, args to be passed to the called function
-/// @return {Promise} a promise encapuslaing the function
-function _promise(f,args) {
-    //cant do anything without promise
+/// encapsulate a method with a node-style callback in a Promise
+/// @param {function} function to be encapsulated
+/// @param {Array-like} args to be passed to the called function
+/// @return {Promise} a Promise encapuslaing the function
+var _promise = function (fn, args) {
 
-    if(typeof Promise === 'undefined')
+    //fn must be a function
+    var _self = this;
+
+    //can't do anything without Promise
+    //fail silently
+    if (typeof Promise === 'undefined') {
         return;
+    }
+
     //just polyfill here (for 0.12)
-    //this just wont work on node 0.12
+    //this just won't work on node 0.12
     //var _from = Array.from || [].slice.call;    
 
     //for node 0.12 stupidity
     var _from = Array.from;
-    if(!_from)
-    _from = function(args) {
-        return [].slice.call(args);    
-    };
-    
-    if(typeof args !== 'Array')
-        args = _from(args);
-    //f must be a function
-    var _self = this;
-    if(typeof f !== 'function') {
-        return Promise.reject(new Error('f must be a function'));
+
+    if (!_from) {
+        _from = function(args) {
+            return [].slice.call(args);
+        };
     }
-    return new Promise (function(resolve,reject) {
-        args.push(function(err,data) {
-            if(err) {
+
+    if (!Array.isArray(args)) {
+        args = _from(args);
+    }
+
+
+    if (typeof fn !== 'function') {
+        return Promise.reject(new Error('fn must be a function'));
+    }
+
+    return new Promise(function(resolve, reject) {
+        args.push(function(err, data) {
+            if (err) {
                 reject(err);
             } else {
                 resolve(data);
             }
         });
-        
-        f.apply(_self,args);
+
+        fn.apply(_self, args);
     });
-}
+};
 
-// silently swallow errors if Promise is not defined
-// emulating old versions
+/// @param {err} the error to be thrown
+var _reject = function (err) {
 
-function _reject(err) {
-    if(typeof Promise === 'undefined')
+    // silently swallow errors if Promise is not defined
+    // emulating old behavior
+    if (typeof Promise === 'undefined') {
         return;
+    }
 
     return Promise.reject(err);
-}
+};
