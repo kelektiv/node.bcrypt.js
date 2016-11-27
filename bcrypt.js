@@ -7,6 +7,8 @@ var bindings = require(binding_path);
 
 var crypto = require('crypto');
 
+var promises = require('./lib/promises');
+
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
 /// @return {String} salt
@@ -37,7 +39,7 @@ module.exports.genSalt = function(rounds, ignore, cb) {
     }
 
     if (!cb) {
-        return _promise(this.genSalt, arguments);
+        return promises.promise(this.genSalt, this, arguments);
     }
 
     // default 10 rounds
@@ -100,11 +102,11 @@ module.exports.hash = function(data, salt, cb) {
     //cb exists but not a function
     // do not throw error to preserve old behavior
     if (cb && typeof cb !== 'function') {
-        return _reject(new Error('cb must be a function or null to return a Promise'));
+        return promises.reject(new Error('cb must be a function or null to return a Promise'));
     }
 
     if (!cb) {
-        return _promise(this.hash, arguments);
+        return promises.promise(this.hash, this, arguments);
     }
 
     if (data == null || salt == null) {
@@ -167,11 +169,11 @@ module.exports.compare = function(data, hash, cb) {
     //or silently failing on errors. Shows warnings on node and browsers
     //so should help diagnose errors too
     if (cb && typeof cb !== 'function') {
-        return _reject(new Error('cb must be a function or null to return a Promise'));
+        return promises.reject(new Error('cb must be a function or null to return a Promise'));
     }
 
     if (!cb) {
-        return _promise(this.compare, arguments);
+        return promises.promise(this.compare, this, arguments);
     }
 
     return bindings.compare(data, hash, cb);
@@ -189,66 +191,4 @@ module.exports.getRounds = function(hash) {
     }
 
     return bindings.get_rounds(hash);
-};
-
-/// encapsulate a method with a node-style callback in a Promise
-/// @param {function} function to be encapsulated
-/// @param {Array-like} args to be passed to the called function
-/// @return {Promise} a Promise encapuslaing the function
-var _promise = function (fn, args) {
-
-    //fn must be a function
-    var _self = this;
-
-    //can't do anything without Promise
-    //fail silently
-    if (typeof Promise === 'undefined') {
-        return;
-    }
-
-    //just polyfill here (for 0.12)
-    //this just won't work on node 0.12
-    //var _from = Array.from || [].slice.call;    
-
-    //for node 0.12 stupidity
-    var _from = Array.from;
-
-    if (!_from) {
-        _from = function(args) {
-            return [].slice.call(args);
-        };
-    }
-
-    if (!Array.isArray(args)) {
-        args = _from(args);
-    }
-
-
-    if (typeof fn !== 'function') {
-        return Promise.reject(new Error('fn must be a function'));
-    }
-
-    return new Promise(function(resolve, reject) {
-        args.push(function(err, data) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
-
-        fn.apply(_self, args);
-    });
-};
-
-/// @param {err} the error to be thrown
-var _reject = function (err) {
-
-    // silently swallow errors if Promise is not defined
-    // emulating old behavior
-    if (typeof Promise === 'undefined') {
-        return;
-    }
-
-    return Promise.reject(err);
 };
