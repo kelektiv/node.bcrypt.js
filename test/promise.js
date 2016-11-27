@@ -3,6 +3,9 @@ var fail = function(assert, error) {
     assert.ok(false, error);
     assert.done();
 };
+
+//only run this tests if promise is available
+if(typeof Promise !== 'undefined')
 module.exports = {
     test_salt_returns_promise_on_no_args: function(assert) {
         assert.ok(bcrypt.genSalt() instanceof Promise, "Should return a promise");

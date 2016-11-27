@@ -100,7 +100,7 @@ module.exports.hash = function(data, salt, cb) {
     //cb exists but not a function
     // do not throw error to preserve old behavior
     if (cb && typeof cb !== 'function') {
-        return Promise.reject(new Error('cb must be a function or null to return a Promise'));
+        return _reject(new Error('cb must be a function or null to return a Promise'));
     }
 
     if(!cb) {
@@ -167,7 +167,7 @@ module.exports.compare = function(data, hash, cb) {
     //or silently failing on errors. Shows warnings on node and browsers
     //so should help diagnose errors too
     if (cb && typeof cb !== 'function') {
-        return Promise.reject(new Error('cb must be a function or null to return a Promise'));
+        return _reject(new Error('cb must be a function or null to return a Promise'));
     }
 
     if(!cb) {
@@ -197,9 +197,15 @@ module.exports.getRounds = function(hash) {
 /// @param {args} Array like, args to be passed to the called function
 /// @return {Promise} a promise encapuslaing the function
 function _promise(f,args) {
+    //cant do anything without promise
 
+    if(typeof Promise === 'undefined')
+        return;
+    //just polyfill here (for 0.12)
+    var _from = Array.from || Array.prototype.slice.call;
+    
     if(typeof args !== 'Array')
-        args = Array.from(args);
+        args = _from(args);
     //f must be a function
     var _self = this;
     if(typeof f !== 'function') {
@@ -215,6 +221,15 @@ function _promise(f,args) {
         });
         
         f.apply(_self,args);
-        //resolve("1234567890");
     });
+}
+
+// silently swallow errors if Promise is not defined
+// emulating old versions
+
+function _reject(err) {
+    if(typeof Promise === 'undefined')
+        return;
+
+    return Promise.reject(err);
 }
