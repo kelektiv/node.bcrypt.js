@@ -36,6 +36,10 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         cb = arguments[1];
     }
 
+    if(!cb) {
+        return _promise(this.genSalt,arguments);
+    }
+
     // default 10 rounds
     if (!rounds) {
         rounds = 10;
@@ -44,10 +48,6 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         return process.nextTick(function() {
             cb(new Error('rounds must be a number'));
         });
-    }
-
-    if (!cb) {
-        return;
     }
 
     crypto.randomBytes(16, function(error, randomBytes) {
@@ -97,6 +97,16 @@ module.exports.hash = function(data, salt, cb) {
         });
     }
 
+    //cb exists but not a function
+    // do not throw error to preserve old behavior
+    if (cb && typeof cb !== 'function') {
+        return Promise.reject(new Error('cb must be a function or null to return a Promise'));
+    }
+
+    if(!cb) {
+        return _promise(this.hash,arguments);
+    }
+
     if (data == null || salt == null) {
         return process.nextTick(function() {
             cb(new Error('data and salt arguments required'));
@@ -109,9 +119,6 @@ module.exports.hash = function(data, salt, cb) {
         });
     }
 
-    if (!cb || typeof cb !== 'function') {
-        return;
-    }
 
     if (typeof salt === 'number') {
         return module.exports.genSalt(salt, function(err, salt) {
@@ -155,8 +162,16 @@ module.exports.compare = function(data, hash, cb) {
         });
     }
 
-    if (!cb || typeof cb !== 'function') {
-        return;
+    //cb exists but not a function
+    //return a rejecting promise to preserve old behavior
+    //or silently failing on errors. Shows warnings on node and browsers
+    //so should help diagnose errors too
+    if (cb && typeof cb !== 'function') {
+        return Promise.reject(new Error('cb must be a function or null to return a Promise'));
+    }
+
+    if(!cb) {
+        return _promise(this.compare,arguments);
     }
 
     return bindings.compare(data, hash, cb);
@@ -175,3 +190,31 @@ module.exports.getRounds = function(hash) {
 
     return bindings.get_rounds(hash);
 };
+
+/// convert a node style callback function
+/// to one returning a promise
+/// @param {f} function to be encapsulated
+/// @param {args} Array like, args to be passed to the called function
+/// @return {Promise} a promise encapuslaing the function
+function _promise(f,args) {
+
+    if(typeof args !== 'Array')
+        args = Array.from(args);
+    //f must be a function
+    var _self = this;
+    if(typeof f !== 'function') {
+        return Promise.reject(new Error('f must be a function'));
+    }
+    return new Promise (function(resolve,reject) {
+        args.push(function(err,data) {
+            if(err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+        
+        f.apply(_self,args);
+        //resolve("1234567890");
+    });
+}
