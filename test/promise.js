@@ -9,34 +9,36 @@ var fail = function(assert, error) {
 if (typeof Promise !== 'undefined') {
     module.exports = {
         test_salt_returns_promise_on_no_args: function(assert) {
-            assert.ok(bcrypt.genSalt() instanceof Promise, "Should return a promise");
+            //make sure test passes with non-native implementations such as bluebird
+            //http://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise
+            assert.ok(typeof bcrypt.genSalt().then === 'function', "Should return a promise");
             assert.done();
         },
         test_salt_length: function(assert) {
-            //assert.expect(2);
+            assert.expect(2);
             bcrypt.genSalt(10).then(function(salt) {
                 assert.ok(typeof salt !== 'undefined', 'salt must not be undefined');
                 assert.equals(29, salt.length, "Salt isn't the correct length.");
                 assert.done();
-            }).catch(function(err) {
-                ///console.log(err);
             });
         },
         test_salt_rounds_is_string_number: function(assert) {
-            bcrypt.genSalt('10').then(function(data) {
-                fail(assert, "should not suceed");
-                assert.done();
+            assert.expect(1);
+            bcrypt.genSalt('10').then(function() {
+                fail(assert, "should not be resolved");
             }).catch(function(err) {
                 assert.ok((err instanceof Error), "Should be an Error. genSalt requires round to be of type number.");
+            }).then(function() {
                 assert.done();
             });
         },
         test_salt_rounds_is_string_non_number: function(assert) {
-            bcrypt.genSalt('b').then(function(data) {
-                fail(assert, "should not suceed");
-                assert.done();
+            assert.expect(1);
+            bcrypt.genSalt('b').then(function() {
+                fail(assert, "should not be resolved");
             }).catch(function(err) {
                 assert.ok((err instanceof Error), "Should be an Error. genSalt requires round to be of type number.");
+            }).then(function() {
                 assert.done();
             });
         },
@@ -58,51 +60,55 @@ if (typeof Promise !== 'undefined') {
         },
         test_hash_empty_strings: function(assert) {
             assert.expect(2);
-            bcrypt.genSalt(10).then(function(salt) {
-                return bcrypt.hash('', salt);
-            }).then(function(res) {
-                assert.ok(res, "Res should be defined even with an empty pw.");
-                bcrypt.hash('', '', function(err, res) {
-                    if (err) {
-                        assert.ok(err);
-                    } else {
-                        assert.fail();
-                    }
-                    assert.done();
-                });
+            Promise.all([
+                bcrypt.genSalt(10).then(function(salt) {
+                    return bcrypt.hash('', salt);
+                }).then(function(res) {
+                    assert.ok(res, "Res should be defined even with an empty pw.");
+                }),
+                bcrypt.hash('', '').then(function() {
+                    fail(assert, "should not be resolved")
+                }).catch(function(err) {
+                    assert.ok(err);
+                }),
+            ]).then(function() {
+                assert.done();
             });
         },
         test_hash_no_params: function(assert) {
-            bcrypt.hash().then(function(hash) {
+            assert.expect(1);
+            bcrypt.hash().then(function() {
                 fail(assert, "should not be resolved");
-                assert.done();
             }).catch(function(err) {
                 assert.ok(err, "Should be an error. No params.");
+            }).then(function() {
                 assert.done();
             });
         },
         test_hash_one_param: function(assert) {
-            bcrypt.hash('password').then(function(hash) {
+            assert.expect(1);
+            bcrypt.hash('password').then(function() {
                 fail(assert, "should not be resolved");
-                assert.done();
             }).catch(function(err) {
                 assert.ok(err, "Should be an error. No salt.");
+            }).then(function() {
                 assert.done();
             });
         },
         test_hash_salt_validity: function(assert) {
             assert.expect(3);
-            bcrypt.hash('password', '$2a$10$somesaltyvaluertsetrse').then(function(enc, err) {
-                assert.equal(err, undefined);
-            }).then(function() {
-                //next test
-                return bcrypt.hash('password', 'some$value');
-            }).then(function(data) {
-                fail(assert, "should not resolve");
-                assert.done();
-            }).catch(function(err) {
-                assert.notEqual(err, undefined);
-                assert.equal(err.message, "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+            Promise.all(
+                [
+                    bcrypt.hash('password', '$2a$10$somesaltyvaluertsetrse').then(function(enc) {
+                        assert.ok(enc, "should be resolved with a value");
+                    }),
+                    bcrypt.hash('password', 'some$value').then(function() {
+                        fail(assert, "should not resolve");
+                    }).catch(function(err) {
+                        assert.notEqual(err, undefined);
+                        assert.equal(err.message, "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+                    })
+                ]).then(function() {
                 assert.done();
             });
         },
@@ -148,8 +154,8 @@ if (typeof Promise !== 'undefined') {
                             assert.equal(res, false, "These hashes should not be equal.");
                         })
                     ]).then(function() {
-                        assert.done();
-                    });
+                    assert.done();
+                });
             });
         },
         test_hash_compare_empty_strings: function(assert) {
@@ -167,11 +173,14 @@ if (typeof Promise !== 'undefined') {
             var fullString = 'envy1362987212538';
             var hash = '$2a$10$XOPbrlUPQdwdJUpSrIF6X.LbE14qsMmKGhM1A8W9iqaG3vv1BD7WC';
             var wut = ':';
-            bcrypt.compare(fullString, hash).then(function(res) {
-                assert.ok(res);
-                return bcrypt.compare(fullString, wut);
-            }).then(function(res, err) {
-                assert.ok(!res);
+            Promise.all([
+                bcrypt.compare(fullString, hash).then(function(res) {
+                    assert.ok(res);
+                }),
+                bcrypt.compare(fullString, wut).then(function(res) {
+                    assert.ok(!res);
+                })
+            ]).then(function() {
                 assert.done();
             });
         }
