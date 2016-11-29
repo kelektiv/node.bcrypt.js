@@ -99,8 +99,8 @@ module.exports.hash = function(data, salt, cb) {
         });
     }
 
-    //cb exists but not a function
-    // do not throw error to preserve old behavior
+    // cb exists but is not a function
+    // return a rejecting promise
     if (cb && typeof cb !== 'function') {
         return promises.reject(new Error('cb must be a function or null to return a Promise'));
     }
@@ -164,10 +164,8 @@ module.exports.compare = function(data, hash, cb) {
         });
     }
 
-    //cb exists but not a function
-    //return a rejecting promise to preserve old behavior
-    //or silently failing on errors. Shows warnings on node and browsers
-    //so should help diagnose errors too
+    // cb exists but is not a function
+    // return a rejecting promise
     if (cb && typeof cb !== 'function') {
         return promises.reject(new Error('cb must be a function or null to return a Promise'));
     }

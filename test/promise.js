@@ -5,12 +5,12 @@ var fail = function(assert, error) {
     assert.done();
 };
 
-//only run this tests if Promise is available
+// only run these tests if Promise is available
 if (typeof Promise !== 'undefined') {
     module.exports = {
         test_salt_returns_promise_on_no_args: function(assert) {
-            //make sure test passes with non-native implementations such as bluebird
-            //http://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise
+            // make sure test passes with non-native implementations such as bluebird
+            // http://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise
             assert.ok(typeof bcrypt.genSalt().then === 'function', "Should return a promise");
             assert.done();
         },
