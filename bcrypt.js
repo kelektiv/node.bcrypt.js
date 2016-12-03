@@ -9,31 +9,43 @@ var crypto = require('crypto');
 
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
+/// @param {Buffer} [saltbase] 16-byte Buffer with unencoded salt as base (default crypto.randomBytes(16))
 /// @return {String} salt
-module.exports.genSaltSync = function(rounds) {
+module.exports.genSaltSync = function(rounds, saltbase) {
     // default 10 rounds
     if (!rounds) {
         rounds = 10;
     } else if (typeof rounds !== 'number') {
         throw new Error('rounds must be a number');
     }
-
-    return bindings.gen_salt_sync(rounds, crypto.randomBytes(16));
+    // seed default is random data
+    if (!saltbase) {
+        saltbase = crypto.randomBytes(16);
+    } else if (!Buffer.isBuffer(saltbase) || saltbase.length !== 16) {
+        throw new Error('saltbase must be a 16-byte Buffer');
+    }
+    return bindings.gen_salt_sync(rounds, saltbase);
 };
 
 /// generate a salt
 /// @param {Number} [rounds] number of rounds (default 10)
+/// @param {Buffer} [saltbase] 16-byte Buffer with unencoded salt as base (default crypto.randomBytes(16))
 /// @param {Function} cb callback(err, salt)
-module.exports.genSalt = function(rounds, ignore, cb) {
+module.exports.genSalt = function(rounds, saltbase, cb) {
     // if callback is first argument, then use defaults for others
     if (typeof arguments[0] === 'function') {
         // have to set callback first otherwise arguments are overriden
         cb = arguments[0];
-        rounds = 10;
+        rounds = undefined;
     // callback is second argument
     } else if (typeof arguments[1] === 'function') {
         // have to set callback first otherwise arguments are overriden
         cb = arguments[1];
+        saltbase = undefined;
+    }
+
+    if (!cb) {
+        throw new Error('no callback given');
     }
 
     // default 10 rounds
@@ -46,18 +58,22 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         });
     }
 
-    if (!cb) {
-        return;
+    if (!saltbase) {
+        crypto.randomBytes(16, function(error, randomBytes) {
+            if (error) {
+                cb(error);
+                return;
+            }
+            bindings.gen_salt(rounds, randomBytes, cb);
+        });
+    } else if (!Buffer.isBuffer(saltbase) || saltbase.length !== 16) {
+        // callback error asynchronously
+        return process.nextTick(function() {
+            cb(new Error('saltbase must be a 16-byte Buffer'));
+        });
+    } else {
+        bindings.gen_salt(rounds, saltbase, cb);
     }
-
-    crypto.randomBytes(16, function(error, randomBytes) {
-        if (error) {
-            cb(error);
-            return;
-        }
-
-        bindings.gen_salt(rounds, randomBytes, cb);
-    });
 };
 
 /// hash data using a salt
