@@ -102,7 +102,26 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, res) {
     // res == false
 });
 ```
+### with promises
 
+bcrypt uses whatever Promise implementation is available in `global.Promise`. NodeJS >= 0.12 has a native Promise implementation built in. However, this should work in any Promises/A+ compilant implementation.
+
+Async methods that accept a callback, return a `Promise` when callback is not specified if Promise support is available.
+
+```javascript
+bcrypt.hash(myPlaintextPassword, saltRounds).then(function(hash) {
+    // Store hash in your password DB.
+});
+```
+```javascript
+// Load hash from your password DB.
+bcrypt.compare(myPlaintextPassword, hash).then(function(res) {
+    // res == true
+});
+bcrypt.compare(someOtherPlaintextPassword, hash).then(function(res) {
+    // res == false
+});
+```
 
 ### sync
 
@@ -151,7 +170,7 @@ If you are using bcrypt on a simple script, using the sync mode is perfectly fin
     * `rounds` - [OPTIONAL] - the cost of processing the data. (default - 10)
   * `genSalt(rounds, cb)`
     * `rounds` - [OPTIONAL] - the cost of processing the data. (default - 10)
-    * `cb` - [REQUIRED] - a callback to be fired once the salt has been generated. uses eio making it asynchronous.
+    * `cb` - [OPTIONAL] - a callback to be fired once the salt has been generated. uses eio making it asynchronous. If `cb` is not specified, a `Promise` is returned if Promise support is available.
       * `err` - First parameter to the callback detailing any errors.
       * `salt` - Second parameter to the callback providing the generated salt.
   * `hashSync(data, salt)`
@@ -160,7 +179,7 @@ If you are using bcrypt on a simple script, using the sync mode is perfectly fin
   * `hash(data, salt, cb)`
     * `data` - [REQUIRED] - the data to be encrypted.
     * `salt` - [REQUIRED] - the salt to be used to hash the password. if specified as a number then a salt will be generated with the specified number of rounds and used (see example under **Usage**).
-    * `cb` - [REQUIRED] - a callback to be fired once the data has been encrypted. uses eio making it asynchronous.
+    * `cb` - [OPTIONAL] - a callback to be fired once the data has been encrypted. uses eio making it asynchronous. If `cb` is not specified, a `Promise` is returned if Promise support is available.
       * `err` - First parameter to the callback detailing any errors.
       * `encrypted` - Second parameter to the callback providing the encrypted form.
   * `compareSync(data, encrypted)`
@@ -169,7 +188,7 @@ If you are using bcrypt on a simple script, using the sync mode is perfectly fin
   * `compare(data, encrypted, cb)`
     * `data` - [REQUIRED] - data to compare.
     * `encrypted` - [REQUIRED] - data to be compared to.
-    * `cb` - [REQUIRED] - a callback to be fired once the data has been compared. uses eio making it asynchronous.
+    * `cb` - [OPTIONAL] - a callback to be fired once the data has been compared. uses eio making it asynchronous. If `cb` is not specified, a `Promise` is returned if Promise support is available.
       * `err` - First parameter to the callback detailing any errors.
       * `same` - Second parameter to the callback providing whether the data and encrypted forms match [true | false].
   * `getRounds(encrypted)` - return the number of rounds used to encrypt a given hash

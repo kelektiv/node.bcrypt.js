@@ -7,6 +7,8 @@ var bindings = require(binding_path);
 
 var crypto = require('crypto');
 
+var promises = require('./lib/promises');
+
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
 /// @return {String} salt
@@ -36,6 +38,10 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         cb = arguments[1];
     }
 
+    if (!cb) {
+        return promises.promise(this.genSalt, this, arguments);
+    }
+
     // default 10 rounds
     if (!rounds) {
         rounds = 10;
@@ -44,10 +50,6 @@ module.exports.genSalt = function(rounds, ignore, cb) {
         return process.nextTick(function() {
             cb(new Error('rounds must be a number'));
         });
-    }
-
-    if (!cb) {
-        return;
     }
 
     crypto.randomBytes(16, function(error, randomBytes) {
@@ -97,6 +99,16 @@ module.exports.hash = function(data, salt, cb) {
         });
     }
 
+    // cb exists but is not a function
+    // return a rejecting promise
+    if (cb && typeof cb !== 'function') {
+        return promises.reject(new Error('cb must be a function or null to return a Promise'));
+    }
+
+    if (!cb) {
+        return promises.promise(this.hash, this, arguments);
+    }
+
     if (data == null || salt == null) {
         return process.nextTick(function() {
             cb(new Error('data and salt arguments required'));
@@ -109,9 +121,6 @@ module.exports.hash = function(data, salt, cb) {
         });
     }
 
-    if (!cb || typeof cb !== 'function') {
-        return;
-    }
 
     if (typeof salt === 'number') {
         return module.exports.genSalt(salt, function(err, salt) {
@@ -155,8 +164,14 @@ module.exports.compare = function(data, hash, cb) {
         });
     }
 
-    if (!cb || typeof cb !== 'function') {
-        return;
+    // cb exists but is not a function
+    // return a rejecting promise
+    if (cb && typeof cb !== 'function') {
+        return promises.reject(new Error('cb must be a function or null to return a Promise'));
+    }
+
+    if (!cb) {
+        return promises.promise(this.compare, this, arguments);
     }
 
     return bindings.compare(data, hash, cb);
