@@ -1,3 +1,7 @@
+# UNRELEASED
+
+  * add Promise support (commit 2488473)
+
 # 0.8.7 (2016-06-09)
 
   * update nan to 2.3.5 for improved node v6 support
