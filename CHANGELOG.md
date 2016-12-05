@@ -1,4 +1,4 @@
-# UNRELEASED
+# 1.0.0 (2016-12-04)
 
   * add Promise support (commit 2488473)
 
