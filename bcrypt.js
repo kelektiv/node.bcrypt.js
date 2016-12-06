@@ -12,7 +12,7 @@ var promises = require('./lib/promises');
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
 /// @return {String} salt
-module.exports.genSaltSync = function(rounds) {
+module.exports.genSaltSync = function genSaltSync(rounds) {
     // default 10 rounds
     if (!rounds) {
         rounds = 10;
@@ -26,7 +26,7 @@ module.exports.genSaltSync = function(rounds) {
 /// generate a salt
 /// @param {Number} [rounds] number of rounds (default 10)
 /// @param {Function} cb callback(err, salt)
-module.exports.genSalt = function(rounds, ignore, cb) {
+module.exports.genSalt = function genSalt(rounds, ignore, cb) {
     // if callback is first argument, then use defaults for others
     if (typeof arguments[0] === 'function') {
         // have to set callback first otherwise arguments are overriden
@@ -39,7 +39,7 @@ module.exports.genSalt = function(rounds, ignore, cb) {
     }
 
     if (!cb) {
-        return promises.promise(this.genSalt, this, arguments);
+        return promises.promise(genSalt, this, arguments);
     }
 
     // default 10 rounds
@@ -66,7 +66,7 @@ module.exports.genSalt = function(rounds, ignore, cb) {
 /// @param {String} data the data to encrypt
 /// @param {String} salt the salt to use when hashing
 /// @return {String} hash
-module.exports.hashSync = function(data, salt) {
+module.exports.hashSync = function hashSync(data, salt) {
     if (data == null || salt == null) {
         throw new Error('data and salt arguments required');
     }
@@ -86,7 +86,7 @@ module.exports.hashSync = function(data, salt) {
 /// @param {String} data the data to encrypt
 /// @param {String} salt the salt to use when hashing
 /// @param {Function} cb callback(err, hash)
-module.exports.hash = function(data, salt, cb) {
+module.exports.hash = function hash(data, salt, cb) {
     if (typeof data === 'function') {
         return process.nextTick(function() {
             data(new Error('data must be a string and salt must either be a salt string or a number of rounds'));
@@ -106,7 +106,7 @@ module.exports.hash = function(data, salt, cb) {
     }
 
     if (!cb) {
-        return promises.promise(this.hash, this, arguments);
+        return promises.promise(hash, this, arguments);
     }
 
     if (data == null || salt == null) {
@@ -135,7 +135,7 @@ module.exports.hash = function(data, salt, cb) {
 /// @param {String} data the data to hash and compare
 /// @param {String} hash expected hash
 /// @return {bool} true if hashed data matches hash
-module.exports.compareSync = function(data, hash) {
+module.exports.compareSync = function compareSync(data, hash) {
     if (data == null || hash == null) {
         throw new Error('data and hash arguments required');
     }
@@ -151,7 +151,7 @@ module.exports.compareSync = function(data, hash) {
 /// @param {String} data the data to hash and compare
 /// @param {String} hash expected hash
 /// @param {Function} cb callback(err, matched) - matched is true if hashed data matches hash
-module.exports.compare = function(data, hash, cb) {
+module.exports.compare = function compare(data, hash, cb) {
     if (data == null || hash == null) {
         return process.nextTick(function() {
             cb(new Error('data and hash arguments required'));
@@ -171,7 +171,7 @@ module.exports.compare = function(data, hash, cb) {
     }
 
     if (!cb) {
-        return promises.promise(this.compare, this, arguments);
+        return promises.promise(compare, this, arguments);
     }
 
     return bindings.compare(data, hash, cb);
@@ -179,7 +179,7 @@ module.exports.compare = function(data, hash, cb) {
 
 /// @param {String} hash extract rounds from this hash
 /// @return {Number} the number of rounds used to encrypt a given hash
-module.exports.getRounds = function(hash) {
+module.exports.getRounds = function getRounds(hash) {
     if (hash == null) {
         throw new Error('hash argument required');
     }
