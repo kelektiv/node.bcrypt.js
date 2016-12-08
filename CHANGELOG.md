@@ -1,4 +1,4 @@
-# UNRELEASED
+# 1.0.1 (2016-12-07)
 
   * Fix destructuring imports with promises
 
