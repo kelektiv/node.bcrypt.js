@@ -1,3 +1,7 @@
+# UNRELEASED
+
+  * Fix destructuring imports with promises
+
 # 1.0.0 (2016-12-04)
 
   * add Promise support (commit 2488473)
