@@ -50,7 +50,8 @@
     "Ben Noorduis <> (https://github.com/bnoordhuis)",
     "Nate Rajlich <nathan@tootallnate.net> (https://github.com/tootallnate)",
     "Sean McArthur <sean.monstar@gmail.com> (https://github.com/seanmonstar)",
-    "Fanie Oosthuysen <fanie.oosthuysen@gmail.com> (https://github.com/weareu)"
+    "Fanie Oosthuysen <fanie.oosthuysen@gmail.com> (https://github.com/weareu)",
+    "Amitosh Swain Mahapatra <amitosh.swain@gmail.com> (https://github.com/Agathver)"
   ],
   "binary": {
     "module_name": "bcrypt_lib",

@@ -183,6 +183,26 @@ if (typeof Promise !== 'undefined') {
             ]).then(function() {
                 assert.done();
             });
+        },
+        test_hash_compare_no_params: function(assert) {
+            assert.expect(1);
+            bcrypt.compare().then(function() {
+                fail(assert, 'Should not resolve');
+            }).catch(function(err) {
+                assert.equal(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
+            }).then(function() {
+                assert.done();
+            });
+        },
+        test_hash_compare_one_param: function(assert) {
+            assert.expect(1);
+            bcrypt.compare('password').then(function() {
+                fail(assert, 'Should not resolve');
+            }).catch(function(err) {
+                assert.equal(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
+            }).then(function() {
+                assert.done();
+            });
         }
     };
 }
