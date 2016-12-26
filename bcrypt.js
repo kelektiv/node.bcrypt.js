@@ -39,7 +39,7 @@ module.exports.genSalt = function genSalt(rounds, ignore, cb) {
     }
 
     if (!cb) {
-        return promises.promise(genSalt, this, arguments);
+        return promises.promise(genSalt, this, [rounds, ignore]);
     }
 
     // default 10 rounds
@@ -106,7 +106,7 @@ module.exports.hash = function hash(data, salt, cb) {
     }
 
     if (!cb) {
-        return promises.promise(hash, this, arguments);
+        return promises.promise(hash, this, [data, salt]);
     }
 
     if (data == null || salt == null) {
@@ -171,7 +171,7 @@ module.exports.compare = function compare(data, hash, cb) {
     }
 
     if (!cb) {
-        return promises.promise(compare, this, arguments);
+        return promises.promise(compare, this, [data, hash]);
     }
 
     if (data == null || hash == null) {

@@ -14,6 +14,10 @@ if (typeof Promise !== 'undefined') {
             assert.ok(typeof bcrypt.genSalt().then === 'function', "Should return a promise");
             assert.done();
         },
+        test_salt_returns_promise_on_null_callback: function(assert) {
+            assert.ok(typeof bcrypt.genSalt(13, null, null).then === 'function', "Should return a promise");
+            assert.done();
+        },
         test_salt_length: function(assert) {
             assert.expect(2);
             bcrypt.genSalt(10).then(function(salt) {
@@ -41,6 +45,10 @@ if (typeof Promise !== 'undefined') {
             }).then(function() {
                 assert.done();
             });
+        },
+        test_hash_returns_promise_on_null_callback: function(assert) {
+            assert.ok(typeof bcrypt.hash('password', 10, null).then === 'function', "Should return a promise");
+            assert.done();
         },
         test_hash: function(assert) {
             assert.expect(1);
@@ -138,6 +146,10 @@ if (typeof Promise !== 'undefined') {
                 assert.ok(split_salt[2], '31');
                 assert.done();
             });
+        },
+        test_hash_compare_returns_promise_on_null_callback: function(assert) {
+            assert.ok(typeof bcrypt.compare('password', 'something', null).then === 'function', "Should return a promise");
+            assert.done();
         },
         test_hash_compare: function(assert) {
             assert.expect(3);
