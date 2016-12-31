@@ -14,6 +14,10 @@ if (typeof Promise !== 'undefined') {
             assert.ok(typeof bcrypt.genSalt().then === 'function', "Should return a promise");
             assert.done();
         },
+        test_salt_returns_promise_on_null_callback: function(assert) {
+            assert.ok(typeof bcrypt.genSalt(13, null, null).then === 'function', "Should return a promise");
+            assert.done();
+        },
         test_salt_length: function(assert) {
             assert.expect(2);
             bcrypt.genSalt(10).then(function(salt) {
@@ -41,6 +45,10 @@ if (typeof Promise !== 'undefined') {
             }).then(function() {
                 assert.done();
             });
+        },
+        test_hash_returns_promise_on_null_callback: function(assert) {
+            assert.ok(typeof bcrypt.hash('password', 10, null).then === 'function', "Should return a promise");
+            assert.done();
         },
         test_hash: function(assert) {
             assert.expect(1);
@@ -139,6 +147,10 @@ if (typeof Promise !== 'undefined') {
                 assert.done();
             });
         },
+        test_hash_compare_returns_promise_on_null_callback: function(assert) {
+            assert.ok(typeof bcrypt.compare('password', 'something', null).then === 'function', "Should return a promise");
+            assert.done();
+        },
         test_hash_compare: function(assert) {
             assert.expect(3);
             bcrypt.genSalt(10).then(function(salt) {
@@ -181,6 +193,26 @@ if (typeof Promise !== 'undefined') {
                     assert.ok(!res);
                 })
             ]).then(function() {
+                assert.done();
+            });
+        },
+        test_hash_compare_no_params: function(assert) {
+            assert.expect(1);
+            bcrypt.compare().then(function() {
+                fail(assert, 'Should not resolve');
+            }).catch(function(err) {
+                assert.equal(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
+            }).then(function() {
+                assert.done();
+            });
+        },
+        test_hash_compare_one_param: function(assert) {
+            assert.expect(1);
+            bcrypt.compare('password').then(function() {
+                fail(assert, 'Should not resolve');
+            }).catch(function(err) {
+                assert.equal(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
+            }).then(function() {
                 assert.done();
             });
         }

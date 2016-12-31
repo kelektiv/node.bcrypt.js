@@ -145,5 +145,17 @@ module.exports = {
           assert.done();
         });
       });
+    },
+    test_compare_no_params: function(assert) {
+        bcrypt.compare(function(err, hash) {
+            assert.ok(err, 'Should be an error. No params.');
+            assert.done();
+        });
+    },
+    test_hash_compare_one_param: function(assert) {
+        bcrypt.compare('password', function(err, hash) {
+            assert.ok(err, 'Should be an Error. No hash.');
+            assert.done();
+        });
     }
 };

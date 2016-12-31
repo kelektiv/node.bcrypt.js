@@ -39,7 +39,7 @@ module.exports.genSalt = function genSalt(rounds, ignore, cb) {
     }
 
     if (!cb) {
-        return promises.promise(genSalt, this, arguments);
+        return promises.promise(genSalt, this, [rounds, ignore]);
     }
 
     // default 10 rounds
@@ -106,7 +106,7 @@ module.exports.hash = function hash(data, salt, cb) {
     }
 
     if (!cb) {
-        return promises.promise(hash, this, arguments);
+        return promises.promise(hash, this, [data, salt]);
     }
 
     if (data == null || salt == null) {
@@ -152,15 +152,15 @@ module.exports.compareSync = function compareSync(data, hash) {
 /// @param {String} hash expected hash
 /// @param {Function} cb callback(err, matched) - matched is true if hashed data matches hash
 module.exports.compare = function compare(data, hash, cb) {
-    if (data == null || hash == null) {
+    if (typeof data === 'function') {
         return process.nextTick(function() {
-            cb(new Error('data and hash arguments required'));
+            data(new Error('data and hash arguments required'));
         });
     }
 
-    if (typeof data !== 'string' || typeof hash !== 'string') {
+    if (typeof hash === 'function') {
         return process.nextTick(function() {
-            cb(new Error('data and hash must be strings'));
+            hash(new Error('data and hash arguments required'));
         });
     }
 
@@ -171,7 +171,19 @@ module.exports.compare = function compare(data, hash, cb) {
     }
 
     if (!cb) {
-        return promises.promise(compare, this, arguments);
+        return promises.promise(compare, this, [data, hash]);
+    }
+
+    if (data == null || hash == null) {
+        return process.nextTick(function() {
+            cb(new Error('data and hash arguments required'));
+        });
+    }
+
+    if (typeof data !== 'string' || typeof hash !== 'string') {
+        return process.nextTick(function() {
+            cb(new Error('data and hash must be strings'));
+        });
     }
 
     return bindings.compare(data, hash, cb);

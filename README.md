@@ -252,6 +252,7 @@ The code for this comes from a few sources:
 * [Nate Rajlich][tootallnate] - Bindings and build process.
 * [Sean McArthur][seanmonstar] - Windows Support
 * [Fanie Oosthuysen][weareu] - Windows Support
+* [Amitosh Swain Mahapatra][agathver] - ES6 Promise Support
 
 ## License
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
@@ -277,3 +278,4 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [tootallnate]:https://github.com/tootallnate
 [seanmonstar]:https://github.com/seanmonstar
 [weareu]:https://github.com/weareu
+[agathver]:https://github.com/Agathver
