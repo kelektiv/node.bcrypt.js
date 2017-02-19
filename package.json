@@ -57,6 +57,6 @@
     "module_name": "bcrypt_lib",
     "module_path": "./lib/binding/",
     "host": "https://github.com",
-    "remote_path": "/kelektiv/node.bcrypt.js/releases/download/v{version}/"
+    "remote_path": "/kelektiv/node.bcrypt.js/archive/v{version}/"
   }
 }
