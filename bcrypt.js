@@ -17,7 +17,7 @@ module.exports.genSaltSync = function genSaltSync(rounds) {
     if (!rounds) {
         rounds = 10;
     } else if (typeof rounds !== 'number') {
-        throw new Error('rounds must be a number');
+        return new Error('rounds must be a number');
     }
 
     return bindings.gen_salt_sync(rounds, crypto.randomBytes(16));
@@ -68,11 +68,11 @@ module.exports.genSalt = function genSalt(rounds, ignore, cb) {
 /// @return {String} hash
 module.exports.hashSync = function hashSync(data, salt) {
     if (data == null || salt == null) {
-        throw new Error('data and salt arguments required');
+        return new Error('data and salt arguments required');
     }
 
     if (typeof data !== 'string' || (typeof salt !== 'string' && typeof salt !== 'number')) {
-        throw new Error('data must be a string and salt must either be a salt string or a number of rounds');
+        return new Error('data must be a string and salt must either be a salt string or a number of rounds');
     }
 
     if (typeof salt === 'number') {
@@ -137,11 +137,11 @@ module.exports.hash = function hash(data, salt, cb) {
 /// @return {bool} true if hashed data matches hash
 module.exports.compareSync = function compareSync(data, hash) {
     if (data == null || hash == null) {
-        throw new Error('data and hash arguments required');
+        return new Error('data and hash arguments required');
     }
 
     if (typeof data !== 'string' || typeof hash !== 'string') {
-        throw new Error('data and hash must be strings');
+        return new Error('data and hash must be strings');
     }
 
     return bindings.compare_sync(data, hash);
