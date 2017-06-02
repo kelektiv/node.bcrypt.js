@@ -30,8 +30,8 @@
   },
   "dependencies": {
     "bindings": "1.2.1",
-    "nan": "2.5.0",
-    "node-pre-gyp": "0.6.32"
+    "nan": "2.6.2",
+    "node-pre-gyp": "0.6.36"
   },
   "devDependencies": {
     "nodeunit": "~0.9.1"
