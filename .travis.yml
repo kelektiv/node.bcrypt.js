@@ -1,28 +1,40 @@
 language: node_js
 
 env:
-  - CXX=g++-4.8
+  - LINUX_CXX=g++-4.8
+
+os:
+  - linux
+  - osx
 
 node_js:
   - "0.8"
   - "0.10"
   - "0.12"
   - "4"
+  - "5"
   - "6"
+  - "7"
+  - "8"
 
 addons:
   apt:
     sources:
-    - ubuntu-toolchain-r-test
+      - ubuntu-toolchain-r-test
     packages:
-    - g++-4.8
-
-sudo: false
+      - g++-4.8
+      - bc
 
 before_install:
-  - $CXX --version
-  - if [ "$TRAVIS_NODE_VERSION" = "0.8" ]; then npm install -g npm@2.7.3; fi;
+  - echo Building for Node $TRAVIS_NODE_VERSION
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=$LINUX_CXX; $CXX --version; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then c++ --version; fi;
+  - if [[ $(echo "$TRAVIS_NODE_VERSION <= 0.12" | bc -l) ]]; then npm install -g npm@2; else npm install -g npm@latest; fi;
 
 install: true
 
 script: npm test
+
+after_success:
+  - REGEX='^v(0|[1-9]+)\.(0|[1-9]+)\.(0|[1-9]+)$'
+  - if [[ $TRAVIS_TAG =~ $REGEX ]] || [[ $TRAVIS_COMMIT_MESSAGE == *"publish binary"* ]]; then echo "Publishing"; npm install node-pre-gyp-github; ./node_modules/.bin/node-pre-gyp configure; ./node_modules/.bin/node-pre-gyp build; ./node_modules/.bin/node-pre-gyp package; ./node_modules/.bin/node-pre-gyp-github publish --release; fi;
