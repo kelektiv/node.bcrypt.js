@@ -28,6 +28,9 @@
     "test": "npm install --build-from-source && nodeunit test",
     "install": "node-pre-gyp install --fallback-to-build"
   },
+  "bin": {
+    "bcrypt-benchmark": "./bcrypt-benchmark.js"
+  },
   "dependencies": {
     "nan": "2.6.2",
     "node-pre-gyp": "0.6.36"
