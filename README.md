@@ -52,10 +52,11 @@ To make it easier for people using this tool to analyze what has been surveyed, 
 * `OpenSSL` - This is only required to build the `bcrypt` project if you are using versions <= 0.7.7. Otherwise, we're using the builtin node crypto bindings for seed data (which use the same OpenSSL code paths we were, but don't have the external dependency).
 
 ## Install via NPM
+Make sure you have the appropriate dependencies installed and configured for your platform. You can find installation instructions for the dependencies for some common platforms [in this page][depsinstall].
+
 ```
 npm install bcrypt
 ```
-
 ***Note:*** OS X users using Xcode 4.3.1 or above may need to run the following command in their terminal prior to installing if errors occur regarding xcodebuild: ```sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer```
 
 ## Usage
@@ -262,6 +263,7 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [codahale]: http://codahale.com/how-to-safely-store-a-password/
 [gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
 [jtr]: http://www.openwall.com/lists/oss-security/2011/06/20/2
+[depsinstall]: https://github.com/kelektiv/node.bcrypt.js/wiki/Installation-Instructions
 
 [shadowfiend]:https://github.com/Shadowfiend
 [thegoleffect]:https://github.com/thegoleffect
