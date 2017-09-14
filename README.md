@@ -105,7 +105,7 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, res) {
 ```
 ### with promises
 
-bcrypt uses whatever Promise implementation is available in `global.Promise`. NodeJS >= 0.12 has a native Promise implementation built in. However, this should work in any Promises/A+ compilant implementation.
+bcrypt uses whatever Promise implementation is available in `global.Promise`. NodeJS >= 0.12 has a native Promise implementation built in. However, this should work in any Promises/A+ compliant implementation.
 
 Async methods that accept a callback, return a `Promise` when callback is not specified if Promise support is available.
 
