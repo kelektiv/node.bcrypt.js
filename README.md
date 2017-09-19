@@ -1,5 +1,6 @@
 # node.bcrypt.js
-[![Build Status](https://travis-ci.org/kelektiv/node.bcrypt.js.svg?branch=master)](https://travis-ci.org/kelektiv/node.bcrypt.js)
+[![Build Status](https://travis-ci.org/antwal/node.bcrypt.js.svg?branch=master)](https://travis-ci.org/antwal/node.bcrypt.js)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/antwal/node.bcrypt.js?branch=master)](https://ci.appveyor.com/project/antwal/node-bcrypt-js/branch/master)
 [![Dependency Status](https://david-dm.org/kelektiv/node.bcrypt.js.svg)](https://david-dm.org/kelektiv/node.bcrypt.js)
 
 Lib to help you hash passwords.
@@ -281,3 +282,4 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [seanmonstar]:https://github.com/seanmonstar
 [weareu]:https://github.com/weareu
 [agathver]:https://github.com/Agathver
+
