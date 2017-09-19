@@ -3,3 +3,4 @@ build
 *.node
 *.sw[a-z]
 node_modules
+.DS_Store
