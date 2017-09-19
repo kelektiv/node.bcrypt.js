@@ -1,5 +1,5 @@
 language: node_js
-  
+
 node_js:
   - "0.8"
   - "0.10"
@@ -9,15 +9,15 @@ node_js:
   - "6"
   - "7"
   - "8"
-  
+
 cache:
   directories:
-  - node_modules  
+  - node_modules
 
 # Node.js v4 (or io.js v3) compiler requirements
 env:
   - CXX=g++-4.8
-  
+
 # Default build Linux Ubuntu Trusty
 dist: trusty
 addons:
@@ -135,7 +135,7 @@ matrix:
       os: osx
       osx_image: xcode8
       env:
-        - OS_NAME="Apple OSX 10.11 El Capitan"        
+        - OS_NAME="Apple OSX 10.11 El Capitan"
     - node_js: "0.8"
       os: osx
       osx_image: xcode8
@@ -155,7 +155,7 @@ matrix:
       os: osx
       osx_image: xcode6.4
       env:
-        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite"
+        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite" TEST_FIX="sudo ln -s /usr/lib/libSystem.B.dylib /usr/local/lib/libgcc_s.10.5.dylib"
     - node_js: "5"
       os: osx
       osx_image: xcode6.4
@@ -180,7 +180,7 @@ matrix:
       os: osx
       osx_image: xcode6.4
       env:
-        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite"        
+        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite"
     - node_js: "0.10"
       os: osx
       osx_image: xcode6.4
@@ -216,7 +216,7 @@ matrix:
       os: osx
       osx_image: xcode6.4
       env:
-        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite"
+        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite" TEST_FIX="sudo ln -s /usr/lib/libSystem.B.dylib /usr/local/lib/libgcc_s.10.5.dylib"
     - node_js: "5"
       os: osx
       osx_image: xcode6.4
@@ -226,13 +226,13 @@ matrix:
       os: osx
       osx_image: xcode6.4
       env:
-        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite"        
+        - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite"
     - node_js: "0.10"
       os: osx
       osx_image: xcode6.4
       env:
         - OS_NAME="Apple OSX 10.9 Mavericks / 10.10 Yosemite"
-  
+
 branches:
   only:
     - master
@@ -243,10 +243,11 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export $CXX; $CXX --version; fi;
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then c++ --version; fi;
   - if [[ $(echo "$TRAVIS_NODE_VERSION <= 0.12" | bc -l) ]]; then npm install -g npm@2; else npm install -g npm@latest; fi;
+  - eval "${TEST_FIX}"
 
 install: true
 
-script: 
+script:
   - npm --version
   - npm test
 
