@@ -3,18 +3,18 @@ var bcrypt = require('../bcrypt');
 module.exports = {
     test_salt_length: function(assert) {
         var salt = bcrypt.genSaltSync(10);
-        assert.equals(29, salt.length, "Salt isn't the correct length.");
+        assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
         var split_salt = salt.split('$');
-        assert.ok(split_salt[1], '2a');
-        assert.ok(split_salt[2], '10');
+        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[2], '10');
         assert.done();
     },
     test_salt_no_params: function(assert) {
         // same as test_verify_salt except using default rounds of 10
         var salt = bcrypt.genSaltSync();
         var split_salt = salt.split('$');
-        assert.ok(split_salt[1], '2a');
-        assert.ok(split_salt[2], '10');
+        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[2], '10');
         assert.done();
     },
     test_salt_rounds_is_string_number: function(assert) {
@@ -31,7 +31,7 @@ module.exports = {
     },
     test_hash_rounds: function(assert) {
         var hash = bcrypt.hashSync('password', 8);
-        assert.equals(bcrypt.getRounds(hash), 8, "Number of rounds should equal 8.");
+        assert.strictEqual(bcrypt.getRounds(hash), 8, "Number of rounds should equal 8.");
         assert.done();
     },
     test_hash_empty_string: function(assert) {
@@ -63,27 +63,27 @@ module.exports = {
     test_verify_salt: function(assert) {
         var salt = bcrypt.genSaltSync(10);
         var split_salt = salt.split('$');
-        assert.ok(split_salt[1], '2a');
-        assert.ok(split_salt[2], '10');
+        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[2], '10');
         assert.done();
     },
     test_verify_salt_min_rounds: function(assert) {
         var salt = bcrypt.genSaltSync(1);
         var split_salt = salt.split('$');
-        assert.ok(split_salt[1], '2a');
-        assert.ok(split_salt[2], '4');
+        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[2], '04');
         assert.done();
     },
     test_verify_salt_max_rounds: function(assert) {
         var salt = bcrypt.genSaltSync(100);
         var split_salt = salt.split('$');
-        assert.ok(split_salt[1], '2a');
-        assert.ok(split_salt[2], '31');
+        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[2], '31');
         assert.done();
     },
     test_hash_compare: function(assert) {
         var salt = bcrypt.genSaltSync(10);
-        assert.equals(29, salt.length, "Salt isn't the correct length.");
+        assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
         var hash = bcrypt.hashSync("test", salt);
         assert.ok(bcrypt.compareSync("test", hash), "These hashes should be equal.");
         assert.ok(!(bcrypt.compareSync("blah", hash)), "These hashes should not be equal.");
@@ -109,12 +109,12 @@ module.exports = {
     },
     test_getRounds: function(assert) {
         var hash = bcrypt.hashSync("test", bcrypt.genSaltSync(9));
-        assert.equals(9, bcrypt.getRounds(hash), "getRounds can't extract rounds");
+        assert.strictEqual(9, bcrypt.getRounds(hash), "getRounds can't extract rounds");
         assert.done();
     },
     test_getRounds: function(assert) {
         var hash = bcrypt.hashSync("test", bcrypt.genSaltSync(9));
-        assert.equals(9, bcrypt.getRounds(hash), "getRounds can't extract rounds");
+        assert.strictEqual(9, bcrypt.getRounds(hash), "getRounds can't extract rounds");
         assert.throws(function() {bcrypt.getRounds(''); }, "Must pass a valid hash to getRounds");
         assert.done();
     }

@@ -11,18 +11,18 @@ if (typeof Promise !== 'undefined') {
         test_salt_returns_promise_on_no_args: function(assert) {
             // make sure test passes with non-native implementations such as bluebird
             // http://stackoverflow.com/questions/27746304/how-do-i-tell-if-an-object-is-a-promise
-            assert.ok(typeof bcrypt.genSalt().then === 'function', "Should return a promise");
+            assert.strictEqual(typeof bcrypt.genSalt().then, 'function', "Should return a promise");
             assert.done();
         },
         test_salt_returns_promise_on_null_callback: function(assert) {
-            assert.ok(typeof bcrypt.genSalt(13, null, null).then === 'function', "Should return a promise");
+            assert.strictEqual(typeof bcrypt.genSalt(13, null, null).then,'function', "Should return a promise");
             assert.done();
         },
         test_salt_length: function(assert) {
             assert.expect(2);
             bcrypt.genSalt(10).then(function(salt) {
-                assert.ok(typeof salt !== 'undefined', 'salt must not be undefined');
-                assert.equals(29, salt.length, "Salt isn't the correct length.");
+                assert.ok(salt,'salt must be defined');
+                assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
                 assert.done();
             });
         },
@@ -47,7 +47,7 @@ if (typeof Promise !== 'undefined') {
             });
         },
         test_hash_returns_promise_on_null_callback: function(assert) {
-            assert.ok(typeof bcrypt.hash('password', 10, null).then === 'function', "Should return a promise");
+            assert.strictEqual(typeof bcrypt.hash('password', 10, null).then,'function', "Should return a promise");
             assert.done();
         },
         test_hash: function(assert) {
@@ -62,7 +62,7 @@ if (typeof Promise !== 'undefined') {
         test_hash_rounds: function(assert) {
             assert.expect(1);
             bcrypt.hash('bacon', 8).then(function(hash) {
-                assert.equals(bcrypt.getRounds(hash), 8, "Number of rounds should be that specified in the function call.");
+                assert.strictEqual(bcrypt.getRounds(hash), 8, "Number of rounds should be that specified in the function call.");
                 assert.done();
             });
         },
@@ -114,7 +114,7 @@ if (typeof Promise !== 'undefined') {
                         fail(assert, "should not resolve");
                     }).catch(function(err) {
                         assert.notEqual(err, undefined);
-                        assert.equal(err.message, "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+                        assert.strictEqual(err.message, "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
                     })
                 ]).then(function() {
                 assert.done();
@@ -124,8 +124,8 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(10).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.ok(split_salt[1], '2a');
-                assert.ok(split_salt[2], '10');
+                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[2], '10');
                 assert.done();
             });
         },
@@ -133,8 +133,8 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(1).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.ok(split_salt[1], '2a');
-                assert.ok(split_salt[2], '4');
+                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[2], '04');
                 assert.done();
             });
         },
@@ -142,28 +142,28 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(100).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.ok(split_salt[1], '2a');
-                assert.ok(split_salt[2], '31');
+                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[2], '31');
                 assert.done();
             });
         },
         test_hash_compare_returns_promise_on_null_callback: function(assert) {
-            assert.ok(typeof bcrypt.compare('password', 'something', null).then === 'function', "Should return a promise");
+            assert.strictEqual(typeof bcrypt.compare('password', 'something', null).then, 'function', "Should return a promise");
             assert.done();
         },
         test_hash_compare: function(assert) {
             assert.expect(3);
             bcrypt.genSalt(10).then(function(salt) {
-                assert.equals(29, salt.length, "Salt isn't the correct length.");
+                assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
                 return bcrypt.hash("test", salt);
             }).then(function(hash) {
                 return Promise.all(
                     [
                         bcrypt.compare("test", hash).then(function(res) {
-                            assert.equal(res, true, "These hashes should be equal.");
+                            assert.strictEqual(res, true, "These hashes should be equal.");
                         }),
                         bcrypt.compare("blah", hash).then(function(res) {
-                            assert.equal(res, false, "These hashes should not be equal.");
+                            assert.strictEqual(res, false, "These hashes should not be equal.");
                         })
                     ]).then(function() {
                     assert.done();
@@ -174,10 +174,10 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             var hash = bcrypt.hashSync("test", bcrypt.genSaltSync(10));
             bcrypt.compare("", hash).then(function(res) {
-                assert.equal(res, false, "These hashes should be equal.");
+                assert.strictEqual(res, false, "These hashes should not be equal.");
                 return bcrypt.compare("", "");
             }).then(function(res) {
-                assert.equal(res, false, "These hashes should be equal.");
+                assert.strictEqual(res, false, "These hashes should not be equal.");
                 assert.done();
             });
         },
@@ -201,7 +201,7 @@ if (typeof Promise !== 'undefined') {
             bcrypt.compare().then(function() {
                 fail(assert, 'Should not resolve');
             }).catch(function(err) {
-                assert.equal(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
+                assert.strictEqual(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
             }).then(function() {
                 assert.done();
             });
@@ -211,7 +211,7 @@ if (typeof Promise !== 'undefined') {
             bcrypt.compare('password').then(function() {
                 fail(assert, 'Should not resolve');
             }).catch(function(err) {
-                assert.equal(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
+                assert.strictEqual(err.message, 'data and hash arguments required', 'Promise should be rejected when no parameters are supplied');
             }).then(function() {
                 assert.done();
             });
