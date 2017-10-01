@@ -84,7 +84,7 @@ module.exports = {
         assert.expect(2);
         bcrypt.genSalt(10, function(err, salt) {
             var split_salt = salt.split('$');
-            assert.strictEqual(split_salt[1], '2a');
+            assert.strictEqual(split_salt[1], '2b');
             assert.strictEqual(split_salt[2], '10');
             assert.done();
         });
@@ -93,7 +93,7 @@ module.exports = {
         assert.expect(2);
         bcrypt.genSalt(1, function(err, salt) {
             var split_salt = salt.split('$');
-            assert.strictEqual(split_salt[1], '2a');
+            assert.strictEqual(split_salt[1], '2b');
             assert.strictEqual(split_salt[2], '04');
             assert.done();
         });
@@ -102,7 +102,7 @@ module.exports = {
         assert.expect(2);
         bcrypt.genSalt(100, function(err, salt) {
             var split_salt = salt.split('$');
-            assert.strictEqual(split_salt[1], '2a');
+            assert.strictEqual(split_salt[1], '2b');
             assert.strictEqual(split_salt[2], '31');
             assert.done();
         });

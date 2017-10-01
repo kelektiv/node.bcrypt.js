@@ -124,7 +124,7 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(10).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[1], '2b');
                 assert.strictEqual(split_salt[2], '10');
                 assert.done();
             });
@@ -133,7 +133,7 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(1).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[1], '2b');
                 assert.strictEqual(split_salt[2], '04');
                 assert.done();
             });
@@ -142,7 +142,7 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(100).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[1], '2b');
                 assert.strictEqual(split_salt[2], '31');
                 assert.done();
             });

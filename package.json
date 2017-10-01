@@ -33,7 +33,7 @@
     "node-pre-gyp": "0.7.0"
   },
   "devDependencies": {
-    "nodeunit": "~0.9.1"
+    "nodeunit": "~0.11.1"
   },
   "contributors": [
     "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
