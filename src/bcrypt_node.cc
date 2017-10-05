@@ -60,7 +60,7 @@ bool ValidateSalt(const char* salt) {
 
 /* SALT GENERATION */
 
-class SaltAsyncWorker : public Nan::AsyncWorker {
+/*class SaltAsyncWorker : public Nan::AsyncWorker {
 public:
     SaltAsyncWorker(Nan::Callback *callback, std::string seed, ssize_t rounds)
         : Nan::AsyncWorker(callback), seed(seed), rounds(rounds) {
@@ -87,9 +87,9 @@ private:
     std::string seed;
     std::string salt;
     ssize_t rounds;
-};
+};*/
 
-NAN_METHOD(GenerateSalt) {
+/*NAN_METHOD(GenerateSalt) {
     Nan::HandleScope scope;
 
     if (info.Length() < 3) {
@@ -110,9 +110,9 @@ NAN_METHOD(GenerateSalt) {
         std::string(Buffer::Data(seed), 16), rounds);
 
     Nan::AsyncQueueWorker(saltWorker);
-}
+}*/
 
-NAN_METHOD(GenerateSaltSync) {
+/*NAN_METHOD(GenerateSaltSync) {
     Nan::HandleScope scope;
 
     if (info.Length() < 2) {
@@ -132,11 +132,11 @@ NAN_METHOD(GenerateSaltSync) {
     bcrypt_gensalt(rounds, seed, salt);
 
     info.GetReturnValue().Set(Nan::Encode(salt, strlen(salt), Nan::BINARY));
-}
+}*/
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
 
-class EncryptAsyncWorker : public Nan::AsyncWorker {
+/*class EncryptAsyncWorker : public Nan::AsyncWorker {
   public:
     EncryptAsyncWorker(Nan::Callback *callback, std::string input, std::string salt)
         : Nan::AsyncWorker(callback), input(input), salt(salt) {
@@ -175,9 +175,9 @@ class EncryptAsyncWorker : public Nan::AsyncWorker {
     std::string salt;
     std::string error;
     std::string output;
-};
+};*/
 
-NAN_METHOD(Encrypt) {
+/*NAN_METHOD(Encrypt) {
     Nan::HandleScope scope;
 
     if (info.Length() < 3) {
@@ -193,9 +193,9 @@ NAN_METHOD(Encrypt) {
         std::string(*data), std::string(*salt));
 
     Nan::AsyncQueueWorker(encryptWorker);
-}
+}*/
 
-NAN_METHOD(EncryptSync) {
+/*NAN_METHOD(EncryptSync) {
     Nan::HandleScope scope;
 
     if (info.Length() < 2) {
@@ -216,11 +216,11 @@ NAN_METHOD(EncryptSync) {
     char bcrypted[_PASSWORD_LEN];
     bcrypt(*data, *salt, bcrypted);
     info.GetReturnValue().Set(Nan::Encode(bcrypted, strlen(bcrypted), Nan::BINARY));
-}
+}*/
 
 /* COMPARATOR */
 
-NAN_INLINE bool CompareStrings(const char* s1, const char* s2) {
+/*NAN_INLINE bool CompareStrings(const char* s1, const char* s2) {
 
     bool eq = true;
     int s1_len = strlen(s1);
@@ -241,9 +241,9 @@ NAN_INLINE bool CompareStrings(const char* s1, const char* s2) {
     }
 
     return eq;
-}
+}*/
 
-class CompareAsyncWorker : public Nan::AsyncWorker {
+/*class CompareAsyncWorker : public Nan::AsyncWorker {
   public:
     CompareAsyncWorker(Nan::Callback *callback, std::string input, std::string encrypted)
         : Nan::AsyncWorker(callback), input(input), encrypted(encrypted) {
@@ -274,9 +274,9 @@ class CompareAsyncWorker : public Nan::AsyncWorker {
     std::string input;
     std::string encrypted;
     bool result;
-};
+};*/
 
-NAN_METHOD(Compare) {
+/*NAN_METHOD(Compare) {
     Nan::HandleScope scope;
 
     if (info.Length() < 3) {
@@ -292,9 +292,9 @@ NAN_METHOD(Compare) {
         std::string(*input), std::string(*encrypted));
 
     Nan::AsyncQueueWorker(compareWorker);
-}
+}*/
 
-NAN_METHOD(CompareSync) {
+/*NAN_METHOD(CompareSync) {
     Nan::HandleScope scope;
 
     if (info.Length() < 2) {
@@ -313,7 +313,7 @@ NAN_METHOD(CompareSync) {
     } else {
         info.GetReturnValue().Set(Nan::False());
     }
-}
+}*/
 
 /*NAN_METHOD(GetRounds) {
     Nan::HandleScope scope;
@@ -335,21 +335,33 @@ NAN_METHOD(CompareSync) {
     info.GetReturnValue().Set(Nan::New(rounds));
 }*/
 
-Napi::String GetRounds (const Napi::CallbackInfo& info) {
+Napi::Value GetRounds(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    return Napi::String::New(env, "world");
+    if (info.Length() < 1) {
+        throw Napi::TypeError::New(info.Env(), "1 argument expected");
+        return info.Env().Undefined();     
+    }
+    Napi::String hashed = info[0].As<Napi::String>();
+    std::string hash = hashed.ToString();
+    const char* bcrypt_hash = hash.c_str();
+    u_int32_t rounds;
+    if (!(rounds = bcrypt_get_rounds(bcrypt_hash))) {
+        throw Napi::Error::New(info.Env(), "invalid hash provided");
+        return info.Env().Undefined();
+    }
+    return Napi::Number::New(env, rounds);
 }
 
 } // anonymous namespace
 
-Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    exports.Set(Napi::String::New(env, "gen_salt_sync"), Napi::Function::New(env, GenerateSaltSync));
-    exports.Set(Napi::String::New(env, "encrypt_sync"), Napi::Function::New(env, EncryptSync));
-    exports.Set(Napi::String::New(env, "compare_sync"), Napi::Function::New(env, CompareSync));
+Napi::Object init(Napi::Env env, Napi::Object exports) {
+    //exports.Set(Napi::String::New(env, "gen_salt_sync"), Napi::Function::New(env, GenerateSaltSync));
+    //exports.Set(Napi::String::New(env, "encrypt_sync"), Napi::Function::New(env, EncryptSync));
+    //exports.Set(Napi::String::New(env, "compare_sync"), Napi::Function::New(env, CompareSync));
     exports.Set(Napi::String::New(env, "get_rounds"), Napi::Function::New(env, GetRounds));
-    exports.Set(Napi::String::New(env, "gen_salt"), Napi::Function::New(env, GenerateSalt));
-    exports.Set(Napi::String::New(env, "encrypt"), Napi::Function::New(env, Encrypt));
-    exports.Set(Napi::String::New(env, "compare"), Napi::Function::New(env, Compare));
+    //exports.Set(Napi::String::New(env, "gen_salt"), Napi::Function::New(env, GenerateSalt));
+    //exports.Set(Napi::String::New(env, "encrypt"), Napi::Function::New(env, Encrypt));
+    //exports.Set(Napi::String::New(env, "compare"), Napi::Function::New(env, Compare));
     return exports;
 };
 
