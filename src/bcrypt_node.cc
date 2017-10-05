@@ -1,4 +1,4 @@
-#include <nan.h>
+#include <napi.h>
 
 #include <string>
 #include <cstring>
@@ -8,9 +8,6 @@
 #include "node_blf.h"
 
 #define NODE_LESS_THAN (!(NODE_VERSION_AT_LEAST(0, 5, 4)))
-
-using namespace v8;
-using namespace node;
 
 namespace {
 
@@ -318,7 +315,7 @@ NAN_METHOD(CompareSync) {
     }
 }
 
-NAN_METHOD(GetRounds) {
+/*NAN_METHOD(GetRounds) {
     Nan::HandleScope scope;
 
     if (info.Length() < 1) {
@@ -336,18 +333,24 @@ NAN_METHOD(GetRounds) {
     }
 
     info.GetReturnValue().Set(Nan::New(rounds));
+}*/
+
+Napi::String GetRounds (const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, "world");
 }
 
 } // anonymous namespace
 
-NAN_MODULE_INIT(init) {
-    Nan::Export(target, "gen_salt_sync", GenerateSaltSync);
-    Nan::Export(target, "encrypt_sync", EncryptSync);
-    Nan::Export(target, "compare_sync", CompareSync);
-    Nan::Export(target, "get_rounds", GetRounds);
-    Nan::Export(target, "gen_salt", GenerateSalt);
-    Nan::Export(target, "encrypt", Encrypt);
-    Nan::Export(target, "compare", Compare);
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    exports.Set(Napi::String::New(env, "gen_salt_sync"), Napi::Function::New(env, GenerateSaltSync));
+    exports.Set(Napi::String::New(env, "encrypt_sync"), Napi::Function::New(env, EncryptSync));
+    exports.Set(Napi::String::New(env, "compare_sync"), Napi::Function::New(env, CompareSync));
+    exports.Set(Napi::String::New(env, "get_rounds"), Napi::Function::New(env, GetRounds));
+    exports.Set(Napi::String::New(env, "gen_salt"), Napi::Function::New(env, GenerateSalt));
+    exports.Set(Napi::String::New(env, "encrypt"), Napi::Function::New(env, Encrypt));
+    exports.Set(Napi::String::New(env, "compare"), Napi::Function::New(env, Compare));
+    return exports;
 };
 
-NODE_MODULE(bcrypt_lib, init);
+NODE_API_MODULE(bcrypt_lib, init);

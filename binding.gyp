@@ -8,8 +8,15 @@
         'src/bcrypt_node.cc'
       ],
       'include_dirs' : [
-          "<!(node -e \"require('nan')\")"
+          "<!@(node -p \"require('node-addon-api').include\")"
       ],
+      'msvs_settings': {
+        'VCCLCompilerTool': { 'ExceptionHandling': 1 },
+      },
+      "xcode_settings": {
+        "CLANG_CXX_LIBRARY": "libc++",
+        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
+      },
       'conditions': [
         [ 'OS=="win"', {
           'defines': [
