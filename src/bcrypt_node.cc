@@ -218,6 +218,24 @@ private:
     info.GetReturnValue().Set(Nan::Encode(bcrypted, strlen(bcrypted), Nan::BINARY));
 }*/
 
+Napi::Value EncryptSync(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 2) {
+        throw Napi::TypeError::New(info.Env(), "2 arguments expected");
+        return info.Env().Undefined();     
+    }
+    std::string data = info[0].As<Napi::String>();;
+    std::string salt = info[1].As<Napi::String>();;
+    if (!(ValidateSalt(salt.c_str()))) {
+        throw Napi::Error::New(info.Env(), "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+        return info.Env().Undefined();
+    }
+    char bcrypted[_PASSWORD_LEN];
+    bcrypt(data.c_str(), salt.c_str(), bcrypted);
+    return Napi::String::New(env, bcrypted, strlen(bcrypted));
+}
+
+
 /* COMPARATOR */
 
 bool CompareStrings(const char* s1, const char* s2) {
@@ -294,27 +312,6 @@ bool CompareStrings(const char* s1, const char* s2) {
     Nan::AsyncQueueWorker(compareWorker);
 }*/
 
-/*NAN_METHOD(CompareSync) {
-    Nan::HandleScope scope;
-
-    if (info.Length() < 2) {
-        Nan::ThrowTypeError("2 arguments expected");
-        info.GetReturnValue().Set(Nan::Undefined());
-        return;
-    }
-
-    Nan::Utf8String pw(info[0]->ToString());
-    Nan::Utf8String hash(info[1]->ToString());
-
-    char bcrypted[_PASSWORD_LEN];
-    if (ValidateSalt(*hash)) {
-        bcrypt(*pw, *hash, bcrypted);
-        info.GetReturnValue().Set(Nan::New<Boolean>(CompareStrings(bcrypted, *hash)));
-    } else {
-        info.GetReturnValue().Set(Nan::False());
-    }
-}*/
-
 Napi::Value CompareSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 2) {
@@ -353,7 +350,7 @@ Napi::Value GetRounds(const Napi::CallbackInfo& info) {
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
     //exports.Set(Napi::String::New(env, "gen_salt_sync"), Napi::Function::New(env, GenerateSaltSync));
-    //exports.Set(Napi::String::New(env, "encrypt_sync"), Napi::Function::New(env, EncryptSync));
+    exports.Set(Napi::String::New(env, "encrypt_sync"), Napi::Function::New(env, EncryptSync));
     exports.Set(Napi::String::New(env, "compare_sync"), Napi::Function::New(env, CompareSync));
     exports.Set(Napi::String::New(env, "get_rounds"), Napi::Function::New(env, GetRounds));
     //exports.Set(Napi::String::New(env, "gen_salt"), Napi::Function::New(env, GenerateSalt));
