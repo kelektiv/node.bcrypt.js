@@ -195,29 +195,6 @@ private:
     Nan::AsyncQueueWorker(encryptWorker);
 }*/
 
-/*NAN_METHOD(EncryptSync) {
-    Nan::HandleScope scope;
-
-    if (info.Length() < 2) {
-        Nan::ThrowTypeError("2 arguments expected");
-        info.GetReturnValue().Set(Nan::Undefined());
-        return;
-    }
-
-    Nan::Utf8String data(info[0]->ToString());
-    Nan::Utf8String salt(info[1]->ToString());
-
-    if (!(ValidateSalt(*salt))) {
-        Nan::ThrowError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
-        info.GetReturnValue().Set(Nan::Undefined());
-        return;
-    }
-
-    char bcrypted[_PASSWORD_LEN];
-    bcrypt(*data, *salt, bcrypted);
-    info.GetReturnValue().Set(Nan::Encode(bcrypted, strlen(bcrypted), Nan::BINARY));
-}*/
-
 Napi::Value EncryptSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 2) {
@@ -294,23 +271,46 @@ bool CompareStrings(const char* s1, const char* s2) {
     bool result;
 };*/
 
-/*NAN_METHOD(Compare) {
-    Nan::HandleScope scope;
-
-    if (info.Length() < 3) {
-        Nan::ThrowTypeError("3 arguments expected");
-        return;
+class CompareAsyncWorker : public Napi::AsyncWorker {
+  public:
+    CompareAsyncWorker(Napi::Function& callback, std::string input, std::string encrypted)
+        :AsyncWorker(callback), input(input), encrypted(encrypted) {
+        result = false;
     }
 
-    Nan::Utf8String input(info[0]->ToString());
-    Nan::Utf8String encrypted(info[1]->ToString());
-    Local<Function> callback = Local<Function>::Cast(info[2]);
+    ~CompareAsyncWorker() {}
 
-    CompareAsyncWorker* compareWorker = new CompareAsyncWorker(new Nan::Callback(callback),
-        std::string(*input), std::string(*encrypted));
+    void Execute() {
+        char bcrypted[_PASSWORD_LEN];
+        if (ValidateSalt(encrypted.c_str())) {
+            bcrypt(input.c_str(), encrypted.c_str(), bcrypted);
+            result = CompareStrings(bcrypted, encrypted.c_str());
+        }
+    }
 
-    Nan::AsyncQueueWorker(compareWorker);
-}*/
+    void OnOK() {
+        Napi::HandleScope scope(Env());   
+        Callback().Call(Env().Global(), {Env().Null(), Napi::Boolean::New(Env(), result)});      
+    }
+
+  private:
+    std::string input;
+    std::string encrypted;
+    bool result;
+};
+
+Napi::Value Compare(const Napi::CallbackInfo& info) {
+    if (info.Length() < 3) {
+        throw Napi::TypeError::New(info.Env(), "3 arguments expected");
+        return info.Env().Undefined();
+    }
+    std::string input = info[0].As<Napi::String>();
+    std::string encrypted = info[1].As<Napi::String>();
+    Napi::Function callback = info[2].As<Napi::Function>();
+    CompareAsyncWorker* compareWorker = new CompareAsyncWorker(callback, input, encrypted);
+    compareWorker->Queue();
+    return info.Env().Undefined();
+}
 
 Napi::Value CompareSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
@@ -355,7 +355,7 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "get_rounds"), Napi::Function::New(env, GetRounds));
     //exports.Set(Napi::String::New(env, "gen_salt"), Napi::Function::New(env, GenerateSalt));
     //exports.Set(Napi::String::New(env, "encrypt"), Napi::Function::New(env, Encrypt));
-    //exports.Set(Napi::String::New(env, "compare"), Napi::Function::New(env, Compare));
+    exports.Set(Napi::String::New(env, "compare"), Napi::Function::New(env, Compare));
     return exports;
 };
 
