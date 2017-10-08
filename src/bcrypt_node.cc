@@ -104,35 +104,29 @@ Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
     return info.Env().Undefined();
 }
 
-
-/*NAN_METHOD(GenerateSaltSync) {
-    Nan::HandleScope scope;
-
+Napi::Value GenerateSaltSync (const Napi::CallbackInfo& info) {
     if (info.Length() < 2) {
-        Nan::ThrowTypeError("2 arguments expected");
-        return;
+        throw Napi::TypeError::New(info.Env(), "3 arguments expected");
+        return info.Env().Undefined();
     }
-
-    if (!Buffer::HasInstance(info[1]) || Buffer::Length(info[1].As<Object>()) != 16) {
-        Nan::ThrowTypeError("Second argument must be a 16 byte Buffer");
-        return;
+    if (!info[1].IsBuffer() || (info[1].As<Napi::Buffer<char>>()).Length() != 16) {
+        throw Napi::TypeError::New(info.Env(), "Second argument must be a 16 byte Buffer");
+        return info.Env().Undefined();
     }
-
-    const int32_t rounds = Nan::To<int32_t>(info[0]).FromMaybe(0);
-    u_int8_t* seed = (u_int8_t*)Buffer::Data(info[1].As<Object>());
-
+    const int32_t rounds = info[0].As<Napi::Number>();
+    Napi::Buffer<u_int8_t> buffer = info[1].As<Napi::Buffer<u_int8_t>>();
+    u_int8_t* seed = (u_int8_t*) buffer.Data();
     char salt[_SALT_LEN];
     bcrypt_gensalt(rounds, seed, salt);
-
-    info.GetReturnValue().Set(Nan::Encode(salt, strlen(salt), Nan::BINARY));
-}*/
+    return Napi::String::New(info.Env(), salt, strlen(salt));
+}
 
 /* ENCRYPT DATA - USED TO BE HASHPW */
 
-/*class EncryptAsyncWorker : public Nan::AsyncWorker {
+class EncryptAsyncWorker : public Napi::AsyncWorker {
   public:
-    EncryptAsyncWorker(Nan::Callback *callback, std::string input, std::string salt)
-        : Nan::AsyncWorker(callback), input(input), salt(salt) {
+    EncryptAsyncWorker(Napi::Function& callback, std::string input, std::string salt)
+        :AsyncWorker(callback), input(input), salt(salt) {
     }
 
     ~EncryptAsyncWorker() {}
@@ -147,20 +141,19 @@ Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
         output = std::string(bcrypted);
     }
 
-    void HandleOKCallback() {
-        Nan::HandleScope scope;
-
-        Local<Value> argv[2];
-
+    void OnOK() {
+        Napi::HandleScope scope(Env());  
         if (!error.empty()) {
-            argv[0] = Nan::Error(error.c_str());
-            argv[1] = Nan::Undefined();
+            Callback().Call({
+                
+                Env().Undefined()                       
+            });
         } else {
-            argv[0] = Nan::Undefined();
-            argv[1] = Nan::Encode(output.c_str(), output.size(), Nan::BINARY);
-        }
-
-        callback->Call(2, argv);
+            Callback().Call({
+                Env().Null(), 
+                Napi::String::New(Env(), output)
+            });
+        }   
     }
 
   private:
@@ -168,25 +161,20 @@ Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
     std::string salt;
     std::string error;
     std::string output;
-};*/
+};
 
-/*NAN_METHOD(Encrypt) {
-    Nan::HandleScope scope;
-
+Napi::Value Encrypt(const Napi::CallbackInfo& info) {
     if (info.Length() < 3) {
-        Nan::ThrowTypeError("3 arguments expected");
-        return;
+        throw Napi::TypeError::New(info.Env(), "3 arguments expected");
+        return info.Env().Undefined();  
     }
-
-    Nan::Utf8String data(info[0]->ToString());
-    Nan::Utf8String salt(info[1]->ToString());
-    Local<Function> callback = Local<Function>::Cast(info[2]);
-
-    EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(new Nan::Callback(callback),
-        std::string(*data), std::string(*salt));
-
-    Nan::AsyncQueueWorker(encryptWorker);
-}*/
+    std::string data = info[0].As<Napi::String>();;
+    std::string salt = info[1].As<Napi::String>();;
+    Napi::Function callback = info[2].As<Napi::Function>();
+    EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(callback, data, salt);
+    encryptWorker->Queue();
+    return info.Env().Undefined();
+}
 
 Napi::Value EncryptSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
@@ -308,12 +296,12 @@ Napi::Value GetRounds(const Napi::CallbackInfo& info) {
 } // anonymous namespace
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
-    //exports.Set(Napi::String::New(env, "gen_salt_sync"), Napi::Function::New(env, GenerateSaltSync));
+    exports.Set(Napi::String::New(env, "gen_salt_sync"), Napi::Function::New(env, GenerateSaltSync));
     exports.Set(Napi::String::New(env, "encrypt_sync"), Napi::Function::New(env, EncryptSync));
     exports.Set(Napi::String::New(env, "compare_sync"), Napi::Function::New(env, CompareSync));
     exports.Set(Napi::String::New(env, "get_rounds"), Napi::Function::New(env, GetRounds));
     exports.Set(Napi::String::New(env, "gen_salt"), Napi::Function::New(env, GenerateSalt));
-    //exports.Set(Napi::String::New(env, "encrypt"), Napi::Function::New(env, Encrypt));
+    exports.Set(Napi::String::New(env, "encrypt"), Napi::Function::New(env, Encrypt));
     exports.Set(Napi::String::New(env, "compare"), Napi::Function::New(env, Compare));
     return exports;
 };
