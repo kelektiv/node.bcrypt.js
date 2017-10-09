@@ -78,7 +78,7 @@ class SaltAsyncWorker : public Napi::AsyncWorker {
 
         void OnOK() {
             Napi::HandleScope scope(Env());   
-            Callback().Call(Env().Global(), {Env().Null(), Napi::String::New(Env(), salt)});
+            Callback().Call(Env().Global(), {Env().Undefined(), Napi::String::New(Env(), salt)});
         }
 
     private:
@@ -149,7 +149,7 @@ class EncryptAsyncWorker : public Napi::AsyncWorker {
             });
         } else {
             Callback().Call({
-                Env().Null(), 
+                Env().Undefined(), 
                 Napi::String::New(Env(), output)
             });
         }   
@@ -236,7 +236,7 @@ class CompareAsyncWorker : public Napi::AsyncWorker {
 
     void OnOK() {
         Napi::HandleScope scope(Env());   
-        Callback().Call(Env().Global(), {Env().Null(), Napi::Boolean::New(Env(), result)});      
+        Callback().Call(Env().Global(), {Env().Undefined(), Napi::Boolean::New(Env(), result)});      
     }
 
   private:
