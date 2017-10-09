@@ -7,8 +7,6 @@
 
 #include "node_blf.h"
 
-using namespace Napi;
-
 #define NODE_LESS_THAN (!(NODE_VERSION_AT_LEAST(0, 5, 4)))
 
 namespace {
