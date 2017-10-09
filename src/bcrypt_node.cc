@@ -135,7 +135,6 @@ class EncryptAsyncWorker : public Napi::AsyncWorker {
         if (!(ValidateSalt(salt.c_str()))) {
             error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
         }
-
         char bcrypted[_PASSWORD_LEN];
         bcrypt(input.c_str(), salt.c_str(), bcrypted);
         output = std::string(bcrypted);
@@ -145,7 +144,7 @@ class EncryptAsyncWorker : public Napi::AsyncWorker {
         Napi::HandleScope scope(Env());  
         if (!error.empty()) {
             Callback().Call({
-                
+                Napi::Error::New(Env(), error.c_str()).Value(),
                 Env().Undefined()                       
             });
         } else {
