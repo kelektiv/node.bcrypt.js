@@ -104,7 +104,7 @@ Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
 
 Napi::Value GenerateSaltSync (const Napi::CallbackInfo& info) {
     if (info.Length() < 2) {
-        throw Napi::TypeError::New(info.Env(), "3 arguments expected");
+        throw Napi::TypeError::New(info.Env(), "2 arguments expected");
         return info.Env().Undefined();
     }
     if (!info[1].IsBuffer() || (info[1].As<Napi::Buffer<char>>()).Length() != 16) {
