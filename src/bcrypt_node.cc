@@ -63,7 +63,7 @@ bool ValidateSalt(const char* salt) {
 class SaltAsyncWorker : public Napi::AsyncWorker {
     public:
         SaltAsyncWorker(Napi::Function& callback, std::string seed, ssize_t rounds)
-            : AsyncWorker(callback), seed(seed), rounds(rounds) {
+            : Napi::AsyncWorker(callback), seed(seed), rounds(rounds) {
         }
 
         ~SaltAsyncWorker() {}
@@ -124,7 +124,7 @@ Napi::Value GenerateSaltSync (const Napi::CallbackInfo& info) {
 class EncryptAsyncWorker : public Napi::AsyncWorker {
   public:
     EncryptAsyncWorker(Napi::Function& callback, std::string input, std::string salt)
-        :AsyncWorker(callback), input(input), salt(salt) {
+        : Napi::AsyncWorker(callback), input(input), salt(salt) {
     }
 
     ~EncryptAsyncWorker() {}
@@ -218,7 +218,7 @@ bool CompareStrings(const char* s1, const char* s2) {
 class CompareAsyncWorker : public Napi::AsyncWorker {
   public:
     CompareAsyncWorker(Napi::Function& callback, std::string input, std::string encrypted)
-        :AsyncWorker(callback), input(input), encrypted(encrypted) {
+        : Napi::AsyncWorker(callback), input(input), encrypted(encrypted) {
         result = false;
     }
 
