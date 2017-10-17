@@ -70,7 +70,7 @@ class SaltAsyncWorker : public Napi::AsyncWorker {
 
         void Execute() {
             char salt[_SALT_LEN];
-            bcrypt_gensalt(rounds, (u_int8_t *)&seed[0], salt);
+            bcrypt_gensalt((char) rounds, (u_int8_t *)&seed[0], salt);
             this->salt = std::string(salt);
         }
 
@@ -83,6 +83,7 @@ class SaltAsyncWorker : public Napi::AsyncWorker {
         std::string seed;
         std::string salt;
         ssize_t rounds;
+        
 };
 
 Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
@@ -97,8 +98,8 @@ Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
     const int32_t rounds = info[0].As<Napi::Number>();
     Napi::Function callback = info[2].As<Napi::Function>();
     Napi::Buffer<char> seed = info[1].As<Napi::Buffer<char>>();
-    SaltAsyncWorker* saltWorker = new SaltAsyncWorker(callback, std::string(seed.Data(), 16), rounds);
-    saltWorker->Queue();
+    //SaltAsyncWorker* saltWorker = new SaltAsyncWorker(callback, std::string(seed.Data(), 16), rounds);
+    //saltWorker->Queue();
     return info.Env().Undefined();
 }
 

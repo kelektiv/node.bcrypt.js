@@ -49,6 +49,17 @@
 #define u_int64_t unsigned __int64
 #endif
 
+/* Windows ssize_t compatibility */
+#if defined(_WIN32) || defined(_WIN64) 
+#  if defined(_WIN64) 
+     typedef __int64 LONG_PTR; 
+#  else 
+     typedef long LONG_PTR; 
+#  endif 
+  typedef LONG_PTR SSIZE_T; 
+  typedef SSIZE_T ssize_t; 
+#endif
+
 #define BCRYPT_VERSION '2'
 #define BCRYPT_MAXSALT 16	/* Precomputation is just so nice */
 #define BCRYPT_BLOCKS 6		/* Ciphertext blocks */
