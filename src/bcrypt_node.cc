@@ -98,8 +98,8 @@ Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
     const int32_t rounds = info[0].As<Napi::Number>();
     Napi::Function callback = info[2].As<Napi::Function>();
     Napi::Buffer<char> seed = info[1].As<Napi::Buffer<char>>();
-    //SaltAsyncWorker* saltWorker = new SaltAsyncWorker(callback, std::string(seed.Data(), 16), rounds);
-    //saltWorker->Queue();
+    SaltAsyncWorker* saltWorker = new SaltAsyncWorker(callback, std::string(seed.Data(), 16), rounds);
+    saltWorker->Queue();
     return info.Env().Undefined();
 }
 
