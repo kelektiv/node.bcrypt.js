@@ -29,7 +29,7 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
-    "node-addon-api": "^1.0.0",
+    "node-addon-api": "git+https://github.com/nodejs/node-addon-api.git",
     "node-pre-gyp": "0.6.36"
   },
   "devDependencies": {
