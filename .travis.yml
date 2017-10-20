@@ -26,7 +26,6 @@ before_install:
   - echo Building for Node $TRAVIS_NODE_VERSION
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=$LINUX_CXX; $CXX --version; fi;
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then c++ --version; fi;
-  - if [[ $(echo "$TRAVIS_NODE_VERSION <= 0.12" | bc -l) ]]; then npm install -g npm@2; else npm install -g npm@latest; fi;
 
 install: true
 
