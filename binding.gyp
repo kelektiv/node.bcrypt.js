@@ -13,12 +13,8 @@
           "<!@(node -p \"require('node-addon-api').include\")"
       ], 
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
-      "xcode_settings": {
-        "CLANG_CXX_LIBRARY": "libc++",
-        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
-      },
       'conditions': [
-        [ 'OS=="win"', {
+        ['OS=="win"', {
           "msvs_settings": {
             "VCCLCompilerTool": {
               "ExceptionHandling": 1
@@ -27,6 +23,13 @@
           'defines': [
             'uint=unsigned int',
           ]
+        }],
+        ['OS=="mac"', {
+          "xcode_settings": {
+            "CLANG_CXX_LIBRARY": "libc++",
+            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+            'MACOSX_DEPLOYMENT_TARGET': '10.7'
+          }
         }]
       ]
     },
