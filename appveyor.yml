@@ -1,13 +1,5 @@
 environment:
   matrix:
-  - nodejs_version: "0.10"
-    platform: x64
-  - nodejs_version: "0.10"
-    platform: x86
-  - nodejs_version: "0.12"
-    platform: x64
-  - nodejs_version: "0.12"
-    platform: x86
   - nodejs_version: "4"
     platform: x64
   - nodejs_version: "4"
@@ -33,8 +25,7 @@ install:
   - where npm
   - where node
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - 'if %nodejs_version% lss 4 npm install -g npm@2'
-  - 'if %nodejs_version% geq 4 npm install -g npm@latest'
+  - 'npm install -g npm@latest'
   - 'if "%nodejs_version%_%platform%" == "4_x86" (npm config set -g cafile=package.json && npm config set -g strict-ssl=false)'
 
 build: off
