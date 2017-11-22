@@ -51,7 +51,8 @@
     "Nate Rajlich <nathan@tootallnate.net> (https://github.com/tootallnate)",
     "Sean McArthur <sean.monstar@gmail.com> (https://github.com/seanmonstar)",
     "Fanie Oosthuysen <fanie.oosthuysen@gmail.com> (https://github.com/weareu)",
-    "Amitosh Swain Mahapatra <amitosh.swain@gmail.com> (https://github.com/Agathver)"
+    "Amitosh Swain Mahapatra <amitosh.swain@gmail.com> (https://github.com/Agathver)",
+    "Nicola Del Gobbo <nicoladelgobbo@gmail.com> (https://github.com/NickNaso)"
   ],
   "binary": {
     "module_name": "bcrypt_lib",
