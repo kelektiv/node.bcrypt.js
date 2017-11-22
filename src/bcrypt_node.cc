@@ -89,11 +89,9 @@ class SaltAsyncWorker : public Napi::AsyncWorker {
 Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
     if (info.Length() < 3) {
         throw Napi::TypeError::New(info.Env(), "3 arguments expected");
-        return info.Env().Undefined();
     }
     if (!info[1].IsBuffer() || (info[1].As<Napi::Buffer<char>>()).Length() != 16) {
         throw Napi::TypeError::New(info.Env(), "Second argument must be a 16 byte Buffer");
-        return info.Env().Undefined();
     }
     const int32_t rounds = info[0].As<Napi::Number>();
     Napi::Function callback = info[2].As<Napi::Function>();
@@ -106,11 +104,9 @@ Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
 Napi::Value GenerateSaltSync (const Napi::CallbackInfo& info) {
     if (info.Length() < 2) {
         throw Napi::TypeError::New(info.Env(), "2 arguments expected");
-        return info.Env().Undefined();
     }
     if (!info[1].IsBuffer() || (info[1].As<Napi::Buffer<char>>()).Length() != 16) {
         throw Napi::TypeError::New(info.Env(), "Second argument must be a 16 byte Buffer");
-        return info.Env().Undefined();
     }
     const int32_t rounds = info[0].As<Napi::Number>();
     Napi::Buffer<u_int8_t> buffer = info[1].As<Napi::Buffer<u_int8_t>>();
@@ -164,7 +160,6 @@ class EncryptAsyncWorker : public Napi::AsyncWorker {
 Napi::Value Encrypt(const Napi::CallbackInfo& info) {
     if (info.Length() < 3) {
         throw Napi::TypeError::New(info.Env(), "3 arguments expected");
-        return info.Env().Undefined();  
     }
     std::string data = info[0].As<Napi::String>();;
     std::string salt = info[1].As<Napi::String>();;
@@ -177,14 +172,12 @@ Napi::Value Encrypt(const Napi::CallbackInfo& info) {
 Napi::Value EncryptSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 2) {
-        throw Napi::TypeError::New(info.Env(), "2 arguments expected");
-        return info.Env().Undefined();     
+        throw Napi::TypeError::New(info.Env(), "2 arguments expected");   
     }
     std::string data = info[0].As<Napi::String>();;
     std::string salt = info[1].As<Napi::String>();;
     if (!(ValidateSalt(salt.c_str()))) {
         throw Napi::Error::New(info.Env(), "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
-        return info.Env().Undefined();
     }
     char bcrypted[_PASSWORD_LEN];
     bcrypt(data.c_str(), salt.c_str(), bcrypted);
@@ -247,7 +240,6 @@ class CompareAsyncWorker : public Napi::AsyncWorker {
 Napi::Value Compare(const Napi::CallbackInfo& info) {
     if (info.Length() < 3) {
         throw Napi::TypeError::New(info.Env(), "3 arguments expected");
-        return info.Env().Undefined();
     }
     std::string input = info[0].As<Napi::String>();
     std::string encrypted = info[1].As<Napi::String>();
@@ -260,8 +252,7 @@ Napi::Value Compare(const Napi::CallbackInfo& info) {
 Napi::Value CompareSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 2) {
-        throw Napi::TypeError::New(info.Env(), "2 arguments expected");
-        return info.Env().Undefined();     
+        throw Napi::TypeError::New(info.Env(), "2 arguments expected");    
     }
     std::string pw = info[0].As<Napi::String>();
     std::string hash = info[1].As<Napi::String>();
@@ -277,8 +268,7 @@ Napi::Value CompareSync(const Napi::CallbackInfo& info) {
 Napi::Value GetRounds(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 1) {
-        throw Napi::TypeError::New(info.Env(), "1 argument expected");
-        return info.Env().Undefined();     
+        throw Napi::TypeError::New(info.Env(), "1 argument expected");    
     }
     Napi::String hashed = info[0].As<Napi::String>();
     std::string hash = hashed.ToString();
@@ -286,7 +276,6 @@ Napi::Value GetRounds(const Napi::CallbackInfo& info) {
     u_int32_t rounds;
     if (!(rounds = bcrypt_get_rounds(bcrypt_hash))) {
         throw Napi::Error::New(info.Env(), "invalid hash provided");
-        return info.Env().Undefined();
     }
     return Napi::Number::New(env, rounds);
 }
