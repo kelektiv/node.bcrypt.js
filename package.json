@@ -29,9 +29,9 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
-    "bindings": "^1.3.0",
-    "node-addon-api": "^1.1.0",
-    "node-pre-gyp": "^0.6.39"
+    "bindings": "1.3.0",
+    "node-addon-api": "1.1.0",
+    "node-pre-gyp": "0.6.39"
   },
   "devDependencies": {
     "nodeunit": "~0.9.1"
