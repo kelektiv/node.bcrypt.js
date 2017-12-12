@@ -14,7 +14,7 @@
   "version": "1.0.3",
   "author": "Nick Campbell (https://github.com/ncb000gt)",
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 4.0.0"
   },
   "repository": {
     "type": "git",
@@ -29,8 +29,9 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
-    "nan": "2.6.2",
-    "node-pre-gyp": "0.6.36"
+    "bindings": "1.3.0",
+    "node-addon-api": "1.1.0",
+    "node-pre-gyp": "0.6.39"
   },
   "devDependencies": {
     "nodeunit": "~0.9.1"
@@ -50,7 +51,8 @@
     "Nate Rajlich <nathan@tootallnate.net> (https://github.com/tootallnate)",
     "Sean McArthur <sean.monstar@gmail.com> (https://github.com/seanmonstar)",
     "Fanie Oosthuysen <fanie.oosthuysen@gmail.com> (https://github.com/weareu)",
-    "Amitosh Swain Mahapatra <amitosh.swain@gmail.com> (https://github.com/Agathver)"
+    "Amitosh Swain Mahapatra <amitosh.swain@gmail.com> (https://github.com/Agathver)",
+    "Nicola Del Gobbo <nicoladelgobbo@gmail.com> (https://github.com/NickNaso)"
   ],
   "binary": {
     "module_name": "bcrypt_lib",
