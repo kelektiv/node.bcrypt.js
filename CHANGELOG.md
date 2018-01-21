@@ -1,3 +1,12 @@
+# 1.1.0-napi (2018-01-21)
+
+  * Initial support for [N-API](https://nodejs.org/api/n-api.html)
+
+# 1.0.3 (2016-08-23)
+
+  * update to nan v2.6.2 for NodeJS 8 support
+  * Fix: use npm scripts instead of node-gyp directly.
+
 # 1.0.2 (2016-12-31)
 
   * Fix `compare` promise rejection with invalid arguments
