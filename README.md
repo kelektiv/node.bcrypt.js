@@ -103,6 +103,11 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, res) {
     // res == false
 });
 ```
+
+The "compare" function counters timing attacks (using a so-called 'constant-time' algorithm).
+In general, don't use the normal JavaScript string comparison functions to compare passwords,
+cryptographic keys, or cryptographic hashes if they are relevant to security.
+
 ### with promises
 
 bcrypt uses whatever Promise implementation is available in `global.Promise`. NodeJS >= 0.12 has a native Promise implementation built in. However, this should work in any Promises/A+ compliant implementation.
@@ -159,6 +164,9 @@ As with async, both techniques achieve the same end-result.
 bcrypt.compareSync(myPlaintextPassword, hash); // true
 bcrypt.compareSync(someOtherPlaintextPassword, hash); // false
 ```
+The "compareSync" function counters timing attacks (using a so-called 'constant-time' algorithm).
+In general, don't use the normal JavaScript string comparison functions to compare passwords,
+cryptographic keys, or cryptographic hashes if they are relevant to security.
 
 ### Why is async mode recommended over sync mode?
 If you are using bcrypt on a simple script, using the sync mode is perfectly fine. However, if you are using bcrypt on a server, the async mode is recommended. This is because the hashing done by bcrypt is CPU intensive, so the sync version will block the event loop and prevent your application from servicing any other inbound requests or events.
