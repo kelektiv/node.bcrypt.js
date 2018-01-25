@@ -1,4 +1,6 @@
 # node.bcrypt.js
+
+[![Join the chat at https://gitter.im/node-bcrypt-js/Lobby](https://badges.gitter.im/node-bcrypt-js/Lobby.svg)](https://gitter.im/node-bcrypt-js/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/kelektiv/node.bcrypt.js.svg?branch=master)](https://travis-ci.org/kelektiv/node.bcrypt.js)
 [![Dependency Status](https://david-dm.org/kelektiv/node.bcrypt.js.svg)](https://david-dm.org/kelektiv/node.bcrypt.js)
 
