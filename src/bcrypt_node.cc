@@ -66,7 +66,8 @@ bool ValidateSalt(const char* salt) {
 class SaltAsyncWorker : public Nan::AsyncWorker {
 public:
     SaltAsyncWorker(Nan::Callback *callback, std::string seed, ssize_t rounds)
-        : Nan::AsyncWorker(callback), seed(seed), rounds(rounds) {
+        : Nan::AsyncWorker(callback, "bcrypt:SaltAsyncWorker"), seed(seed),
+          rounds(rounds) {
     }
 
     ~SaltAsyncWorker() {}
@@ -83,7 +84,7 @@ public:
         Local<Value> argv[2];
         argv[0] = Nan::Undefined();
         argv[1] = Nan::Encode(salt.c_str(), salt.size(), Nan::BINARY);
-        callback->Call(2, argv);
+        callback->Call(2, argv, async_resource);
     }
 
 private:
@@ -142,7 +143,8 @@ NAN_METHOD(GenerateSaltSync) {
 class EncryptAsyncWorker : public Nan::AsyncWorker {
   public:
     EncryptAsyncWorker(Nan::Callback *callback, std::string input, std::string salt)
-        : Nan::AsyncWorker(callback), input(input), salt(salt) {
+        : Nan::AsyncWorker(callback, "bcrypt:EncryptAsyncWorker"), input(input),
+          salt(salt) {
     }
 
     ~EncryptAsyncWorker() {}
@@ -170,7 +172,7 @@ class EncryptAsyncWorker : public Nan::AsyncWorker {
             argv[1] = Nan::Encode(output.c_str(), output.size(), Nan::BINARY);
         }
 
-        callback->Call(2, argv);
+        callback->Call(2, argv, async_resource);
     }
 
   private:
@@ -249,7 +251,8 @@ NAN_INLINE bool CompareStrings(const char* s1, const char* s2) {
 class CompareAsyncWorker : public Nan::AsyncWorker {
   public:
     CompareAsyncWorker(Nan::Callback *callback, std::string input, std::string encrypted)
-        : Nan::AsyncWorker(callback), input(input), encrypted(encrypted) {
+        : Nan::AsyncWorker(callback, "bcrypt:CompareAsyncWorker"), input(input),
+          encrypted(encrypted) {
 
         result = false;
     }
@@ -270,7 +273,7 @@ class CompareAsyncWorker : public Nan::AsyncWorker {
         Local<Value> argv[2];
         argv[0] = Nan::Undefined();
         argv[1] = Nan::New<Boolean>(result);
-        callback->Call(2, argv);
+        callback->Call(2, argv, async_resource);
     }
 
   private:

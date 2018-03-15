@@ -29,7 +29,7 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
-    "nan": "2.8.0",
+    "nan": "2.9.2",
     "node-pre-gyp": "0.7.0"
   },
   "devDependencies": {
