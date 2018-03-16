@@ -213,7 +213,7 @@ In general, don't use the normal JavaScript string comparison functions to compa
 cryptographic keys, or cryptographic hashes if they are relevant to security.
 
 ### Why is async mode recommended over sync mode?
-If you are using bcrypt on a simple script, using the sync mode is perfectly fine. However, if you are using bcrypt on a server, the async mode is recommended. This is because the hashing done by bcrypt is CPU intensive, so the sync version will block the event loop and prevent your application from servicing any other inbound requests or events. The async version also uses another thread so as not to block the event loop.
+If you are using bcrypt on a simple script, using the sync mode is perfectly fine. However, if you are using bcrypt on a server, the async mode is recommended. This is because the hashing done by bcrypt is CPU intensive, so the sync version will block the event loop and prevent your application from servicing any other inbound requests or events. The async version uses a thread pool which does not block the main event loop.
 
 ## API
 
