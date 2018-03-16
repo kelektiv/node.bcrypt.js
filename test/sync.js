@@ -5,7 +5,7 @@ module.exports = {
         var salt = bcrypt.genSaltSync(10);
         assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
         var split_salt = salt.split('$');
-        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[1], '2b');
         assert.strictEqual(split_salt[2], '10');
         assert.done();
     },
@@ -13,7 +13,7 @@ module.exports = {
         // same as test_verify_salt except using default rounds of 10
         var salt = bcrypt.genSaltSync();
         var split_salt = salt.split('$');
-        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[1], '2b');
         assert.strictEqual(split_salt[2], '10');
         assert.done();
     },
@@ -55,7 +55,7 @@ module.exports = {
     test_hash_salt_validity: function(assert) {
         assert.expect(2);
         assert.ok(bcrypt.hashSync('password', '$2a$10$somesaltyvaluertsetrse'));
-        assert.throws(function() { 
+        assert.throws(function() {
             bcrypt.hashSync('password', 'some$value');
         });
         assert.done();
@@ -63,21 +63,21 @@ module.exports = {
     test_verify_salt: function(assert) {
         var salt = bcrypt.genSaltSync(10);
         var split_salt = salt.split('$');
-        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[1], '2b');
         assert.strictEqual(split_salt[2], '10');
         assert.done();
     },
     test_verify_salt_min_rounds: function(assert) {
         var salt = bcrypt.genSaltSync(1);
         var split_salt = salt.split('$');
-        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[1], '2b');
         assert.strictEqual(split_salt[2], '04');
         assert.done();
     },
     test_verify_salt_max_rounds: function(assert) {
         var salt = bcrypt.genSaltSync(100);
         var split_salt = salt.split('$');
-        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[1], '2b');
         assert.strictEqual(split_salt[2], '31');
         assert.done();
     },

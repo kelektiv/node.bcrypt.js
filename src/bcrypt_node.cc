@@ -30,6 +30,7 @@ bool ValidateSalt(const char* salt) {
     if (salt[1] != '$') {
         switch (salt[1]) {
         case 'a':
+        case 'b':
             salt++;
             break;
         default:
