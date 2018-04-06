@@ -25,6 +25,22 @@ module.exports = {
         assert.throws(function() {bcrypt.genSaltSync('b');}, "Should throw an Error. gen_salt requires rounds to be a number.");
         assert.done();
     },
+    test_salt_minor_a: function(assert) {
+        var salt = bcrypt.genSaltSync(10, 'a');
+        assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
+        var split_salt = salt.split('$');
+        assert.strictEqual(split_salt[1], '2a');
+        assert.strictEqual(split_salt[2], '10');
+        assert.done();
+    },
+    test_salt_minor_b: function(assert) {
+        var salt = bcrypt.genSaltSync(10, 'b');
+        assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
+        var split_salt = salt.split('$');
+        assert.strictEqual(split_salt[1], '2b');
+        assert.strictEqual(split_salt[2], '10');
+        assert.done();
+    },
     test_hash: function(assert) {
         assert.ok(bcrypt.hashSync('password', bcrypt.genSaltSync(10)), "Shouldn't throw an Error.");
         assert.done();

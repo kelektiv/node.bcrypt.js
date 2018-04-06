@@ -1,3 +1,7 @@
+# UNRELEASED
+
+  * Make `2b` the default bcrypt version
+
 # 1.0.2 (2016-12-31)
 
   * Fix `compare` promise rejection with invalid arguments

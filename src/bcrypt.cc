@@ -111,11 +111,11 @@ decode_base64(u_int8_t *buffer, u_int16_t len, u_int8_t *data)
 }
 
 void
-encode_salt(char *salt, u_int8_t *csalt, u_int16_t clen, u_int8_t logr)
+encode_salt(char *salt, u_int8_t *csalt, char minor, u_int16_t clen, u_int8_t logr)
 {
 	salt[0] = '$';
 	salt[1] = BCRYPT_VERSION;
-	salt[2] = 'b';
+	salt[2] = minor;
 	salt[3] = '$';
 
 	snprintf(salt + 4, 4, "%2.2u$", logr);
@@ -130,14 +130,14 @@ encode_salt(char *salt, u_int8_t *csalt, u_int16_t clen, u_int8_t logr)
    from: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 */
 void
-bcrypt_gensalt(u_int8_t log_rounds, u_int8_t *seed, char *gsalt)
+bcrypt_gensalt(char minor, u_int8_t log_rounds, u_int8_t *seed, char *gsalt)
 {
 	if (log_rounds < 4)
 		log_rounds = 4;
 	else if (log_rounds > 31)
 		log_rounds = 31;
 
-	encode_salt(gsalt, seed, BCRYPT_MAXSALT, log_rounds);
+	encode_salt(gsalt, seed, minor, BCRYPT_MAXSALT, log_rounds);
 }
 
 /* We handle $Vers$log2(NumRounds)$salt+passwd$

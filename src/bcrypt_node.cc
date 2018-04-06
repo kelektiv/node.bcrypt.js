@@ -62,20 +62,25 @@ bool ValidateSalt(const char* salt) {
     return true;
 }
 
+char ToCharVersion(Local<String> str) {
+  String::Utf8Value value(str);
+  return **value;
+}
+
 /* SALT GENERATION */
 
 class SaltAsyncWorker : public Nan::AsyncWorker {
 public:
-    SaltAsyncWorker(Nan::Callback *callback, std::string seed, ssize_t rounds)
+    SaltAsyncWorker(Nan::Callback *callback, std::string seed, ssize_t rounds, char minor_ver)
         : Nan::AsyncWorker(callback, "bcrypt:SaltAsyncWorker"), seed(seed),
-          rounds(rounds) {
+          rounds(rounds), minor_ver(minor_ver) {
     }
 
     ~SaltAsyncWorker() {}
 
     void Execute() {
         char salt[_SALT_LEN];
-        bcrypt_gensalt(rounds, (u_int8_t *)&seed[0], salt);
+        bcrypt_gensalt(minor_ver, rounds, (u_int8_t *)&seed[0], salt);
         this->salt = std::string(salt);
     }
 
@@ -92,27 +97,34 @@ private:
     std::string seed;
     std::string salt;
     ssize_t rounds;
+    char minor_ver;
 };
 
 NAN_METHOD(GenerateSalt) {
     Nan::HandleScope scope;
 
-    if (info.Length() < 3) {
-        Nan::ThrowTypeError("3 arguments expected");
+    if (info.Length() < 4) {
+        Nan::ThrowTypeError("4 arguments expected");
         return;
     }
 
-    if (!Buffer::HasInstance(info[1]) || Buffer::Length(info[1].As<Object>()) != 16) {
-        Nan::ThrowTypeError("Second argument must be a 16 byte Buffer");
+    if(!info[0]->IsString()) {
+        Nan::ThrowTypeError("First argument must be a string");
         return;
     }
 
-    const int32_t rounds = Nan::To<int32_t>(info[0]).FromMaybe(0);
-    Local<Object> seed = info[1].As<Object>();
-    Local<Function> callback = Local<Function>::Cast(info[2]);
+    if (!Buffer::HasInstance(info[2]) || Buffer::Length(info[2].As<Object>()) != 16) {
+        Nan::ThrowTypeError("Third argument must be a 16 byte Buffer");
+        return;
+    }
+
+    const char minor_ver = ToCharVersion(info[0]->ToString());
+    const int32_t rounds = Nan::To<int32_t>(info[1]).FromMaybe(0);
+    Local<Object> seed = info[2].As<Object>();
+    Local<Function> callback = Local<Function>::Cast(info[3]);
 
     SaltAsyncWorker* saltWorker = new SaltAsyncWorker(new Nan::Callback(callback),
-        std::string(Buffer::Data(seed), 16), rounds);
+        std::string(Buffer::Data(seed), 16), rounds, minor_ver);
 
     Nan::AsyncQueueWorker(saltWorker);
 }
@@ -120,21 +132,27 @@ NAN_METHOD(GenerateSalt) {
 NAN_METHOD(GenerateSaltSync) {
     Nan::HandleScope scope;
 
-    if (info.Length() < 2) {
+    if (info.Length() < 3) {
         Nan::ThrowTypeError("2 arguments expected");
         return;
     }
 
-    if (!Buffer::HasInstance(info[1]) || Buffer::Length(info[1].As<Object>()) != 16) {
-        Nan::ThrowTypeError("Second argument must be a 16 byte Buffer");
+    if(!info[0]->IsString()) {
+        Nan::ThrowTypeError("First argument must be a string");
         return;
     }
 
-    const int32_t rounds = Nan::To<int32_t>(info[0]).FromMaybe(0);
-    u_int8_t* seed = (u_int8_t*)Buffer::Data(info[1].As<Object>());
+    if (!Buffer::HasInstance(info[2]) || Buffer::Length(info[2].As<Object>()) != 16) {
+        Nan::ThrowTypeError("Third argument must be a 16 byte Buffer");
+        return;
+    }
+
+    const char minor_ver = ToCharVersion(info[0]->ToString());
+    const int32_t rounds = Nan::To<int32_t>(info[1]).FromMaybe(0);
+    u_int8_t* seed = (u_int8_t*)Buffer::Data(info[2].As<Object>());
 
     char salt[_SALT_LEN];
-    bcrypt_gensalt(rounds, seed, salt);
+    bcrypt_gensalt(minor_ver, rounds, seed, salt);
 
     info.GetReturnValue().Set(Nan::Encode(salt, strlen(salt), Nan::BINARY));
 }

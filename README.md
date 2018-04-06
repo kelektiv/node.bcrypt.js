@@ -181,10 +181,12 @@ If you are using bcrypt on a simple script, using the sync mode is perfectly fin
 
 `BCrypt.`
 
-  * `genSaltSync(rounds)`
+  * `genSaltSync(rounds, minor)`
     * `rounds` - [OPTIONAL] - the cost of processing the data. (default - 10)
-  * `genSalt(rounds, cb)`
+    * `minor` - [OPTIONAL] - minor version of bcrypt to use. (default - b)
+  * `genSalt(rounds, minor, cb)`
     * `rounds` - [OPTIONAL] - the cost of processing the data. (default - 10)
+    * `minor` - [OPTIONAL] - minor version of bcrypt to use. (default - b)
     * `cb` - [OPTIONAL] - a callback to be fired once the salt has been generated. uses eio making it asynchronous. If `cb` is not specified, a `Promise` is returned if Promise support is available.
       * `err` - First parameter to the callback detailing any errors.
       * `salt` - Second parameter to the callback providing the generated salt.
@@ -267,7 +269,7 @@ The code for this comes from a few sources:
 * [Nate Rajlich][tootallnate] - Bindings and build process.
 * [Sean McArthur][seanmonstar] - Windows Support
 * [Fanie Oosthuysen][weareu] - Windows Support
-* [Amitosh Swain Mahapatra][agathver] - ES6 Promise Support
+* [Amitosh Swain Mahapatra][agathver] - $2b$ hash support, ES6 Promise support
 
 ## License
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
