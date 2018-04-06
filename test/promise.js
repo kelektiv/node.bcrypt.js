@@ -1,4 +1,5 @@
 var bcrypt = require('../bcrypt');
+var promises = require('../lib/promises');
 
 var fail = function(assert, error) {
     assert.ok(false, error);
@@ -215,6 +216,37 @@ if (typeof Promise !== 'undefined') {
             }).then(function() {
                 assert.done();
             });
+        },
+        test_change_promise_impl_reject: function(assert) {
+
+          promises.use({
+            reject: function() {
+              return 'mock';
+            }
+          });
+
+          assert.equal(promises.reject(), 'mock');
+
+          // need to reset the promise implementation because of require cache
+          promises.use(global.Promise);
+          assert.done();
+
+        },
+        test_change_promise_impl_promise: function(assert) {
+
+          promises.use({
+            reject: function(err) {
+              assert.equal(err.message, 'fn must be a function');
+              return 'mock';
+            }
+          });
+
+          assert.equal(promises.promise('', '', ''), 'mock');
+
+          // need to reset the promise implementation because of require cache
+          promises.use(global.Promise);
+          assert.done();
+
         }
     };
 }
