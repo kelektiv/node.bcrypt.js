@@ -29,8 +29,8 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
-    "nan": "2.9.2",
-    "node-pre-gyp": "0.7.0"
+    "nan": "2.10.0",
+    "node-pre-gyp": "0.9.0"
   },
   "devDependencies": {
     "nodeunit": "~0.11.1"
@@ -56,6 +56,7 @@
     "module_name": "bcrypt_lib",
     "module_path": "./lib/binding/",
     "host": "https://github.com",
-    "remote_path": "/kelektiv/node.bcrypt.js/releases/download/v{version}/"
+    "remote_path": "/kelektiv/node.bcrypt.js/releases/download/v{version}/",
+    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}-{libc}.tar.gz"
   }
 }
