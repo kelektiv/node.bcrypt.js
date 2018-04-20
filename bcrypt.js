@@ -7,7 +7,7 @@ var bindings = require(binding_path);
 
 var crypto = require('crypto');
 
-var promises = require('./lib/promises');
+var promises = require('./promises');
 
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)

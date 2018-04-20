@@ -1,5 +1,5 @@
 var bcrypt = require('../bcrypt');
-var promises = require('../lib/promises');
+var promises = require('../promises');
 
 var fail = function(assert, error) {
     assert.ok(false, error);
