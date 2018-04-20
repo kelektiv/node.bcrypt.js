@@ -1,4 +1,4 @@
-# UNRELEASED
+# 2.0.1 (2018-04-20)
 
   * Update `node-pre-gyp` to allow downloading prebuilt modules
 # 2.0.0 (2018-04-07)
