@@ -30,11 +30,14 @@
   },
   "dependencies": {
     "nan": "2.10.0",
-    "node-pre-gyp": "0.9.0"
+    "node-pre-gyp": "0.9.1"
   },
   "devDependencies": {
     "nodeunit": "~0.11.1"
   },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
   "contributors": [
     "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
     "Van Nguyen <the.gol.effect@gmail.com> (https://github.com/thegoleffect)",
