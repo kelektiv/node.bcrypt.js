@@ -33,7 +33,7 @@ install:
   - where npm
   - where node
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - 'if "%nodejs_version%" == "4" (npm install -g npm@5) else (npm install -g npm@latest)'
+  - 'if "%nodejs_version%" <= 5 (npm install -g npm@5) else (npm install -g npm@latest)'
   - 'if "%nodejs_version%_%platform%" == "4_x86" (npm config set -g cafile=package.json && npm config set -g strict-ssl=false)'
 
 build: off
