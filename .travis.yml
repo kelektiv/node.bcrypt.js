@@ -14,6 +14,7 @@ node_js:
   - "7"
   - "8"
   - "9"
+  - "10"
 
 addons:
   apt:
@@ -27,7 +28,7 @@ before_install:
   - echo Building for Node $TRAVIS_NODE_VERSION
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=$LINUX_CXX; $CXX --version; fi;
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then c++ --version; fi;
-  - npm install -g npm@latest
+  - if [[ "$TRAVIS_NODE_VERSION" == "4" || "$TRAVIS_NODE_VERSION" == "5" ]]; then npm install -g npm@5; else npm install -g npm@latest; fi;
 
 install: true
 

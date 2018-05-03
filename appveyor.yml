@@ -24,18 +24,22 @@ environment:
     platform: x64
   - nodejs_version: "9"
     platform: x86
+  - nodejs_version: "10"
+    platform: x64
+  - nodejs_version: "10"
+    platform: x86
 
 install:
   - where npm
   - where node
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - 'npm install -g npm@latest'
+  - 'if "%nodejs_version%" LEQ 5 (npm install -g npm@5) else (npm install -g npm@latest)'
   - 'if "%nodejs_version%_%platform%" == "4_x86" (npm config set -g cafile=package.json && npm config set -g strict-ssl=false)'
 
 build: off
 
 artifacts:
-  - path: 'build/stage/**/bcrypt*.tar.gz'  
+  - path: 'build/stage/**/bcrypt*.tar.gz'
 
 test_script:
   - node --version
