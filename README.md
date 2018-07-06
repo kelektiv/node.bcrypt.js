@@ -21,7 +21,7 @@ If you are on a stable version of node, we can't magically know what you are doi
 | 0.4            | <= 0.4         |
 | 0.6, 0.8, 0.10 | >= 0.5         |
 | 0.11           | >= 0.8         |
-| 4              | <= 2           |
+| 4              | < 2.1          |
 | 8              | >= 1.0.3       |
 | 10             | >= 3           |
 
