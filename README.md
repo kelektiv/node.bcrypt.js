@@ -25,7 +25,7 @@ If you are on a stable version of node, we can't magically know what you are doi
 | 0.11.x | >= 0.8.x |
 | 4.x.x | <= 2.0.x |
 | 8.x.x | >= 1.0.3 |
-| 10.x.x | >= 3.0.0 |
+| 10.x.x | >= 3.0.0 **(Unreleased)**|
 
 `node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
 
