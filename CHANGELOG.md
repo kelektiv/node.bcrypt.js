@@ -1,4 +1,4 @@
-# UNRELEASED
+# 3.0.0 (2018-07-06)
 
   * Drop support for NodeJS <= 4
 
