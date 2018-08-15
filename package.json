@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "nan": "2.10.0",
-    "node-pre-gyp": "0.10.2"
+    "node-pre-gyp": "0.11.0"
   },
   "devDependencies": {
     "nodeunit": "^0.11.2"
