@@ -25,8 +25,7 @@ install:
   - where npm
   - where node
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - 'if "%nodejs_version%" LEQ 5 (npm install -g npm@5) else (npm install -g npm@latest)'
-  - 'if "%nodejs_version%_%platform%" == "4_x86" (npm config set -g cafile=package.json && npm config set -g strict-ssl=false)'
+  - 'npm install -g npm@latest'
 
 build: off
 
@@ -38,5 +37,7 @@ test_script:
   - npm --version
   - npm test
 
-after_test:
+on_success:
   - .\node_modules\.bin\node-pre-gyp package
+  - ps: if ($APPVEYOR_REPO_TAG_NAME -match '^v(0|[1-9]+)\.(0|[1-9]+)\.(0|[1-9]+)$') { echo "Publishing"; npm install node-pre-gyp-github@1.3.1; ./node_modules/.bin/node-pre-gyp-github publish --release }
+
