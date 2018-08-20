@@ -2,16 +2,16 @@
 [![Build Status](https://travis-ci.org/kelektiv/node.bcrypt.js.svg?branch=master)](https://travis-ci.org/kelektiv/node.bcrypt.js)
 [![Dependency Status](https://david-dm.org/kelektiv/node.bcrypt.js.svg)](https://david-dm.org/kelektiv/node.bcrypt.js)
 
-Lib to help you hash passwords.
+This is a lib for you to hash password.
 [bcrypt on wikipedia][bcryptwiki]
 
 Catalyst for this module: [How To Safely Store A Password][codahale]
 
-## If You Are Submitting Bugs/Issues
+## In any cases, before submitting the bugs or issues you are found 
 
-First, make sure that the version of node you are using is a _stable_ version. You'll know this because it'll have an even major release number. We do not currently support unstable versions and while the module may happen to work on some unstable versions you'll find that we quickly close issues if you're not using a stable version.
+First of all, make sure that the version of node you are using is a _stable_ version. The reason for ensuring that is  because it will have an even major release number. Currently, we do not support all the unstable versions and while the module may happen to work on some unstable versions you will find out that we quickly close issues if you are not using a stable version. 
 
-If you are on a stable version of node, we can't magically know what you are doing to expose an issue, it is best if you provide a snippet of code or log files if you're having an install issue. This snippet need not include your secret sauce, but it must replicate the issue you are describing. The issues that get closed without resolution tend to be the ones that don't help us help you. Thanks.
+If you are on a stable version of node, we cannot magically know what you are doing to expose an issue, it is best if you provide a snippet of code or log files if you are having an install issue. This snippet does not need to include your secret sauce, but it must replicate the issue you are describing. The issues that get closed without resolution tend to be the ones that do not help us in order to help you. Thank you for all of you attention to this matter.
 
 
 ## Version Compatibility
@@ -35,7 +35,7 @@ gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --node
 
 > Per bcrypt implementation, only the first 72 characters of a string are used. Any extra characters are ignored when matching passwords.
 
-As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code- please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
+As should be the case with any security tool, this library should be scrutinized by anyone who is using it. If you find out or suspect an issue with the code- please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
 
 To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
 
@@ -79,7 +79,7 @@ Currently, we have pre-built binaries that support the following platforms:
 2. Linux x64 (GlibC targets only). Pre-built binaries for MUSL targets such as Apline Linux are not available.
 3. macOS
 
-If you face an error like this:
+If you face an error just like the statement below when you are trying to download or install :
 
 ```
 node-pre-gyp ERR! Tried to download(404): https://github.com/kelektiv/node.bcrypt.js/releases/download/v1.0.2/bcrypt_lib-v1.0.2-node-v48-linux-x64.tar.gz
@@ -214,7 +214,7 @@ cryptographic keys, or cryptographic hashes if they are relevant to security.
 
 ### Why is async mode recommended over sync mode?
 
-If you are using bcrypt on a simple script, using the sync mode is perfectly fine. However, if you are using bcrypt on a server, the async mode is recommended. This is because the hashing done by bcrypt is CPU intensive, so the sync version will block the event loop and prevent your application from servicing any other inbound requests or events.
+If you are using bcrypt on a simple script, using the sync mode is perfectly fine. Nevertheless, the async mode is recommended if you are using bcrypt on a server. This is because the hashing done by bcrypt is CPU intensive, so the sync version will block the event loop and prevent your application from servicing any other inbound requests or events.
 
 ## API
 
