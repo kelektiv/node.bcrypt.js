@@ -92,7 +92,7 @@ Make sure you have the appropriate dependencies installed and configured for you
 ### async (recommended)
 
 ```javascript
-var bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const myPlaintextPassword = 's0/\/\P4$$w0rD';
 const someOtherPlaintextPassword = 'not_bacon';
@@ -176,7 +176,7 @@ async function checkUser(username, password) {
 ### sync
 
 ```javascript
-var bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const myPlaintextPassword = 's0/\/\P4$$w0rD';
 const someOtherPlaintextPassword = 'not_bacon';
