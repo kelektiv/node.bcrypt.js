@@ -11,7 +11,7 @@
     "crypto"
   ],
   "main": "./bcrypt",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "Nick Campbell (https://github.com/ncb000gt)",
   "engines": {
     "node": ">= 6.0.0"
@@ -33,7 +33,7 @@
     "node-pre-gyp": "0.11.0"
   },
   "devDependencies": {
-    "nodeunit": "^0.11.2"
+    "nodeunit": "^0.11.3"
   },
   "bundledDependencies": [
     "node-pre-gyp"
