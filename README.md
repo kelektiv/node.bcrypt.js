@@ -2,16 +2,16 @@
 [![Build Status](https://travis-ci.org/kelektiv/node.bcrypt.js.svg?branch=master)](https://travis-ci.org/kelektiv/node.bcrypt.js)
 [![Dependency Status](https://david-dm.org/kelektiv/node.bcrypt.js.svg)](https://david-dm.org/kelektiv/node.bcrypt.js)
 
-Lib to help you hash passwords.
-[bcrypt on wikipedia][bcryptwiki]
+A library to help you hash passwords.
 
-Catalyst for this module: [How To Safely Store A Password][codahale]
+You can read about [bcrypt in Wikipedia][bcryptwiki] as well as in the following article:
+[How To Safely Store A Password][codahale]
 
-## If You Are Submitting Bugs/Issues
+## If You Are Submitting Bugs or Issues
 
-First, make sure that the version of node you are using is a _stable_ version. You'll know this because it'll have an even major release number. We do not currently support unstable versions and while the module may happen to work on some unstable versions you'll find that we quickly close issues if you're not using a stable version.
+Verify that the node version you are using is a _stable_ version; it has an even major release number. Unstable versions are currently not supported and issues created while using an unstable version will be closed.
 
-If you are on a stable version of node, we can't magically know what you are doing to expose an issue, it is best if you provide a snippet of code or log files if you're having an install issue. This snippet need not include your secret sauce, but it must replicate the issue you are describing. The issues that get closed without resolution tend to be the ones that don't help us help you. Thanks.
+If you are on a stable version of node, please provide a sufficient code snippet or log files for installation issues. The code snippet does not require you to include confidential information. However, it must provide enough information such that the problem can be replicable. Issues which are closed without resolution often lack required information for replication.
 
 
 ## Version Compatibility
@@ -25,17 +25,17 @@ If you are on a stable version of node, we can't magically know what you are doi
 | 8              | >= 1.0.3       |
 | 10             | >= 3           |
 
-`node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
+`node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install, you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
 
 ```
 gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --nodedir flag instead
 ```
 
-## Security Issues/Concerns
+## Security Issues And Concerns
 
 > Per bcrypt implementation, only the first 72 characters of a string are used. Any extra characters are ignored when matching passwords.
 
-As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code- please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
+As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code, please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
 
 To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
 
@@ -71,7 +71,7 @@ npm install bcrypt
 
 _Pre-built binaries for various NodeJS versions are made available on a best-effort basis._
 
-Only the current stable and the supported LTS releases are actively tested against. Please note that there may be an interval between the release of the module and the availabilty of the compiled modules.
+Only the current stable and supported LTS releases are actively tested against. Please note that there may be an interval between the release of the module and the availabilty of the compiled modules.
 
 Currently, we have pre-built binaries that support the following platforms:
 
@@ -85,7 +85,7 @@ If you face an error like this:
 node-pre-gyp ERR! Tried to download(404): https://github.com/kelektiv/node.bcrypt.js/releases/download/v1.0.2/bcrypt_lib-v1.0.2-node-v48-linux-x64.tar.gz
 ```
 
-Make sure you have the appropriate dependencies installed and configured for your platform. You can find installation instructions for the dependencies for some common platforms [in this page][depsinstall].
+make sure you have the appropriate dependencies installed and configured for your platform. You can find installation instructions for the dependencies for some common platforms [in this page][depsinstall].
 
 ## Usage
 
