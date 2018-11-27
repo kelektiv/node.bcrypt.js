@@ -39,6 +39,7 @@ artifacts:
 test_script:
   - node --version
   - npm --version
+  - npm run test:remotebinary
   - npm test
 
 after_test:
