@@ -63,8 +63,11 @@ bool ValidateSalt(const char* salt) {
 }
 
 char ToCharVersion(Local<String> str) {
-  String::Utf8Value value(str);
-  return **value;
+  //String::Utf8Value value(str);
+
+  std::string our_str = *Nan::Utf8String(str);
+
+  return our_str[0];
 }
 
 /* SALT GENERATION */
@@ -118,7 +121,7 @@ NAN_METHOD(GenerateSalt) {
         return;
     }
 
-    const char minor_ver = ToCharVersion(info[0]->ToString());
+    const char minor_ver = ToCharVersion(Nan::To<v8::String>(info[0]).ToLocalChecked());
     const int32_t rounds = Nan::To<int32_t>(info[1]).FromMaybe(0);
     Local<Object> seed = info[2].As<Object>();
     Local<Function> callback = Local<Function>::Cast(info[3]);
@@ -147,7 +150,7 @@ NAN_METHOD(GenerateSaltSync) {
         return;
     }
 
-    const char minor_ver = ToCharVersion(info[0]->ToString());
+    const char minor_ver = ToCharVersion(Nan::To<v8::String>(info[0]).ToLocalChecked());
     const int32_t rounds = Nan::To<int32_t>(info[1]).FromMaybe(0);
     u_int8_t* seed = (u_int8_t*)Buffer::Data(info[2].As<Object>());
 
@@ -209,8 +212,8 @@ NAN_METHOD(Encrypt) {
         return;
     }
 
-    Nan::Utf8String data(info[0]->ToString());
-    Nan::Utf8String salt(info[1]->ToString());
+    Nan::Utf8String data(Nan::To<v8::String>(info[0]).ToLocalChecked());
+    Nan::Utf8String salt(Nan::To<v8::String>(info[1]).ToLocalChecked());
     Local<Function> callback = Local<Function>::Cast(info[2]);
 
     EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(new Nan::Callback(callback),
@@ -228,8 +231,8 @@ NAN_METHOD(EncryptSync) {
         return;
     }
 
-    Nan::Utf8String data(info[0]->ToString());
-    Nan::Utf8String salt(info[1]->ToString());
+    Nan::Utf8String data(Nan::To<v8::String>(info[0]).ToLocalChecked());
+    Nan::Utf8String salt(Nan::To<v8::String>(info[1]).ToLocalChecked());
 
     if (!(ValidateSalt(*salt))) {
         Nan::ThrowError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
@@ -309,8 +312,8 @@ NAN_METHOD(Compare) {
         return;
     }
 
-    Nan::Utf8String input(info[0]->ToString());
-    Nan::Utf8String encrypted(info[1]->ToString());
+    Nan::Utf8String input(Nan::To<v8::String>(info[0]).ToLocalChecked());
+    Nan::Utf8String encrypted(Nan::To<v8::String>(info[1]).ToLocalChecked());
     Local<Function> callback = Local<Function>::Cast(info[2]);
 
     CompareAsyncWorker* compareWorker = new CompareAsyncWorker(new Nan::Callback(callback),
@@ -328,8 +331,8 @@ NAN_METHOD(CompareSync) {
         return;
     }
 
-    Nan::Utf8String pw(info[0]->ToString());
-    Nan::Utf8String hash(info[1]->ToString());
+    Nan::Utf8String pw(Nan::To<v8::String>(info[0]).ToLocalChecked());
+    Nan::Utf8String hash(Nan::To<v8::String>(info[1]).ToLocalChecked());
 
     char bcrypted[_PASSWORD_LEN];
     if (ValidateSalt(*hash)) {
@@ -349,7 +352,7 @@ NAN_METHOD(GetRounds) {
         return;
     }
 
-    Nan::Utf8String hash(info[0]->ToString());
+    Nan::Utf8String hash(Nan::To<v8::String>(info[0]).ToLocalChecked());
     u_int32_t rounds;
     if (!(rounds = bcrypt_get_rounds(*hash))) {
         Nan::ThrowError("invalid hash provided");
