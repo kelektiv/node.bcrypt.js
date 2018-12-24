@@ -118,7 +118,8 @@ encode_salt(char *salt, u_int8_t *csalt, char minor, u_int16_t clen, u_int8_t lo
 	salt[2] = minor;
 	salt[3] = '$';
 
-	snprintf(salt + 4, 4, "%2.2u$", logr);
+    // Max rounds are 31
+	snprintf(salt + 4, 4, "%2.2u$", logr & 0x001F);
 
 	encode_base64((u_int8_t *) salt + 7, csalt, clen);
 }
@@ -261,7 +262,7 @@ bcrypt(const char *key, const char *salt, char *encrypted)
 		encrypted[i++] = minor;
 	encrypted[i++] = '$';
 
-	snprintf(encrypted + i, 4, "%2.2u$", logr);
+	snprintf(encrypted + i, 4, "%2.2u$", logr & 0x001F);
 
 	encode_base64((u_int8_t *) encrypted + i + 3, csalt, BCRYPT_MAXSALT);
 	encode_base64((u_int8_t *) encrypted + strlen(encrypted), ciphertext,
