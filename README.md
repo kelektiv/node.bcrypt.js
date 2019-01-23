@@ -308,6 +308,7 @@ The code for this comes from a few sources:
 * [Sean McArthur][seanmonstar] - Windows Support
 * [Fanie Oosthuysen][weareu] - Windows Support
 * [Amitosh Swain Mahapatra][agathver] - $2b$ hash support, ES6 Promise support
+* [Nicola Del Gobbo][NickNaso] - Initial implementation with N-API
 
 ## License
 Unless stated elsewhere, file headers or otherwise, the license as stated in the LICENSE file.
@@ -335,3 +336,4 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [seanmonstar]:https://github.com/seanmonstar
 [weareu]:https://github.com/weareu
 [agathver]:https://github.com/Agathver
+[NickNaso]: https://github.com/NickNaso
