@@ -1,3 +1,27 @@
+# 3.0.3 (2018-12-19)
+
+  * Update `nan` to 2.12.1
+
+# 3.0.2 (2018-10-18)
+
+  * Update `nan` to 2.11.1
+
+# 3.0.1 (2018-09-20)
+
+  * Update `nan` to 2.11.0
+
+# 3.0.0 (2018-07-06)
+
+  * Drop support for NodeJS <= 4
+
+# 2.0.1 (2018-04-20)
+
+  * Update `node-pre-gyp` to allow downloading prebuilt modules
+
+# 2.0.0 (2018-04-07)
+
+  * Make `2b` the default bcrypt version
+
 # 1.1.0-napi (2018-01-21)
 
   * Initial support for [N-API](https://nodejs.org/api/n-api.html)

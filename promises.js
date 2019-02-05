@@ -1,10 +1,12 @@
 'use strict';
 
+var Promise = global.Promise;
+
 /// encapsulate a method with a node-style callback in a Promise
 /// @param {object} 'this' of the encapsulated function
 /// @param {function} function to be encapsulated
 /// @param {Array-like} args to be passed to the called function
-/// @return {Promise} a Promise encapuslaing the function
+/// @return {Promise} a Promise encapsulating the function
 module.exports.promise = function (fn, context, args) {
 
     if (!Array.isArray(args)) {
@@ -31,4 +33,10 @@ module.exports.promise = function (fn, context, args) {
 /// @param {err} the error to be thrown
 module.exports.reject = function (err) {
     return Promise.reject(err);
+};
+
+/// changes the promise implementation that bcrypt uses
+/// @param {Promise} the implementation to use
+module.exports.use = function(promise) {
+  Promise = promise;
 };

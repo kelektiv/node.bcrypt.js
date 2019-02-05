@@ -11,10 +11,10 @@
     "crypto"
   ],
   "main": "./bcrypt",
-  "version": "1.2.0-napi",
+  "version": "3.0.4-napi",
   "author": "Nick Campbell (https://github.com/ncb000gt)",
   "engines": {
-    "node": ">= 4.0.0"
+    "node": ">= 6.0.0"
   },
   "repository": {
     "type": "git",
@@ -29,13 +29,15 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
-    "bindings": "1.3.0",
-    "node-addon-api": "1.2.0",
-    "node-pre-gyp": "0.6.39"
+    "node-addon-api": "^1.6.2",
+    "node-pre-gyp": "0.12.0"
   },
   "devDependencies": {
-    "nodeunit": "~0.9.1"
+    "nodeunit": "^0.11.3"
   },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
   "contributors": [
     "Antonio Salazar Cardozo <savedfastcool@gmail.com> (https://github.com/Shadowfiend)",
     "Van Nguyen <the.gol.effect@gmail.com> (https://github.com/thegoleffect)",
@@ -52,12 +54,17 @@
     "Sean McArthur <sean.monstar@gmail.com> (https://github.com/seanmonstar)",
     "Fanie Oosthuysen <fanie.oosthuysen@gmail.com> (https://github.com/weareu)",
     "Amitosh Swain Mahapatra <amitosh.swain@gmail.com> (https://github.com/Agathver)",
+    "Corbin Crutchley <crutchcorn@gmail.com> (https://github.com/crutchcorn)",
     "Nicola Del Gobbo <nicoladelgobbo@gmail.com> (https://github.com/NickNaso)"
   ],
   "binary": {
     "module_name": "bcrypt_lib",
-    "module_path": "./lib/binding/",
-    "host": "https://github.com",
-    "remote_path": "/kelektiv/node.bcrypt.js/releases/download/v{version}/"
+    "module_path": "./lib/binding/napi-v{napi_build_version}",
+    "package_name": "{module_name}-v{version}-napi-v{napi_build_version}-{platform}-{arch}-{libc}.tar.gz",
+    "host": "https://github.com/kelektiv/node.bcrypt.js/releases/download/",
+    "remote_path": "v{version}",
+    "napi_versions": [
+      3
+    ]
   }
 }

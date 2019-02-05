@@ -1,4 +1,5 @@
 var bcrypt = require('../bcrypt');
+var promises = require('../promises');
 
 var fail = function(assert, error) {
     assert.ok(false, error);
@@ -124,7 +125,7 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(10).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[1], '2b');
                 assert.strictEqual(split_salt[2], '10');
                 assert.done();
             });
@@ -133,7 +134,7 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(1).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[1], '2b');
                 assert.strictEqual(split_salt[2], '04');
                 assert.done();
             });
@@ -142,7 +143,7 @@ if (typeof Promise !== 'undefined') {
             assert.expect(2);
             bcrypt.genSalt(100).then(function(salt) {
                 var split_salt = salt.split('$');
-                assert.strictEqual(split_salt[1], '2a');
+                assert.strictEqual(split_salt[1], '2b');
                 assert.strictEqual(split_salt[2], '31');
                 assert.done();
             });
@@ -215,6 +216,37 @@ if (typeof Promise !== 'undefined') {
             }).then(function() {
                 assert.done();
             });
+        },
+        test_change_promise_impl_reject: function(assert) {
+
+          promises.use({
+            reject: function() {
+              return 'mock';
+            }
+          });
+
+          assert.equal(promises.reject(), 'mock');
+
+          // need to reset the promise implementation because of require cache
+          promises.use(global.Promise);
+          assert.done();
+
+        },
+        test_change_promise_impl_promise: function(assert) {
+
+          promises.use({
+            reject: function(err) {
+              assert.equal(err.message, 'fn must be a function');
+              return 'mock';
+            }
+          });
+
+          assert.equal(promises.promise('', '', ''), 'mock');
+
+          // need to reset the promise implementation because of require cache
+          promises.use(global.Promise);
+          assert.done();
+
         }
     };
 }

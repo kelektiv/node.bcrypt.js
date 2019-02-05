@@ -19,8 +19,28 @@ module.exports = {
         });
     },
     test_salt_rounds_is_string_non_number: function(assert) {
-        bcrypt.genSalt('b', function (err, salt) {
+        bcrypt.genSalt('z', function (err, salt) {
             assert.ok((err instanceof Error), "Should throw an Error. genSalt requires rounds to of type number.");
+            assert.done();
+        });
+    },
+    test_salt_minor: function(assert) {
+        assert.expect(3);
+        bcrypt.genSalt(10, 'a', function(err, salt) {
+            assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
+            var split_salt = salt.split('$');
+            assert.strictEqual(split_salt[1], '2a');
+            assert.strictEqual(split_salt[2], '10');
+            assert.done();
+        });
+    },
+    test_salt_minor_b: function(assert) {
+        assert.expect(3);
+        bcrypt.genSalt(10, 'b', function(err, salt) {
+            assert.strictEqual(29, salt.length, "Salt isn't the correct length.");
+            var split_salt = salt.split('$');
+            assert.strictEqual(split_salt[1], '2b');
+            assert.strictEqual(split_salt[2], '10');
             assert.done();
         });
     },
@@ -84,7 +104,7 @@ module.exports = {
         assert.expect(2);
         bcrypt.genSalt(10, function(err, salt) {
             var split_salt = salt.split('$');
-            assert.strictEqual(split_salt[1], '2a');
+            assert.strictEqual(split_salt[1], '2b');
             assert.strictEqual(split_salt[2], '10');
             assert.done();
         });
@@ -93,7 +113,7 @@ module.exports = {
         assert.expect(2);
         bcrypt.genSalt(1, function(err, salt) {
             var split_salt = salt.split('$');
-            assert.strictEqual(split_salt[1], '2a');
+            assert.strictEqual(split_salt[1], '2b');
             assert.strictEqual(split_salt[2], '04');
             assert.done();
         });
@@ -102,7 +122,7 @@ module.exports = {
         assert.expect(2);
         bcrypt.genSalt(100, function(err, salt) {
             var split_salt = salt.split('$');
-            assert.strictEqual(split_salt[1], '2a');
+            assert.strictEqual(split_salt[1], '2b');
             assert.strictEqual(split_salt[2], '31');
             assert.done();
         });

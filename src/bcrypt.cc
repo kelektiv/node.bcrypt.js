@@ -1,46 +1,32 @@
-/*	$OpenBSD: bcrypt.c,v 1.24 2008/04/02 19:54:05 millert Exp $	*/
+/*	$OpenBSD: bcrypt.c,v 1.31 2014/03/22 23:02:03 tedu Exp $	*/
 
 /*
- * Copyright 1997 Niels Provos <provos@physnet.uni-hamburg.de>
- * All rights reserved.
+ * Copyright (c) 1997 Niels Provos <provos@umich.edu>
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *      This product includes software developed by Niels Provos.
- * 4. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /* This password hashing algorithm was designed by David Mazieres
  * <dm@lcs.mit.edu> and works as follows:
  *
  * 1. state := InitState ()
- * 2. state := ExpandKey (state, salt, password) 3.
- * REPEAT rounds:
- *	state := ExpandKey (state, 0, salt)
- *      state := ExpandKey(state, 0, password)
+ * 2. state := ExpandKey (state, salt, password)
+ * 3. REPEAT rounds:
+ *    	state := ExpandKey (state, 0, password)
+ *    state := ExpandKey (state, 0, salt)
  * 4. ctext := "OrpheanBeholderScryDoubt"
  * 5. REPEAT 64:
- * 	ctext := Encrypt_ECB (state, ctext);
+ *    	ctext := Encrypt_ECB (state, ctext);
  * 6. RETURN Concatenate (salt, ctext);
  *
  */
@@ -51,7 +37,7 @@
 #include <string.h>
 #include "node_blf.h"
 
-#ifdef _WIN32 
+#ifdef _WIN32
 #define snprintf _snprintf
 #endif
 
@@ -63,10 +49,6 @@
  * You can have up to 2^31 rounds which should be enough for some
  * time to come.
  */
-
-/*char *bcrypt(const char *, const char *);
-void encode_salt(char *, u_int8_t *, u_int16_t, u_int8_t);
-char * bcrypt_gensalt(u_int8_t log_rounds);*/
 
 static void encode_base64(u_int8_t *, u_int8_t *, u_int16_t);
 static void decode_base64(u_int8_t *, u_int16_t, u_int8_t *);
@@ -129,14 +111,15 @@ decode_base64(u_int8_t *buffer, u_int16_t len, u_int8_t *data)
 }
 
 void
-encode_salt(char *salt, u_int8_t *csalt, u_int16_t clen, u_int8_t logr)
+encode_salt(char *salt, u_int8_t *csalt, char minor, u_int16_t clen, u_int8_t logr)
 {
 	salt[0] = '$';
 	salt[1] = BCRYPT_VERSION;
-	salt[2] = 'a';
+	salt[2] = minor;
 	salt[3] = '$';
 
-	snprintf(salt + 4, 4, "%2.2u$", logr);
+    // Max rounds are 31
+	snprintf(salt + 4, 4, "%2.2u$", logr & 0x001F);
 
 	encode_base64((u_int8_t *) salt + 7, csalt, clen);
 }
@@ -148,14 +131,14 @@ encode_salt(char *salt, u_int8_t *csalt, u_int16_t clen, u_int8_t logr)
    from: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
 */
 void
-bcrypt_gensalt(u_int8_t log_rounds, u_int8_t *seed, char *gsalt)
+bcrypt_gensalt(char minor, u_int8_t log_rounds, u_int8_t *seed, char *gsalt)
 {
-    if (log_rounds < 4)
-        log_rounds = 4;
-    else if (log_rounds > 31)
-        log_rounds = 31;
+	if (log_rounds < 4)
+		log_rounds = 4;
+	else if (log_rounds > 31)
+		log_rounds = 31;
 
-    encode_salt(gsalt, seed, BCRYPT_MAXSALT, log_rounds);
+	encode_salt(gsalt, seed, minor, BCRYPT_MAXSALT, log_rounds);
 }
 
 /* We handle $Vers$log2(NumRounds)$salt+passwd$
@@ -185,8 +168,8 @@ bcrypt(const char *key, const char *salt, char *encrypted)
 	/* Check for minor versions */
 	if (salt[1] != '$') {
 		 switch (salt[1]) {
-		 case 'a':
-			 /* 'ab' should not yield the same as 'abab' */
+		 case 'a': /* 'ab' should not yield the same as 'abab' */
+		 case 'b': /* cap input length at 72 bytes */
 			 minor = salt[1];
 			 salt++;
 			 break;
@@ -205,7 +188,7 @@ bcrypt(const char *key, const char *salt, char *encrypted)
 		strcpy(encrypted, error);
 		return;
 	}
-	
+
 	/* Computer power doesn't increase linear, 2^x should be fine */
 	n = atoi(salt);
 	if (n > 31 || n < 0) {
@@ -229,13 +212,25 @@ bcrypt(const char *key, const char *salt, char *encrypted)
 	/* We dont want the base64 salt but the raw data */
 	decode_base64(csalt, BCRYPT_MAXSALT, (u_int8_t *) salt);
 	salt_len = BCRYPT_MAXSALT;
-	key_len = strlen(key) + (minor >= 'a' ? 1 : 0);
+	if (minor <= 'a')
+		key_len = (u_int8_t)(strlen(key) + (minor >= 'a' ? 1 : 0));
+	else
+	{
+		/* strlen() returns a size_t, but the function calls
+		* below result in implicit casts to a narrower integer
+		* type, so cap key_len at the actual maximum supported
+		* length here to avoid integer wraparound */
+		key_len = strlen(key);
+		if (key_len > 72)
+			key_len = 72;
+		key_len++; /* include the NUL */
+	}
 
 
 	/* Setting up S-Boxes and Subkeys */
 	Blowfish_initstate(&state);
 	Blowfish_expandstate(&state, csalt, salt_len,
-	    (u_int8_t *) key, key_len);
+		(u_int8_t *) key, key_len);
 	for (k = 0; k < rounds; k++) {
 		Blowfish_expand0state(&state, (u_int8_t *) key, key_len);
 		Blowfish_expand0state(&state, csalt, salt_len);
@@ -267,11 +262,11 @@ bcrypt(const char *key, const char *salt, char *encrypted)
 		encrypted[i++] = minor;
 	encrypted[i++] = '$';
 
-	snprintf(encrypted + i, 4, "%2.2u$", logr);
+	snprintf(encrypted + i, 4, "%2.2u$", logr & 0x001F);
 
 	encode_base64((u_int8_t *) encrypted + i + 3, csalt, BCRYPT_MAXSALT);
 	encode_base64((u_int8_t *) encrypted + strlen(encrypted), ciphertext,
-	    4 * BCRYPT_BLOCKS - 1);
+		4 * BCRYPT_BLOCKS - 1);
 	memset(&state, 0, sizeof(state));
 	memset(ciphertext, 0, sizeof(ciphertext));
 	memset(csalt, 0, sizeof(csalt));

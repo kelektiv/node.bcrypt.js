@@ -7,12 +7,12 @@ var bindings = require(binding_path);
 
 var crypto = require('crypto');
 
-var promises = require('./lib/promises');
+var promises = require('./promises');
 
 /// generate a salt (sync)
 /// @param {Number} [rounds] number of rounds (default 10)
 /// @return {String} salt
-module.exports.genSaltSync = function genSaltSync(rounds) {
+module.exports.genSaltSync = function genSaltSync(rounds, minor) {
     // default 10 rounds
     if (!rounds) {
         rounds = 10;
@@ -20,13 +20,20 @@ module.exports.genSaltSync = function genSaltSync(rounds) {
         throw new Error('rounds must be a number');
     }
 
-    return bindings.gen_salt_sync(rounds, crypto.randomBytes(16));
+    if(!minor) {
+        minor = 'b';
+    } else if(minor !== 'b' && minor !== 'a') {
+        console.log(minor, typeof minor);
+        throw new Error('minor must be either "a" or "b"');
+    }
+
+    return bindings.gen_salt_sync(minor, rounds, crypto.randomBytes(16));
 };
 
 /// generate a salt
 /// @param {Number} [rounds] number of rounds (default 10)
 /// @param {Function} cb callback(err, salt)
-module.exports.genSalt = function genSalt(rounds, ignore, cb) {
+module.exports.genSalt = function genSalt(rounds, minor, cb) {
     var error;
 
     // if callback is first argument, then use defaults for others
@@ -34,14 +41,16 @@ module.exports.genSalt = function genSalt(rounds, ignore, cb) {
         // have to set callback first otherwise arguments are overriden
         cb = arguments[0];
         rounds = 10;
+        minor = 'b';
     // callback is second argument
     } else if (typeof arguments[1] === 'function') {
         // have to set callback first otherwise arguments are overriden
         cb = arguments[1];
+        minor = 'b';
     }
 
     if (!cb) {
-        return promises.promise(genSalt, this, [rounds, ignore]);
+        return promises.promise(genSalt, this, [rounds, minor]);
     }
 
     // default 10 rounds
@@ -55,13 +64,22 @@ module.exports.genSalt = function genSalt(rounds, ignore, cb) {
         });
     }
 
+    if(!minor) {
+        minor = 'b'
+    } else if(minor !== 'b' && minor !== 'a') {
+        error = new Error('minor must be either "a" or "b"');
+        return process.nextTick(function() {
+            cb(error);
+        });
+    }
+
     crypto.randomBytes(16, function(error, randomBytes) {
         if (error) {
             cb(error);
             return;
         }
 
-        bindings.gen_salt(rounds, randomBytes, cb);
+        bindings.gen_salt(minor, rounds, randomBytes, cb);
     });
 };
 
