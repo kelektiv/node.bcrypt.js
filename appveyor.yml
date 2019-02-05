@@ -45,5 +45,10 @@ after_test:
   - .\node_modules\.bin\node-pre-gyp package
 
 on_success:
-  - ps: if ($env:APPVEYOR_REPO_TAG_NAME -match '^v(0|[1-9]+)\.(0|[1-9]+)\.(0|[1-9]+)$') { echo "Publishing"; npm install node-pre-gyp-github@1.3.1; ./node_modules/.bin/node-pre-gyp-github publish --release }
+  - ps: >
+        if ($env:NODE_PRE_GYP_GITHUB_TOKEN -ne $null -and $env:APPVEYOR_REPO_TAG_NAME -match '^v(0|[1-9]+)\.(0|[1-9]+)\.(0|[1-9]+)$') {
+            echo "Publishing $env:APPVEYOR_REPO_TAG_NAME"
+            npm install node-pre-gyp-github@1.4.3
+            ./node_modules/.bin/node-pre-gyp-github publish --release
+        }
 
