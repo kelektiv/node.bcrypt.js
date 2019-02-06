@@ -1,3 +1,9 @@
+# 3.0.4 (2019-02-07)
+
+  * Fix GCC, NAN and V8 deprecation warnings
+  * NodeJS 12 compatibility
+
+
 # 3.0.3 (2018-12-19)
 
   * Update `nan` to 2.12.1
