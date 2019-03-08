@@ -1,3 +1,7 @@
+# 3.0.4-napi (2019-03-08)
+
+  * Sync N-API bcrypt with NAN bcrypt
+
 # 3.0.4 (2019-02-07)
 
   * Fix GCC, NAN and V8 deprecation warnings
