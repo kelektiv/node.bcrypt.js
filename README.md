@@ -24,7 +24,7 @@ If you are on a stable version of node, please provide a sufficient code snippet
 | 4              | < 2.1          |
 | 8              | >= 1.0.3       |
 | 10, 11         | >= 3           |
-| 12             | >= 3.0.4       |
+| 12             | >= 3.0.5       |
 
 `node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install, you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
 

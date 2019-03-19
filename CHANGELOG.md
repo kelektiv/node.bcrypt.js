@@ -1,8 +1,12 @@
+# 3.0.5 (2019-03-19)
+
+  * Update `nan` to 2.13.1
+  * NodeJS 12 compatibility
+  * Remove `node-pre-gyp` from bundled dependencies
+
 # 3.0.4 (2019-02-07)
 
   * Fix GCC, NAN and V8 deprecation warnings
-  * NodeJS 12 compatibility
-
 
 # 3.0.3 (2018-12-19)
 
