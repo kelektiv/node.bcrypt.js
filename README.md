@@ -21,12 +21,12 @@ If you are on a stable version of node, please provide a sufficient code snippet
 | 0.4            | <= 0.4         |
 | 0.6, 0.8, 0.10 | >= 0.5         |
 | 0.11           | >= 0.8         |
-| 4              | < 2.1          |
+| 4              | <= 2.1.0       |
 | 8              | >= 1.0.3       |
 | 10, 11         | >= 3           |
-| 12             | >= 3.0.5       |
+| 12 (nightly)   | >= 3.0.6       |
 
-`node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install, you'll need a stable version of node to use bcrypt. If you do not you'll likely see an error that starts with:
+`node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install, you'll need a stable version of node to use bcrypt. If you do not, you'll likely see an error that starts with:
 
 ```
 gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --nodedir flag instead
