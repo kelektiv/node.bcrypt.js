@@ -16,6 +16,11 @@
             'uint=unsigned int',
           ],
         }],
+        [ 'OS=="zos"', {
+          'cflags': [
+            '-qascii',
+          ],
+        }],
       ],
     },
     {

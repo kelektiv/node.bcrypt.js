@@ -49,6 +49,14 @@
 #define u_int64_t unsigned __int64
 #endif
 
+/* z/OS compatibility */
+#ifdef __MVS__
+typedef unsigned char u_int8_t;
+typedef unsigned short u_int16_t;
+typedef unsigned int u_int32_t;
+typedef unsigned long long u_int64_t;
+#endif
+
 #define BCRYPT_VERSION '2'
 #define BCRYPT_MAXSALT 16	/* Precomputation is just so nice */
 #define BCRYPT_BLOCKS 6		/* Ciphertext blocks */
