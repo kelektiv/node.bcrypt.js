@@ -34,8 +34,13 @@
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
           }
-        }]
-      ]
+        }],
+        [ 'OS=="zos"', {
+          'cflags': [
+            '-qascii',
+          ],
+        }],
+      ],
     },
     {
       "target_name": "action_after_build",
