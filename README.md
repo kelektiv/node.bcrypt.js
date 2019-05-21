@@ -133,9 +133,7 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, res) {
 });
 ```
 
-The "compare" function counters timing attacks (using a so-called 'constant-time' algorithm).
-In general, don't use the normal JavaScript string comparison functions to compare passwords,
-cryptographic keys, or cryptographic hashes if they are relevant to security.
+[A Note on Timing Attacks](#a-note-on-timing-attacks)
 
 ### with promises
 
@@ -209,9 +207,8 @@ As with async, both techniques achieve the same end-result.
 bcrypt.compareSync(myPlaintextPassword, hash); // true
 bcrypt.compareSync(someOtherPlaintextPassword, hash); // false
 ```
-The "compareSync" function counters timing attacks (using a so-called 'constant-time' algorithm).
-In general, don't use the normal JavaScript string comparison functions to compare passwords,
-cryptographic keys, or cryptographic hashes if they are relevant to security.
+
+[A Note on Timing Attacks](#a-note-on-timing-attacks)
 
 ### Why is async mode recommended over sync mode?
 If you are using bcrypt on a simple script, using the sync mode is perfectly fine. However, if you are using bcrypt on a server, the async mode is recommended. This is because the hashing done by bcrypt is CPU intensive, so the sync version will block the event loop and prevent your application from servicing any other inbound requests or events. The async version uses a thread pool which does not block the main event loop.
@@ -268,6 +265,16 @@ From @garthk, on a 2GHz core you can roughly expect:
     rounds=31: 2-3 days/hash
 
 
+## A Note on Timing Attacks
+
+Because it's come up multiple times in this project, and other bcrypt projects, it needs to be said- bcrypt comparator functions are not susceptible to timing attacks. They are not susceptible because the comparison function is comparing one hash to another. Basically it boils down to you know nothing about the password you're trying to attack by trying to use a timing attack.
+
+A great thread on this, in much more detail can be found @ codahale/bcrypt-ruby#43
+
+If you're unfamiliar with timing attacks and want to learn more you can find a great writeup @ [A Lesson In Timing Attacks][timingatk]
+
+However, timing attacks are real. And, the comparison function is _not_ time safe. What that means is that it may exit the function early in the comparison process. This happens because of the above. We don't need to be careful that an attacker is going to learn anything, and our comparison function serves to provide a comparison of hashes, it is a utility to the overall purpose of the library. If you end up using it for something else we cannot guarantee the security of the comparator. Keep that in mind as you use the library.
+
 ## Hash Info
 
 The characters that comprise the resultant hash are `./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$`.
@@ -319,6 +326,7 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
 [jtr]: http://www.openwall.com/lists/oss-security/2011/06/20/2
 [depsinstall]: https://github.com/kelektiv/node.bcrypt.js/wiki/Installation-Instructions
+[timingatk]: https://codahale.com/a-lesson-in-timing-attacks/
 
 [shadowfiend]:https://github.com/Shadowfiend
 [thegoleffect]:https://github.com/thegoleffect
