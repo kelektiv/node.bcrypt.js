@@ -248,26 +248,7 @@ NAN_METHOD(EncryptSync) {
 /* COMPARATOR */
 
 NAN_INLINE bool CompareStrings(const char* s1, const char* s2) {
-
-    bool eq = true;
-    int s1_len = strlen(s1);
-    int s2_len = strlen(s2);
-
-    if (s1_len != s2_len) {
-        eq = false;
-    }
-
-    const int max_len = (s2_len < s1_len) ? s1_len : s2_len;
-
-    // to prevent timing attacks, should check entire string
-    // don't exit after found to be false
-    for (int i = 0; i < max_len; ++i) {
-      if (s1_len >= i && s2_len >= i && s1[i] != s2[i]) {
-        eq = false;
-      }
-    }
-
-    return eq;
+    return strcmp(s1, s2) == 0;
 }
 
 class CompareAsyncWorker : public Nan::AsyncWorker {
