@@ -267,7 +267,9 @@ From @garthk, on a 2GHz core you can roughly expect:
 
 ## A Note on Timing Attacks
 
-Because it's come up multiple times in this project, and other bcrypt projects, it needs to be said- bcrypt comparator functions are not susceptible to timing attacks. They are not susceptible because the comparison function is comparing one hash to another. Basically it boils down to you know nothing about the password you're trying to attack by trying to use a timing attack.
+Because it's come up multiple times in this project, and other bcrypt projects, it needs to be said. The bcrypt comparison function is not susceptible to timing attacks. From codahale/bcrypt-ruby#42:
+
+> One of the desired properties of a cryptographic hash function is preimage attack resistance, which means there is no shortcut for generating a message which, when hashed, produces a specific digest.
 
 A great thread on this, in much more detail can be found @ codahale/bcrypt-ruby#43
 
