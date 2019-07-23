@@ -1,3 +1,8 @@
+# UNRELEASED
+
+  * Update `nan` to 2.14.0
+  * Update `node-pre-gyp` to 0.13
+
 # 3.0.6 (2019-04-11)
 
   * Update `nan` to 2.13.2
