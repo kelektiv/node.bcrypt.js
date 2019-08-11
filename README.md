@@ -34,7 +34,7 @@ gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --node
 
 ## Security Issues And Concerns
 
-> Per bcrypt implementation, only the first 72 characters of a string are used. Any extra characters are ignored when matching passwords.
+> Per bcrypt implementation, only the first 72 bytes of a string are used. Any extra bytes are ignored when matching passwords. Note that this is not the first 72 *characters*. It is possible for a string to contain less than 72 characters, while taking up more than 72 bytes (e.g. a UTF-8 encoded string containing emojis).
 
 As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code, please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
 
