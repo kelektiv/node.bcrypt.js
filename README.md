@@ -125,11 +125,11 @@ Note that both techniques achieve the same end-result.
 
 ```javascript
 // Load hash from your password DB.
-bcrypt.compare(myPlaintextPassword, hash, function(err, response) {
-    // response == true
+bcrypt.compare(myPlaintextPassword, hash, function(err, result) {
+    // result == true
 });
-bcrypt.compare(someOtherPlaintextPassword, hash, function(err, response) {
-    // response == false
+bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
+    // == false
 });
 ```
 
@@ -150,11 +150,11 @@ bcrypt.hash(myPlaintextPassword, saltRounds).then(function(hash) {
 ```
 ```javascript
 // Load hash from your password DB.
-bcrypt.compare(myPlaintextPassword, hash).then(function(response) {
-    // response == true
+bcrypt.compare(myPlaintextPassword, hash).then(function(result) {
+    // result == true
 });
-bcrypt.compare(someOtherPlaintextPassword, hash).then(function(response) {
-    // response == false
+bcrypt.compare(someOtherPlaintextPassword, hash).then(function(result) {
+    // result == false
 });
 ```
 
