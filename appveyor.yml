@@ -1,17 +1,5 @@
 environment:
   matrix:
-  - nodejs_version: "6"
-    platform: x64
-  - nodejs_version: "6"
-    platform: x86
-  - nodejs_version: "8"
-    platform: x64
-  - nodejs_version: "8"
-    platform: x86
-  - nodejs_version: "9"
-    platform: x64
-  - nodejs_version: "9"
-    platform: x86
   - nodejs_version: "10"
     platform: x64
   - nodejs_version: "10"
