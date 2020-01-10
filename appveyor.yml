@@ -4,10 +4,6 @@ environment:
     platform: x64
   - nodejs_version: "6"
     platform: x86
-  - nodejs_version: "7"
-    platform: x64
-  - nodejs_version: "7"
-    platform: x86
   - nodejs_version: "8"
     platform: x64
   - nodejs_version: "8"
@@ -54,7 +50,7 @@ after_test:
 
 on_success:
   - ps: >
-        if ($env:NODE_PRE_GYP_GITHUB_TOKEN -ne $null -and $env:APPVEYOR_REPO_TAG_NAME -match '^v(0|[1-9]+)\.(0|[1-9]+)\.(0|[1-9]+)$') {
+        if ($env:NODE_PRE_GYP_GITHUB_TOKEN -ne $null -and $env:APPVEYOR_REPO_TAG_NAME -match '^v(0|[1-9]+)\.(0|[1-9]+)\.(0|[1-9]+)(-\w)?$') {
             echo "Publishing $env:APPVEYOR_REPO_TAG_NAME"
             npm install node-pre-gyp-github@1.4.3
             ./node_modules/.bin/node-pre-gyp-github publish --release

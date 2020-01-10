@@ -11,7 +11,7 @@
     "crypto"
   ],
   "main": "./bcrypt",
-  "version": "3.0.8",
+  "version": "4.0.0",
   "author": "Nick Campbell (https://github.com/ncb000gt)",
   "engines": {
     "node": ">= 6.0.0"
@@ -29,8 +29,8 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {
-    "nan": "2.14.0",
-    "node-pre-gyp": "0.14.0"
+    "node-pre-gyp": "0.14.0",
+    "node-addon-api": "^1.6.2"
   },
   "devDependencies": {
     "nodeunit": "^0.11.3"
@@ -51,13 +51,17 @@
     "Sean McArthur <sean.monstar@gmail.com> (https://github.com/seanmonstar)",
     "Fanie Oosthuysen <fanie.oosthuysen@gmail.com> (https://github.com/weareu)",
     "Amitosh Swain Mahapatra <amitosh.swain@gmail.com> (https://github.com/Agathver)",
-    "Corbin Crutchley <crutchcorn@gmail.com> (https://github.com/crutchcorn)"
+    "Corbin Crutchley <crutchcorn@gmail.com> (https://github.com/crutchcorn)",
+    "Nicola Del Gobbo <nicoladelgobbo@gmail.com> (https://github.com/NickNaso)"
   ],
   "binary": {
     "module_name": "bcrypt_lib",
-    "module_path": "./lib/binding/",
-    "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}-{libc}.tar.gz",
+    "module_path": "./lib/binding/napi-v{napi_build_version}",
+    "package_name": "{module_name}-v{version}-napi-v{napi_build_version}-{platform}-{arch}-{libc}.tar.gz",
     "host": "https://github.com/kelektiv/node.bcrypt.js/releases/download/",
-    "remote_path": "v{version}"
+    "remote_path": "v{version}",
+    "napi_versions": [
+      3
+    ]
   }
 }

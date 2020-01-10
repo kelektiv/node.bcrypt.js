@@ -9,7 +9,6 @@ os:
 
 node_js:
   - "6"
-  - "7"
   - "8"
   - "9"
   - "10"
@@ -36,4 +35,4 @@ install: true
 script: npm test
 
 after_success:
-  - if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+ ]]; then echo "Publishing"; npm install node-pre-gyp-github@1.4.3; ./node_modules/.bin/node-pre-gyp configure; ./node_modules/.bin/node-pre-gyp build; ./node_modules/.bin/node-pre-gyp package; ./node_modules/.bin/node-pre-gyp-github publish --release; fi;
+  - if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-\w)? ]]; then echo "Publishing"; npm install node-pre-gyp-github@1.4.3; ./node_modules/.bin/node-pre-gyp configure; ./node_modules/.bin/node-pre-gyp build; ./node_modules/.bin/node-pre-gyp package; ./node_modules/.bin/node-pre-gyp-github publish --release; fi;

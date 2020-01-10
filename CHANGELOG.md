@@ -1,3 +1,7 @@
+# UNRELEASED
+
+  * Switch to NAPI bcrypt
+
 # 3.0.8 (2019-12-31)
 
   * Update `node-pre-gyp` to 0.14
@@ -17,6 +21,10 @@
   * Update `nan` to 2.13.1
   * NodeJS 12 compatibility
   * Remove `node-pre-gyp` from bundled dependencies
+
+# 3.0.4-napi (2019-03-08)
+
+  * Sync N-API bcrypt with NAN bcrypt
 
 # 3.0.4 (2019-02-07)
 
@@ -45,6 +53,15 @@
 # 2.0.0 (2018-04-07)
 
   * Make `2b` the default bcrypt version
+
+# 1.1.0-napi (2018-01-21)
+
+  * Initial support for [N-API](https://nodejs.org/api/n-api.html)
+
+# 1.0.3 (2016-08-23)
+
+  * update to nan v2.6.2 for NodeJS 8 support
+  * Fix: use npm scripts instead of node-gyp directly.
 
 # 1.0.2 (2016-12-31)
 
