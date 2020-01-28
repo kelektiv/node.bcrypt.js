@@ -93,14 +93,15 @@ namespace {
     };
 
     Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
+        Napi::Env env = info.Env();
         if (info.Length() < 4) {
-            throw Napi::TypeError::New(info.Env(), "4 arguments expected");
+            throw Napi::TypeError::New(env, "4 arguments expected");
         }
         if (!info[0].IsString()) {
-            throw Napi::TypeError::New(info.Env(), "First argument must be a string");
+            throw Napi::TypeError::New(env, "First argument must be a string");
         }
         if (!info[2].IsBuffer() || (info[2].As<Napi::Buffer<char>>()).Length() != 16) {
-            throw Napi::TypeError::New(info.Env(), "Second argument must be a 16 byte Buffer");
+            throw Napi::TypeError::New(env, "Second argument must be a 16 byte Buffer");
         }
 
         const char minor_ver = ToCharVersion(info[0].As<Napi::String>());
@@ -109,18 +110,19 @@ namespace {
         Napi::Function callback = info[3].As<Napi::Function>();
         SaltAsyncWorker* saltWorker = new SaltAsyncWorker(callback, std::string(seed.Data(), 16), rounds, minor_ver);
         saltWorker->Queue();
-        return info.Env().Undefined();
+        return env.Undefined();
     }
 
     Napi::Value GenerateSaltSync(const Napi::CallbackInfo& info) {
+        Napi::Env env = info.Env();
         if (info.Length() < 3) {
-            throw Napi::TypeError::New(info.Env(), "3 arguments expected");
+            throw Napi::TypeError::New(env, "3 arguments expected");
         }
         if (!info[0].IsString()) {
-            throw Napi::TypeError::New(info.Env(), "First argument must be a string");
+            throw Napi::TypeError::New(env, "First argument must be a string");
         }
         if (!info[2].IsBuffer() || (info[2].As<Napi::Buffer<char>>()).Length() != 16) {
-            throw Napi::TypeError::New(info.Env(), "Third argument must be a 16 byte Buffer");
+            throw Napi::TypeError::New(env, "Third argument must be a 16 byte Buffer");
         }
         const char minor_ver = ToCharVersion(info[0].As<Napi::String>());
         const int32_t rounds = info[1].As<Napi::Number>();
@@ -128,7 +130,7 @@ namespace {
         u_int8_t* seed = (u_int8_t*) buffer.Data();
         char salt[_SALT_LEN];
         bcrypt_gensalt(minor_ver, rounds, seed, salt);
-        return Napi::String::New(info.Env(), salt, strlen(salt));
+        return Napi::String::New(env, salt, strlen(salt));
     }
 
     /* ENCRYPT DATA - USED TO BE HASHPW */
@@ -143,7 +145,7 @@ namespace {
 
             void Execute() {
                 if (!(ValidateSalt(salt.c_str()))) {
-                    error = "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue";
+                     SetError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
                 }
                 char bcrypted[_PASSWORD_LEN];
                 bcrypt(input.c_str(), salt.c_str(), bcrypted);
@@ -152,23 +154,11 @@ namespace {
 
             void OnOK() {
                 Napi::HandleScope scope(Env());
-                if (!error.empty()) {
-                    Callback().Call({
-                        Napi::Error::New(Env(), error.c_str()).Value(),
-                        Env().Undefined()
-                    });
-                } else {
-                    Callback().Call({
-                        Env().Undefined(),
-                        Napi::String::New(Env(), output)
-                    });
-                }
+                Callback().Call({Env().Undefined(),Napi::String::New(Env(), output)});
             }
-
         private:
             std::string input;
             std::string salt;
-            std::string error;
             std::string output;
     };
 
@@ -192,7 +182,7 @@ namespace {
         std::string data = info[0].As<Napi::String>();;
         std::string salt = info[1].As<Napi::String>();;
         if (!(ValidateSalt(salt.c_str()))) {
-            throw Napi::Error::New(info.Env(), "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+            throw Napi::Error::New(env, "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
         }
         char bcrypted[_PASSWORD_LEN];
         bcrypt(data.c_str(), salt.c_str(), bcrypted);
@@ -263,14 +253,12 @@ namespace {
     Napi::Value GetRounds(const Napi::CallbackInfo& info) {
         Napi::Env env = info.Env();
         if (info.Length() < 1) {
-            throw Napi::TypeError::New(info.Env(), "1 argument expected");
+            throw Napi::TypeError::New(env, "1 argument expected");
         }
-        Napi::String hashed = info[0].As<Napi::String>();
-        std::string hash = hashed.ToString();
-        const char* bcrypt_hash = hash.c_str();
+        std::string hash =  info[0].As<Napi::String>();
         u_int32_t rounds;
-        if (!(rounds = bcrypt_get_rounds(bcrypt_hash))) {
-            throw Napi::Error::New(info.Env(), "invalid hash provided");
+        if (!(rounds = bcrypt_get_rounds(hash.c_str()))) {
+            throw Napi::Error::New(env, "invalid hash provided");
         }
         return Napi::Number::New(env, rounds);
     }

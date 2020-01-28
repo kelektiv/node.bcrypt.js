@@ -186,15 +186,15 @@ const someOtherPlaintextPassword = 'not_bacon';
 Technique 1 (generate a salt and hash on separate function calls):
 
 ```javascript
-var salt = bcrypt.genSaltSync(saltRounds);
-var hash = bcrypt.hashSync(myPlaintextPassword, salt);
+const salt = bcrypt.genSaltSync(saltRounds);
+const hash = bcrypt.hashSync(myPlaintextPassword, salt);
 // Store hash in your password DB.
 ```
 
 Technique 2 (auto-gen a salt and hash):
 
 ```javascript
-var hash = bcrypt.hashSync(myPlaintextPassword, saltRounds);
+const hash = bcrypt.hashSync(myPlaintextPassword, saltRounds);
 // Store hash in your password DB.
 ```
 
