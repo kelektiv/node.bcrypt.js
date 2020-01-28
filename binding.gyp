@@ -25,10 +25,11 @@
           ]
         }],
         ['OS=="mac"', {
+          'cflags+': ['-fvisibility=hidden'],
           "xcode_settings": {
             "CLANG_CXX_LIBRARY": "libc++",
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
-            'MACOSX_DEPLOYMENT_TARGET': '10.7'
+            'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
           }
         }]
       ]

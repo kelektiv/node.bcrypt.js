@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "node-pre-gyp": "0.14.0",
-    "node-addon-api": "^1.6.2"
+    "node-addon-api": "^2.0.0"
   },
   "devDependencies": {
     "nodeunit": "^0.11.3"
