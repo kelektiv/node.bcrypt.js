@@ -145,7 +145,7 @@ namespace {
 
             void Execute() {
                 if (!(ValidateSalt(salt.c_str()))) {
-                     SetError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
+                    SetError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
                 }
                 char bcrypted[_PASSWORD_LEN];
                 bcrypt(input.c_str(), salt.c_str(), bcrypted);
