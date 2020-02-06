@@ -191,7 +191,14 @@ namespace {
 
     /* COMPARATOR */
     inline bool CompareStrings(const char* s1, const char* s2) {
-        return strcmp(s1, s2) == 0;
+        bool ok = true;
+        while (*s1 != '\0') {
+            ok &= (*s1 == *s2);
+            s1 += 1;
+            s2 += (*s2 != '\0');
+        }
+        ok &= (*s1 == '\0') & (*s2 == '\0');
+        return ok;
     }
 
     class CompareAsyncWorker : public Napi::AsyncWorker {
