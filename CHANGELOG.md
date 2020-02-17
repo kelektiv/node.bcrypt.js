@@ -1,4 +1,4 @@
-# UNRELEASED
+# 4.0.0 (2020-02-17)
 
   * Switch to NAPI bcrypt
 

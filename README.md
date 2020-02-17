@@ -16,15 +16,15 @@ If you are on a stable version of node, please provide a sufficient code snippet
 
 ## Version Compatibility
 
-| Node Version   | Bcrypt Version |
-| -------------- | -------------- |
-| 0.4            | <= 0.4         |
-| 0.6, 0.8, 0.10 | >= 0.5         |
-| 0.11           | >= 0.8         |
-| 4              | <= 2.1.0       |
-| 8              | >= 1.0.3       |
-| 10, 11         | >= 3           |
-| 12             | >= 3.0.6       |
+| Node Version   |   Bcrypt Version  |
+| -------------- | ------------------|
+| 0.4            | <= 0.4            |
+| 0.6, 0.8, 0.10 | >= 0.5            |
+| 0.11           | >= 0.8            |
+| 4              | <= 2.1.0          |
+| 8              | >= 1.0.3 <= 4.0.0 |
+| 10, 11         | >= 3              |
+| 12             | >= 3.0.6          |
 
 `node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install, you'll need a stable version of node to use bcrypt. If you do not, you'll likely see an error that starts with:
 
