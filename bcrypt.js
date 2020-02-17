@@ -23,7 +23,6 @@ module.exports.genSaltSync = function genSaltSync(rounds, minor) {
     if(!minor) {
         minor = 'b';
     } else if(minor !== 'b' && minor !== 'a') {
-        console.log(minor, typeof minor);
         throw new Error('minor must be either "a" or "b"');
     }
 
