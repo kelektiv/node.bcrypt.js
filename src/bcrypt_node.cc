@@ -76,7 +76,7 @@ namespace {
 
             void Execute() {
                 char salt[_SALT_LEN];
-                bcrypt_gensalt(minor_ver, rounds, (u_int8_t *)&seed[0], salt);
+                bcrypt_gensalt(minor_ver, rounds, (uint8_t *)&seed[0], salt);
                 this->salt = std::string(salt);
             }
 
@@ -126,8 +126,8 @@ namespace {
         }
         const char minor_ver = ToCharVersion(info[0].As<Napi::String>());
         const int32_t rounds = info[1].As<Napi::Number>();
-        Napi::Buffer<u_int8_t> buffer = info[2].As<Napi::Buffer<u_int8_t>>();
-        u_int8_t* seed = (u_int8_t*) buffer.Data();
+        Napi::Buffer<uint8_t> buffer = info[2].As<Napi::Buffer<uint8_t>>();
+        uint8_t* seed = (uint8_t*) buffer.Data();
         char salt[_SALT_LEN];
         bcrypt_gensalt(minor_ver, rounds, seed, salt);
         return Napi::String::New(env, salt, strlen(salt));
@@ -256,7 +256,7 @@ namespace {
             throw Napi::TypeError::New(env, "1 argument expected");
         }
         std::string hash =  info[0].As<Napi::String>();
-        u_int32_t rounds;
+        uint32_t rounds;
         if (!(rounds = bcrypt_get_rounds(hash.c_str()))) {
             throw Napi::Error::New(env, "invalid hash provided");
         }

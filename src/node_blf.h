@@ -34,31 +34,7 @@
 #ifndef _NODE_BLF_H_
 #define _NODE_BLF_H_
 
-/* Solaris compatibility */
-#ifdef __sun
-#define u_int8_t uint8_t
-#define u_int16_t uint16_t
-#define u_int32_t uint32_t
-#define u_int64_t uint64_t
-#endif
-
-#ifdef _WIN32
-#define u_int8_t unsigned __int8
-#define u_int16_t unsigned __int16
-#define u_int32_t unsigned __int32
-#define u_int64_t unsigned __int64
-#endif
-
-/* Windows ssize_t compatibility */
-#if defined(_WIN32) || defined(_WIN64) 
-#  if defined(_WIN64) 
-     typedef __int64 LONG_PTR; 
-#  else 
-     typedef long LONG_PTR; 
-#  endif 
-  typedef LONG_PTR SSIZE_T; 
-  typedef SSIZE_T ssize_t; 
-#endif
+#include <stdint.h>
 
 #define BCRYPT_VERSION '2'
 #define BCRYPT_MAXSALT 16	/* Precomputation is just so nice */
@@ -81,8 +57,8 @@
 
 /* Blowfish context */
 typedef struct BlowfishContext {
-	u_int32_t S[4][256];	/* S-Boxes */
-	u_int32_t P[BLF_N + 2];	/* Subkeys */
+	uint32_t S[4][256];	/* S-Boxes */
+	uint32_t P[BLF_N + 2];	/* Subkeys */
 } blf_ctx;
 
 /* Raw access to customized Blowfish
@@ -91,32 +67,32 @@ typedef struct BlowfishContext {
  *	Blowfish_expand0state( state, key, keylen )
  */
 
-void Blowfish_encipher(blf_ctx *, u_int32_t *, u_int32_t *);
-void Blowfish_decipher(blf_ctx *, u_int32_t *, u_int32_t *);
+void Blowfish_encipher(blf_ctx *, uint32_t *, uint32_t *);
+void Blowfish_decipher(blf_ctx *, uint32_t *, uint32_t *);
 void Blowfish_initstate(blf_ctx *);
-void Blowfish_expand0state(blf_ctx *, const u_int8_t *, u_int16_t);
+void Blowfish_expand0state(blf_ctx *, const uint8_t *, uint16_t);
 void Blowfish_expandstate
-(blf_ctx *, const u_int8_t *, u_int16_t, const u_int8_t *, u_int16_t);
+(blf_ctx *, const uint8_t *, uint16_t, const uint8_t *, uint16_t);
 
 /* Standard Blowfish */
 
-void blf_key(blf_ctx *, const u_int8_t *, u_int16_t);
-void blf_enc(blf_ctx *, u_int32_t *, u_int16_t);
-void blf_dec(blf_ctx *, u_int32_t *, u_int16_t);
+void blf_key(blf_ctx *, const uint8_t *, uint16_t);
+void blf_enc(blf_ctx *, uint32_t *, uint16_t);
+void blf_dec(blf_ctx *, uint32_t *, uint16_t);
 
-void blf_ecb_encrypt(blf_ctx *, u_int8_t *, u_int32_t);
-void blf_ecb_decrypt(blf_ctx *, u_int8_t *, u_int32_t);
+void blf_ecb_encrypt(blf_ctx *, uint8_t *, uint32_t);
+void blf_ecb_decrypt(blf_ctx *, uint8_t *, uint32_t);
 
-void blf_cbc_encrypt(blf_ctx *, u_int8_t *, u_int8_t *, u_int32_t);
-void blf_cbc_decrypt(blf_ctx *, u_int8_t *, u_int8_t *, u_int32_t);
+void blf_cbc_encrypt(blf_ctx *, uint8_t *, uint8_t *, uint32_t);
+void blf_cbc_decrypt(blf_ctx *, uint8_t *, uint8_t *, uint32_t);
 
-/* Converts u_int8_t to u_int32_t */
-u_int32_t Blowfish_stream2word(const u_int8_t *, u_int16_t , u_int16_t *);
+/* Converts uint8_t to uint32_t */
+uint32_t Blowfish_stream2word(const uint8_t *, uint16_t , uint16_t *);
 
 /* bcrypt functions*/
-void bcrypt_gensalt(char, u_int8_t, u_int8_t*, char *);
+void bcrypt_gensalt(char, uint8_t, uint8_t*, char *);
 void bcrypt(const char *, const char *, char *);
-void encode_salt(char *, u_int8_t *, char, u_int16_t, u_int8_t);
-u_int32_t bcrypt_get_rounds(const char *);
+void encode_salt(char *, uint8_t *, char, uint16_t, uint8_t);
+uint32_t bcrypt_get_rounds(const char *);
 
 #endif

@@ -39,13 +39,6 @@
  * Bruce Schneier.
  */
 
-#if 0
-#include <stdio.h>		/* used for debugging */
-#include <string.h>
-#endif
-
-#include <sys/types.h>
-
 #include "node_blf.h"
 
 #undef inline
@@ -65,12 +58,12 @@
 #define BLFRND(s,p,i,j,n) (i ^= F(s,j) ^ (p)[n])
 
 void
-Blowfish_encipher(blf_ctx *c, u_int32_t *xl, u_int32_t *xr)
+Blowfish_encipher(blf_ctx *c, uint32_t *xl, uint32_t *xr)
 {
-	u_int32_t Xl;
-	u_int32_t Xr;
-	u_int32_t *s = c->S[0];
-	u_int32_t *p = c->P;
+	uint32_t Xl;
+	uint32_t Xr;
+	uint32_t *s = c->S[0];
+	uint32_t *p = c->P;
 
 	Xl = *xl;
 	Xr = *xr;
@@ -90,12 +83,12 @@ Blowfish_encipher(blf_ctx *c, u_int32_t *xl, u_int32_t *xr)
 }
 
 void
-Blowfish_decipher(blf_ctx *c, u_int32_t *xl, u_int32_t *xr)
+Blowfish_decipher(blf_ctx *c, uint32_t *xl, uint32_t *xr)
 {
-	u_int32_t Xl;
-	u_int32_t Xr;
-	u_int32_t *s = c->S[0];
-	u_int32_t *p = c->P;
+	uint32_t Xl;
+	uint32_t Xr;
+	uint32_t *s = c->S[0];
+	uint32_t *p = c->P;
 
 	Xl = *xl;
 	Xr = *xr;
@@ -393,13 +386,13 @@ Blowfish_initstate(blf_ctx *c)
 	*c = initstate;
 }
 
-u_int32_t
-Blowfish_stream2word(const u_int8_t *data, u_int16_t databytes,
-    u_int16_t *current)
+uint32_t
+Blowfish_stream2word(const uint8_t *data, uint16_t databytes,
+    uint16_t *current)
 {
-	u_int8_t i;
-	u_int16_t j;
-	u_int32_t temp;
+	uint8_t i;
+	uint16_t j;
+	uint32_t temp;
 
 	temp = 0x00000000;
 	j = *current;
@@ -415,14 +408,14 @@ Blowfish_stream2word(const u_int8_t *data, u_int16_t databytes,
 }
 
 void
-Blowfish_expand0state(blf_ctx *c, const u_int8_t *key, u_int16_t keybytes)
+Blowfish_expand0state(blf_ctx *c, const uint8_t *key, uint16_t keybytes)
 {
-	u_int16_t i;
-	u_int16_t j;
-	u_int16_t k;
-	u_int32_t temp;
-	u_int32_t datal;
-	u_int32_t datar;
+	uint16_t i;
+	uint16_t j;
+	uint16_t k;
+	uint32_t temp;
+	uint32_t datal;
+	uint32_t datar;
 
 	j = 0;
 	for (i = 0; i < BLF_N + 2; i++) {
@@ -453,15 +446,15 @@ Blowfish_expand0state(blf_ctx *c, const u_int8_t *key, u_int16_t keybytes)
 
 
 void
-Blowfish_expandstate(blf_ctx *c, const u_int8_t *data, u_int16_t databytes,
-    const u_int8_t *key, u_int16_t keybytes)
+Blowfish_expandstate(blf_ctx *c, const uint8_t *data, uint16_t databytes,
+    const uint8_t *key, uint16_t keybytes)
 {
-	u_int16_t i;
-	u_int16_t j;
-	u_int16_t k;
-	u_int32_t temp;
-	u_int32_t datal;
-	u_int32_t datar;
+	uint16_t i;
+	uint16_t j;
+	uint16_t k;
+	uint32_t temp;
+	uint32_t datal;
+	uint32_t datar;
 
 	j = 0;
 	for (i = 0; i < BLF_N + 2; i++) {
@@ -496,7 +489,7 @@ Blowfish_expandstate(blf_ctx *c, const u_int8_t *data, u_int16_t databytes,
 }
 
 void
-blf_key(blf_ctx *c, const u_int8_t *k, u_int16_t len)
+blf_key(blf_ctx *c, const uint8_t *k, uint16_t len)
 {
 	/* Initialize S-boxes and subkeys with Pi */
 	Blowfish_initstate(c);
@@ -506,10 +499,10 @@ blf_key(blf_ctx *c, const u_int8_t *k, u_int16_t len)
 }
 
 void
-blf_enc(blf_ctx *c, u_int32_t *data, u_int16_t blocks)
+blf_enc(blf_ctx *c, uint32_t *data, uint16_t blocks)
 {
-	u_int32_t *d;
-	u_int16_t i;
+	uint32_t *d;
+	uint16_t i;
 
 	d = data;
 	for (i = 0; i < blocks; i++) {
@@ -519,10 +512,10 @@ blf_enc(blf_ctx *c, u_int32_t *data, u_int16_t blocks)
 }
 
 void
-blf_dec(blf_ctx *c, u_int32_t *data, u_int16_t blocks)
+blf_dec(blf_ctx *c, uint32_t *data, uint16_t blocks)
 {
-	u_int32_t *d;
-	u_int16_t i;
+	uint32_t *d;
+	uint16_t i;
 
 	d = data;
 	for (i = 0; i < blocks; i++) {
@@ -532,10 +525,10 @@ blf_dec(blf_ctx *c, u_int32_t *data, u_int16_t blocks)
 }
 
 void
-blf_ecb_encrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
+blf_ecb_encrypt(blf_ctx *c, uint8_t *data, uint32_t len)
 {
-	u_int32_t l, r;
-	u_int32_t i;
+	uint32_t l, r;
+	uint32_t i;
 
 	for (i = 0; i < len; i += 8) {
 		l = data[0] << 24 | data[1] << 16 | data[2] << 8 | data[3];
@@ -554,10 +547,10 @@ blf_ecb_encrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
 }
 
 void
-blf_ecb_decrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
+blf_ecb_decrypt(blf_ctx *c, uint8_t *data, uint32_t len)
 {
-	u_int32_t l, r;
-	u_int32_t i;
+	uint32_t l, r;
+	uint32_t i;
 
 	for (i = 0; i < len; i += 8) {
 		l = data[0] << 24 | data[1] << 16 | data[2] << 8 | data[3];
@@ -576,10 +569,10 @@ blf_ecb_decrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
 }
 
 void
-blf_cbc_encrypt(blf_ctx *c, u_int8_t *iv, u_int8_t *data, u_int32_t len)
+blf_cbc_encrypt(blf_ctx *c, uint8_t *iv, uint8_t *data, uint32_t len)
 {
-	u_int32_t l, r;
-	u_int32_t i, j;
+	uint32_t l, r;
+	uint32_t i, j;
 
 	for (i = 0; i < len; i += 8) {
 		for (j = 0; j < 8; j++)
@@ -601,11 +594,11 @@ blf_cbc_encrypt(blf_ctx *c, u_int8_t *iv, u_int8_t *data, u_int32_t len)
 }
 
 void
-blf_cbc_decrypt(blf_ctx *c, u_int8_t *iva, u_int8_t *data, u_int32_t len)
+blf_cbc_decrypt(blf_ctx *c, uint8_t *iva, uint8_t *data, uint32_t len)
 {
-	u_int32_t l, r;
-	u_int8_t *iv;
-	u_int32_t i, j;
+	uint32_t l, r;
+	uint8_t *iv;
+	uint32_t i, j;
 
 	iv = data + len - 16;
 	data = data + len - 8;
@@ -643,9 +636,9 @@ blf_cbc_decrypt(blf_ctx *c, u_int8_t *iva, u_int8_t *data, u_int32_t len)
 
 #if 0
 void
-report(u_int32_t data[], u_int16_t len)
+report(uint32_t data[], uint16_t len)
 {
-	u_int16_t i;
+	uint16_t i;
 	for (i = 0; i < len; i += 2)
 		printf("Block %0hd: %08lx %08lx.\n",
 		    i / 2, data[i], data[i + 1]);
@@ -658,17 +651,17 @@ main(void)
 	char    key[] = "AAAAA";
 	char    key2[] = "abcdefghijklmnopqrstuvwxyz";
 
-	u_int32_t data[10];
-	u_int32_t data2[] =
+	uint32_t data[10];
+	uint32_t data2[] =
 	{0x424c4f57l, 0x46495348l};
 
-	u_int16_t i;
+	uint16_t i;
 
 	/* First test */
 	for (i = 0; i < 10; i++)
 		data[i] = i;
 
-	blf_key(&c, (u_int8_t *) key, 5);
+	blf_key(&c, (uint8_t *) key, 5);
 	blf_enc(&c, data, 5);
 	blf_dec(&c, data, 1);
 	blf_dec(&c, data + 2, 4);
@@ -676,7 +669,7 @@ main(void)
 	report(data, 10);
 
 	/* Second test */
-	blf_key(&c, (u_int8_t *) key2, strlen(key2));
+	blf_key(&c, (uint8_t *) key2, strlen(key2));
 	blf_enc(&c, data2, 1);
 	printf("\nShould read as: 0x324ed0fe 0xf413a203.\n");
 	report(data2, 2);
