@@ -39,13 +39,6 @@
  * Bruce Schneier.
  */
 
-#if 0
-#include <stdio.h>		/* used for debugging */
-#include <string.h>
-#endif
-
-#include <sys/types.h>
-
 #include "node_blf.h"
 
 #undef inline

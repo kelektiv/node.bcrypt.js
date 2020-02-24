@@ -34,7 +34,7 @@ install: true
 
 script:
   - npm test
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -it -w /src --entrypoint /bin/sh -v`pwd`:/src "node:${TRAVIS_NODE_VERSION}-alpine" test_alpine.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -w /src --entrypoint /bin/sh -v`pwd`:/src "node:${TRAVIS_NODE_VERSION}-alpine" test_alpine.sh; fi;
 
 
 after_success:
