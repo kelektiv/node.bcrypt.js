@@ -4,6 +4,7 @@
 #include <cstring>
 #include <vector>
 #include <stdlib.h> // atoi
+#include <sys/types.h>
 
 #include "node_blf.h"
 
