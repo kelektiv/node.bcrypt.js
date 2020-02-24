@@ -7,6 +7,9 @@
         'src/bcrypt.cc',
         'src/bcrypt_node.cc'
       ],
+      'defines': [
+            '_GNU_SOURCE',
+      ],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
       'include_dirs' : [

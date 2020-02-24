@@ -34,6 +34,8 @@
 #ifndef _NODE_BLF_H_
 #define _NODE_BLF_H_
 
+#include <sys/types.h>
+
 /* Solaris compatibility */
 #ifdef __sun
 #define u_int8_t uint8_t
@@ -50,14 +52,14 @@
 #endif
 
 /* Windows ssize_t compatibility */
-#if defined(_WIN32) || defined(_WIN64) 
-#  if defined(_WIN64) 
-     typedef __int64 LONG_PTR; 
-#  else 
-     typedef long LONG_PTR; 
-#  endif 
-  typedef LONG_PTR SSIZE_T; 
-  typedef SSIZE_T ssize_t; 
+#if defined(_WIN32) || defined(_WIN64)
+#  if defined(_WIN64)
+     typedef __int64 LONG_PTR;
+#  else
+     typedef long LONG_PTR;
+#  endif
+  typedef LONG_PTR SSIZE_T;
+  typedef SSIZE_T ssize_t;
 #endif
 
 #define BCRYPT_VERSION '2'
