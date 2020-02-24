@@ -1,5 +1,8 @@
 language: node_js
 
+services:
+  - docker
+
 env:
   - LINUX_CXX=g++-4.8
 
@@ -29,7 +32,10 @@ before_install:
 
 install: true
 
-script: npm test
+script:
+  - npm test
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -it -w /src --entrypoint /bin/sh -v`pwd`:/src "node:${TRAVIS_NODE_VERSION}-alpine" test_alpine.sh; fi;
+
 
 after_success:
   - if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-\w)? ]]; then echo "Publishing"; npm install node-pre-gyp-github@1.4.3; ./node_modules/.bin/node-pre-gyp configure; ./node_modules/.bin/node-pre-gyp build; ./node_modules/.bin/node-pre-gyp package; ./node_modules/.bin/node-pre-gyp-github publish --release; fi;
