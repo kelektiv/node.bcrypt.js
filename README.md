@@ -22,7 +22,7 @@ If you are on a stable version of node, please provide a sufficient code snippet
 | 0.6, 0.8, 0.10 | >= 0.5            |
 | 0.11           | >= 0.8            |
 | 4              | <= 2.1.0          |
-| 8              | >= 1.0.3 <= 4.0.0 |
+| 8              | >= 1.0.3 < 4.0.0 |
 | 10, 11         | >= 3              |
 | 12             | >= 3.0.6          |
 
