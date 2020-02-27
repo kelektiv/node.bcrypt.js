@@ -1,3 +1,7 @@
+# 4.0.1 (2020-02-27)
+
+  * Fix compilation errors in Alpine linux
+
 # 4.0.0 (2020-02-17)
 
   * Switch to NAPI bcrypt
