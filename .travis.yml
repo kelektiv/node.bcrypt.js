@@ -1,55 +1,56 @@
 language: node_js
 
 services:
-  - docker
+- docker
 
 env:
-  - LINUX_CXX=g++-4.8
+- LINUX_CXX=g++-4.8
 
 os:
-  - linux
-  - osx
+- linux
+- osx
 
 node_js:
-  - "10"
-  - "11"
-  - "12"
-  - "13"
+- '10'
+- '11'
+- '12'
+- '13'
 
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - g++-4.8
-      - bc
+    - g++-4.8
+    - bc
 
 before_install:
-  - echo Building for Node $TRAVIS_NODE_VERSION
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=$LINUX_CXX; $CXX --version; fi;
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then c++ --version; fi;
-  - npm install -g npm@latest
+- echo Building for Node $TRAVIS_NODE_VERSION
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=$LINUX_CXX; $CXX --version;
+  fi;
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then c++ --version; fi;
+- npm install -g npm@latest
 
 install: true
 
 script:
-  - npm test
-  - ./node_modules/.bin/node-pre-gyp configure
-  - ./node_modules/.bin/node-pre-gyp build
-  - ./node_modules/.bin/node-pre-gyp package
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]
-    then
-      docker run -w /src --entrypoint /bin/sh -v`pwd`:/src "node:${TRAVIS_NODE_VERSION}-alpine" test_alpine.sh
-    fi
+- npm test
+- "./node_modules/.bin/node-pre-gyp configure"
+- "./node_modules/.bin/node-pre-gyp build"
+- "./node_modules/.bin/node-pre-gyp package"
+- |
+  if [[ "$TRAVIS_OS_NAME" == "linux" ]]
+  then
+    docker run -w /src --entrypoint /bin/sh -v`pwd`:/src "node:${TRAVIS_NODE_VERSION}-alpine" test_alpine.sh
+  fi
 
-
-after_success:
-  - ls
-  - |
-    if [[ $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-\w)? ]]
-    then
-      echo "Publishing"
-      npm install node-pre-gyp-github@1.4.3
-      ./node_modules/.bin/node-pre-gyp-github publish --release
-    fi
+deploy:
+  provider: releases
+  api_key:
+    secure: j4gQ+m02izaw56EOd0gEStHAjCRfSCkohDWvpABiPzh1YPM9MvfEMSIvzzjV/0oMqi3Sy7eGyFv47EgQHZvouW0I8BIUzxuTCE5wP8z2SjABXCa/rz4WTppTc9d9ABq8JSdz80JxEwjmuwnYeMwWgOd7sT/VDiMxLYaXj0JWO7w=
+  file_glob: true
+  file: build/stage/*/*
+  on:
+    repo: kelektiv/node.bcrypt.js
+    tags: true
+    condition: $TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-\w)?
