@@ -10,6 +10,10 @@ os:
 - linux
 - osx
 
+arch:
+- amd64
+- arm64
+
 node_js:
 - '10'
 - '11'
