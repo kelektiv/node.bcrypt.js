@@ -1,4 +1,4 @@
-# UNRELEASED
+# 5.0.0 (2020-06-02)
 
   * Fix the bcrypt "wrap-around" bug. It affects passwords with lengths >= 255.
     It is uncommon but it's a bug nevertheless. Previous attempts to fix the bug
