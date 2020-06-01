@@ -1,3 +1,9 @@
+# UNRELEASED
+
+  * Fix the bcrypt "wrap-around" bug. It affects passwords with lengths >= 255. 
+    It is uncommon but it's a bug nevertheless. Previous attempts to fix the bug
+    was unsuccessful.
+
 # 4.0.1 (2020-02-27)
 
   * Fix compilation errors in Alpine linux
