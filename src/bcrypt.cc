@@ -146,12 +146,11 @@ bcrypt_gensalt(char minor, u_int8_t log_rounds, u_int8_t *seed, char *gsalt)
    i.e. $2$04$iwouldntknowwhattosayetKdJ6iFtacBqJdKe6aW7ou */
 
 void
-bcrypt(const char *key, const char *salt, char *encrypted)
+bcrypt(const char *key, size_t key_len, const char *salt, char *encrypted)
 {
 	blf_ctx state;
 	u_int32_t rounds, i, k;
 	u_int16_t j;
-	size_t key_len;
 	u_int8_t salt_len, logr, minor;
 	u_int8_t ciphertext[4 * BCRYPT_BLOCKS+1] = "OrpheanBeholderScryDoubt";
 	u_int8_t csalt[BCRYPT_MAXSALT];
@@ -215,14 +214,13 @@ bcrypt(const char *key, const char *salt, char *encrypted)
 	decode_base64(csalt, BCRYPT_MAXSALT, (u_int8_t *) salt);
 	salt_len = BCRYPT_MAXSALT;
 	if (minor <= 'a')
-		key_len = (u_int8_t)(strlen(key) + (minor >= 'a' ? 1 : 0));
+		key_len = (u_int8_t)(key_len + (minor >= 'a' ? 1 : 0));
 	else
 	{
-		/* strlen() returns a size_t, but the function calls
+		/* size_t, but the function calls
 		* below result in implicit casts to a narrower integer
 		* type, so cap key_len at the actual maximum supported
 		* length here to avoid integer wraparound */
-		key_len = strlen(key);
 		if (key_len > 72)
 			key_len = 72;
 		key_len++; /* include the NUL */

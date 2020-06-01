@@ -148,7 +148,7 @@ namespace {
                     SetError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
                 }
                 char bcrypted[_PASSWORD_LEN];
-                bcrypt(input.c_str(), salt.c_str(), bcrypted);
+                bcrypt(input.c_str(), input.length(), salt.c_str(), bcrypted);
                 output = std::string(bcrypted);
             }
 
@@ -185,7 +185,7 @@ namespace {
             throw Napi::Error::New(env, "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
         }
         char bcrypted[_PASSWORD_LEN];
-        bcrypt(data.c_str(), salt.c_str(), bcrypted);
+        bcrypt(data.c_str(), data.length(), salt.c_str(), bcrypted);
         return Napi::String::New(env, bcrypted, strlen(bcrypted));
     }
 
@@ -206,7 +206,7 @@ namespace {
             void Execute() {
                 char bcrypted[_PASSWORD_LEN];
                 if (ValidateSalt(encrypted.c_str())) {
-                    bcrypt(input.c_str(), encrypted.c_str(), bcrypted);
+                    bcrypt(input.c_str(), input.length(), encrypted.c_str(), bcrypted);
                     result = CompareStrings(bcrypted, encrypted.c_str());
                 }
             }
@@ -243,7 +243,7 @@ namespace {
         std::string hash = info[1].As<Napi::String>();
         char bcrypted[_PASSWORD_LEN];
         if (ValidateSalt(hash.c_str())) {
-            bcrypt(pw.c_str(), hash.c_str(), bcrypted);
+            bcrypt(pw.c_str(), pw.length(), hash.c_str(), bcrypted);
             return Napi::Boolean::New(env, CompareStrings(bcrypted, hash.c_str()));
         } else {
             return Napi::Boolean::New(env, false);
