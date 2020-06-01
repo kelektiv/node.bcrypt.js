@@ -4,6 +4,8 @@
     It is uncommon but it's a bug nevertheless. Previous attempts to fix the bug
     was unsuccessful.
   * Experimental support for z/OS
+  * Fix a bug related to NUL in password input
+  * Update `node-pre-gyp` to 0.15.0
 
 # 4.0.1 (2020-02-27)
 
