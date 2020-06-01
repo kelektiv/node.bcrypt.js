@@ -151,7 +151,8 @@ bcrypt(const char *key, const char *salt, char *encrypted)
 	blf_ctx state;
 	u_int32_t rounds, i, k;
 	u_int16_t j;
-	u_int8_t key_len, salt_len, logr, minor;
+	size_t key_len;
+	u_int8_t salt_len, logr, minor;
 	u_int8_t ciphertext[4 * BCRYPT_BLOCKS+1] = "OrpheanBeholderScryDoubt";
 	u_int8_t csalt[BCRYPT_MAXSALT];
 	u_int32_t cdata[BCRYPT_BLOCKS];
