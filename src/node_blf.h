@@ -60,9 +60,9 @@
 #  endif
   typedef LONG_PTR SSIZE_T;
   typedef SSIZE_T ssize_t;
-/* z/OS compatibility */
 #endif
 
+/* z/OS compatibility */
 #ifdef __MVS__
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
