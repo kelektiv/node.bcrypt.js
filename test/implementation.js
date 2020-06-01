@@ -26,6 +26,11 @@ module.exports = {
         assert.strictEqual(bcrypt.hashSync("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345", "$2b$05$CCCCCCCCCCCCCCCCCCCCC."), "$2b$05$CCCCCCCCCCCCCCCCCCCCC.XxrQqgBi/5Sxuq9soXzDtjIZ7w5pMfK");
         assert.done();
     },
+    test_embedded_nulls: function(assert) {
+        assert.strictEqual(bcrypt.hashSync("Passw\0rd123", "$2b$05$CCCCCCCCCCCCCCCCCCCCC."), "$2b$05$CCCCCCCCCCCCCCCCCCCCC.VHy/kzL4sCcX3Ib3wN5rNGiRt.TpfxS");
+        assert.strictEqual(bcrypt.hashSync("Passw\0 you can literally write anything after the NUL character", "$2b$05$CCCCCCCCCCCCCCCCCCCCC."), "$2b$05$CCCCCCCCCCCCCCCCCCCCC.4vJLJQ6nZ/70INTjjSZWQ0iyUek92tu");
+        assert.done();
+    },
     test_shorten_salt_to_128_bits: function(assert) {
         assert.strictEqual(bcrypt.hashSync("test", "$2a$10$1234567899123456789012"), "$2a$10$123456789912345678901u.OtL1A1eGK5wmvBKUDYKvuVKI7h2XBu");
         assert.strictEqual(bcrypt.hashSync("U*U*", "$2a$05$CCCCCCCCCCCCCCCCCCCCCh"), "$2a$05$CCCCCCCCCCCCCCCCCCCCCeUQ7VjYZ2hd4bLYZdhuPpZMUpEUJDw1S");
