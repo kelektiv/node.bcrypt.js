@@ -59,25 +59,22 @@ namespace {
         return true;
     }
 
-    char ToCharVersion(Napi::String str) {
-        std::string our_str = str.Utf8Value();
-        return our_str.c_str()[0];
+    inline char ToCharVersion(const std::string& str) {
+        return str[0];
     }
 
     /* SALT GENERATION */
 
     class SaltAsyncWorker : public Napi::AsyncWorker {
         public:
-            SaltAsyncWorker(Napi::Function& callback, std::string seed, ssize_t rounds, char minor_ver)
+            SaltAsyncWorker(const Napi::Function& callback, const std::string& seed, ssize_t rounds, char minor_ver)
                 : Napi::AsyncWorker(callback, "bcrypt:SaltAsyncWorker"), seed(seed), rounds(rounds), minor_ver(minor_ver) {
             }
 
             ~SaltAsyncWorker() {}
 
             void Execute() {
-                char salt[_SALT_LEN];
                 bcrypt_gensalt(minor_ver, rounds, (u_int8_t *)&seed[0], salt);
-                this->salt = std::string(salt);
             }
 
             void OnOK() {
@@ -87,9 +84,9 @@ namespace {
 
         private:
             std::string seed;
-            std::string salt;
             ssize_t rounds;
             char minor_ver;
+            char salt[_SALT_LEN];
     };
 
     Napi::Value GenerateSalt(const Napi::CallbackInfo& info) {
@@ -133,11 +130,15 @@ namespace {
         return Napi::String::New(env, salt, strlen(salt));
     }
 
+    inline std::string BufferToString(const Napi::Buffer<char> &buf) {
+        return std::string(buf.Data(), buf.Length());
+    }
+
     /* ENCRYPT DATA - USED TO BE HASHPW */
 
     class EncryptAsyncWorker : public Napi::AsyncWorker {
         public:
-            EncryptAsyncWorker(Napi::Function& callback, std::string input, std::string salt)
+            EncryptAsyncWorker(const Napi::Function& callback, const std::string& input, const std::string& salt)
                 : Napi::AsyncWorker(callback, "bcrypt:EncryptAsyncWorker"), input(input), salt(salt) {
             }
 
@@ -147,27 +148,27 @@ namespace {
                 if (!(ValidateSalt(salt.c_str()))) {
                     SetError("Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
                 }
-                char bcrypted[_PASSWORD_LEN];
                 bcrypt(input.c_str(), input.length(), salt.c_str(), bcrypted);
-                output = std::string(bcrypted);
             }
 
             void OnOK() {
                 Napi::HandleScope scope(Env());
-                Callback().Call({Env().Undefined(),Napi::String::New(Env(), output)});
+                Callback().Call({Env().Undefined(),Napi::String::New(Env(), bcrypted)});
             }
         private:
             std::string input;
             std::string salt;
-            std::string output;
+            char bcrypted[_PASSWORD_LEN];
     };
 
     Napi::Value Encrypt(const Napi::CallbackInfo& info) {
         if (info.Length() < 3) {
             throw Napi::TypeError::New(info.Env(), "3 arguments expected");
         }
-        std::string data = info[0].As<Napi::String>();;
-        std::string salt = info[1].As<Napi::String>();;
+        std::string data = info[0].IsBuffer()
+            ? BufferToString(info[0].As<Napi::Buffer<char>>())
+            : info[0].As<Napi::String>();
+        std::string salt = info[1].As<Napi::String>();
         Napi::Function callback = info[2].As<Napi::Function>();
         EncryptAsyncWorker* encryptWorker = new EncryptAsyncWorker(callback, data, salt);
         encryptWorker->Queue();
@@ -179,8 +180,10 @@ namespace {
         if (info.Length() < 2) {
             throw Napi::TypeError::New(info.Env(), "2 arguments expected");
         }
-        std::string data = info[0].As<Napi::String>();;
-        std::string salt = info[1].As<Napi::String>();;
+        std::string data = info[0].IsBuffer()
+            ? BufferToString(info[0].As<Napi::Buffer<char>>())
+            : info[0].As<Napi::String>();
+        std::string salt = info[1].As<Napi::String>();
         if (!(ValidateSalt(salt.c_str()))) {
             throw Napi::Error::New(env, "Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue");
         }
@@ -196,7 +199,7 @@ namespace {
 
     class CompareAsyncWorker : public Napi::AsyncWorker {
         public:
-            CompareAsyncWorker(Napi::Function& callback, std::string input, std::string encrypted)
+            CompareAsyncWorker(const Napi::Function& callback, const std::string& input, const std::string& encrypted)
                 : Napi::AsyncWorker(callback, "bcrypt:CompareAsyncWorker"), input(input), encrypted(encrypted) {
                 result = false;
             }
@@ -226,7 +229,9 @@ namespace {
         if (info.Length() < 3) {
                 throw Napi::TypeError::New(info.Env(), "3 arguments expected");
         }
-        std::string input = info[0].As<Napi::String>();
+        std::string input = info[0].IsBuffer()
+            ? BufferToString(info[0].As<Napi::Buffer<char>>())
+            : info[0].As<Napi::String>();
         std::string encrypted = info[1].As<Napi::String>();
         Napi::Function callback = info[2].As<Napi::Function>();
         CompareAsyncWorker* compareWorker = new CompareAsyncWorker(callback, input, encrypted);
@@ -239,7 +244,9 @@ namespace {
         if (info.Length() < 2) {
             throw Napi::TypeError::New(info.Env(), "2 arguments expected");
         }
-        std::string pw = info[0].As<Napi::String>();
+        std::string pw = info[0].IsBuffer()
+            ? BufferToString(info[0].As<Napi::Buffer<char>>())
+            : info[0].As<Napi::String>();
         std::string hash = info[1].As<Napi::String>();
         char bcrypted[_PASSWORD_LEN];
         if (ValidateSalt(hash.c_str())) {

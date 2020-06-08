@@ -29,6 +29,7 @@ module.exports = {
     test_embedded_nulls: function(assert) {
         assert.strictEqual(bcrypt.hashSync("Passw\0rd123", "$2b$05$CCCCCCCCCCCCCCCCCCCCC."), "$2b$05$CCCCCCCCCCCCCCCCCCCCC.VHy/kzL4sCcX3Ib3wN5rNGiRt.TpfxS");
         assert.strictEqual(bcrypt.hashSync("Passw\0 you can literally write anything after the NUL character", "$2b$05$CCCCCCCCCCCCCCCCCCCCC."), "$2b$05$CCCCCCCCCCCCCCCCCCCCC.4vJLJQ6nZ/70INTjjSZWQ0iyUek92tu");
+        assert.strictEqual(bcrypt.hashSync(Buffer.from("Passw\0 you can literally write anything after the NUL character"), "$2b$05$CCCCCCCCCCCCCCCCCCCCC."), "$2b$05$CCCCCCCCCCCCCCCCCCCCC.4vJLJQ6nZ/70INTjjSZWQ0iyUek92tu");
         assert.done();
     },
     test_shorten_salt_to_128_bits: function(assert) {
@@ -43,6 +44,10 @@ module.exports = {
         assert.strictEqual(bcrypt.hashSync("p@5sw0rd", "$2b$12$zQ4CooEXdGqcwi0PHsgc8e"), "$2b$12$zQ4CooEXdGqcwi0PHsgc8eAf0DLXE/XHoBE8kCSGQ97rXwuClaPam");
         assert.strictEqual(bcrypt.hashSync("C'est bon, la vie!", "$2b$12$cbo7LZ.wxgW4yxAA5Vqlv."), "$2b$12$cbo7LZ.wxgW4yxAA5Vqlv.KR6QFPt4qCdc9RYJNXxa/rbUOp.1sw.");
         assert.strictEqual(bcrypt.hashSync("ἓν οἶδα ὅτι οὐδὲν οἶδα", "$2b$12$LeHKWR2bmrazi/6P22Jpau"), "$2b$12$LeHKWR2bmrazi/6P22JpauX5my/eKwwKpWqL7L5iEByBnxNc76FRW");
-        assert.done();
+        assert.strictEqual(bcrypt.hashSync(Buffer.from("ἓν οἶδα ὅτι οὐδὲν οἶδα"), "$2b$12$LeHKWR2bmrazi/6P22Jpau"), "$2b$12$LeHKWR2bmrazi/6P22JpauX5my/eKwwKpWqL7L5iEByBnxNc76FRW");
+        bcrypt.hash(Buffer.from("ἓν οἶδα ὅτι οὐδὲν οἶδα"), "$2b$12$LeHKWR2bmrazi/6P22Jpau", function(err, hash) {
+            assert.strictEqual(hash, "$2b$12$LeHKWR2bmrazi/6P22JpauX5my/eKwwKpWqL7L5iEByBnxNc76FRW");
+            assert.done();
+        });
     }
 }
