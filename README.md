@@ -41,7 +41,7 @@ As should be the case with any security tool, this library should be scrutinized
 To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
 
 * An [issue with passwords][jtr] was found with a version of the Blowfish algorithm developed for John the Ripper. This is not present in the OpenBSD version and is thus not a problem for this module. HT [zooko][zooko].
-* Versions `< 5.0.0` suffer from bcrypt wrap-around bug and _will truncate passwords >= 255 characters leading to severely weakeded passwords_. Please upgrade at  earliest. See [this wiki page][wrap-around-bug] for more details.
+* Versions `< 5.0.0` suffer from bcrypt wrap-around bug and _will truncate passwords >= 255 characters leading to severely weakened passwords_. Please upgrade at  earliest. See [this wiki page][wrap-around-bug] for more details.
 * Versions `< 5.0.0` _do not handle NUL characters inside passwords properly leading to all subsequent characters being dropped and thus resulting in severely  weakened passwords_. Please upgrade at earliest. See [this wiki page][improper-nuls] for more details.
 
 ## Compatibility Note
