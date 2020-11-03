@@ -287,14 +287,14 @@ Resultant hashes will be 60 characters long and they will include the salt among
 
 `$[algorithm]$[cost]$[salt][hash]`
 
-- 2 chars hash algorithm identifier prefix. `"$2a$" or "$2b$" or "$2y$"` indicates BCrypt
+- 2 chars hash algorithm identifier prefix. `"$2a$" or "$2b$"` indicates BCrypt
 - Cost-factor (n). Represents the exponent used to determine how many iterations 2^n
 - 16-byte (128-bit) salt, base64 encoded to 22 characters
 - 24-byte (192-bit) hash, base64 encoded to 31 characters
 
 Example:
 ```
-$2y$10$nOUIs5kJ7naTuTFkBy1veuK0kSxUFXfuaOKdOKf9xYT0KKIGSJwFa
+$2b$10$nOUIs5kJ7naTuTFkBy1veuK0kSxUFXfuaOKdOKf9xYT0KKIGSJwFa
  |  |  |                     |
  |  |  |                     hash-value = K0kSxUFXfuaOKdOKf9xYT0KKIGSJwFa
  |  |  |
@@ -302,7 +302,7 @@ $2y$10$nOUIs5kJ7naTuTFkBy1veuK0kSxUFXfuaOKdOKf9xYT0KKIGSJwFa
  |  |
  |  cost-factor => 10 = 2^10 rounds
  |
- hash-algorithm identifier => 2y = BCrypt
+ hash-algorithm identifier => 2b = BCrypt
 ```
 
 ## Testing
