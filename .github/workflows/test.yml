@@ -12,5 +12,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: make test
-      run: make test
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14'
+    - name: npm test
+      run: npm test
