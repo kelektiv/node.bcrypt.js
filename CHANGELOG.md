@@ -1,3 +1,7 @@
+# 5.0.1 (2021-02-22)
+
+  * Update `node-pre-gyp` to 1.0.0
+
 # 5.0.0 (2020-06-02)
 
   * Fix the bcrypt "wrap-around" bug. It affects passwords with lengths >= 255.
