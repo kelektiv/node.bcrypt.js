@@ -56,7 +56,7 @@ deploy:
   api_key:
     secure: j4gQ+m02izaw56EOd0gEStHAjCRfSCkohDWvpABiPzh1YPM9MvfEMSIvzzjV/0oMqi3Sy7eGyFv47EgQHZvouW0I8BIUzxuTCE5wP8z2SjABXCa/rz4WTppTc9d9ABq8JSdz80JxEwjmuwnYeMwWgOd7sT/VDiMxLYaXj0JWO7w=
   file_glob: true
-  file: build/stage/*/*
+  file: build/stage/kelektiv/node.bcrypt.js/releases/download/*/*
   on:
     node_js: '10'
     repo: kelektiv/node.bcrypt.js
