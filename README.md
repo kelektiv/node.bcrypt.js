@@ -116,7 +116,7 @@ bcrypt.genSalt(saltRounds, function(err, salt) {
 Technique 2 (auto-gen a salt and hash):
 
 ```javascript
-bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
+bcrypt.hash(myPlaintextPassword, salt, function(err, hash) {
     // Store hash in your password DB.
 });
 ```
@@ -144,7 +144,7 @@ bcrypt uses whatever Promise implementation is available in `global.Promise`. No
 Async methods that accept a callback, return a `Promise` when callback is not specified if Promise support is available.
 
 ```javascript
-bcrypt.hash(myPlaintextPassword, saltRounds).then(function(hash) {
+bcrypt.hash(myPlaintextPassword, salt).then(function(hash) {
     // Store hash in your password DB.
 });
 ```
