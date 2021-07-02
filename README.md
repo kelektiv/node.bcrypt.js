@@ -79,7 +79,7 @@ Only the current stable and supported LTS releases are actively tested against. 
 Currently, we have pre-built binaries that support the following platforms:
 
 1. Windows x32 and x64
-2. Linux x64 (GlibC targets only). Pre-built binaries for MUSL targets such as Apline Linux are not available.
+2. Linux x64 (GlibC and musl)
 3. macOS
 
 If you face an error like this:
