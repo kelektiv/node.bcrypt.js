@@ -15,7 +15,7 @@ var promises = require('./promises');
 module.exports.genSaltSync = function genSaltSync(rounds, minor) {
     // default 10 rounds
     if (!rounds) {
-        rounds = 10;
+        rounds = 18;
     } else if (typeof rounds !== 'number') {
         throw new Error('rounds must be a number');
     }
