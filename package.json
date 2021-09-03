@@ -26,11 +26,12 @@
   },
   "scripts": {
     "test": "npm ci --build-from-source && jest",
-    "install": "node-pre-gyp install --fallback-to-build"
+    "install": "node-gyp-build",
+    "build": "prebuildify --napi"
   },
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^1.0.11",
-    "node-addon-api": "^5.0.0"
+    "node-addon-api": "^5.0.0",
+    "node-gyp-build": "^4.2.3"
   },
   "devDependencies": {
     "jest": "^29.6.2"
