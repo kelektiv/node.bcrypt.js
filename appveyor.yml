@@ -15,25 +15,29 @@ install:
   - where npm
   - where node
   - ps: Install-Product node $env:nodejs_version $env:platform
+  - 'npm install -g npm@latest prebuildify node-gyp'
 
 build: off
 
 artifacts:
-  - path: 'build/stage/**/bcrypt*.tar.gz'
+  - path: './bcrypt*.tgz'
 
 test_script:
   - node --version
   - npm --version
+  - npm install --build-from-source
   - npm test
 
 after_test:
-  - .\node_modules\.bin\node-pre-gyp package
+  - npm run build
+  - npm run pack
 
 on_success:
   - ps: >
         if ($env:NODE_PRE_GYP_GITHUB_TOKEN -ne $null -and $env:APPVEYOR_REPO_TAG_NAME -match '^v(0|[1-9]+)\.(0|[1-9]+)\.(0|[1-9]+)(-\w)?$') {
             echo "Publishing $env:APPVEYOR_REPO_TAG_NAME"
-            npm install node-pre-gyp-github@1.4.3
-            ./node_modules/.bin/node-pre-gyp-github publish --release
+            ## TODO CONFIGURE FOR GITHUB NPM REGISTRY ###
+            ## See https://docs.github.com/en/actions/guides/publishing-nodejs-packages#publishing-packages-to-github-packages
+            npm publish
         }
 
