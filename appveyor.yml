@@ -10,6 +10,8 @@ environment:
     platform: x86
   - nodejs_version: "18"
     platform: x64
+  - nodejs_version: "20"
+    platform: x64
 
 install:
   - where npm

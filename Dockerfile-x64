@@ -1,11 +1,11 @@
 # Usage:
 #
-#   docker build -t bcryptjs-linux-arm-builder -f Dockerfile-arm .
-#   docker create --name donut bcryptjs-linux-arm-builder
+#   docker build -t bcryptjs-linux-x64-builder .
+#   docker create --name donut bcryptjs-linux-x64-builder
 #   # Then copy the artifact to your host:
 #   docker cp donut:/usr/local/opt/bcrypt-js/prebuilds .
 
-FROM arm32v7/node:14-bullseye
+FROM node:14-bullseye
 
 ENV project bcrypt-js
 ENV DEBIAN_FRONTEND noninteractive
