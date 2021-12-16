@@ -27,7 +27,7 @@
   "scripts": {
     "test": "npm ci --build-from-source && jest",
     "install": "node-gyp-build",
-    "build": "prebuildify --napi"
+    "build": "prebuildify --napi --tag-libc --strip"
   },
   "dependencies": {
     "node-addon-api": "^5.0.0",

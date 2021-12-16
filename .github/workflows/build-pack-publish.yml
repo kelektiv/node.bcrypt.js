@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [x64, arm, arm64]
+        arch: [x64, arm, arm64, alpine, alpine-arm, alpine-arm64]
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-qemu-action@v1
@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir prebuilds
           for d in /tmp/prebuilds/*; do
-            mv $d/* prebuilds/
+            cp -Rav $d/* prebuilds/
           done
       - run: chmod a+x prebuilds/*/*.node && find prebuilds -executable -type f
       - run: echo "PACK_FILE=$(npm pack)" >> $GITHUB_ENV
