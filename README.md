@@ -13,6 +13,31 @@ Verify that the node version you are using is a _stable_ version; it has an even
 
 If you are on a stable version of node, please provide a sufficient code snippet or log files for installation issues. The code snippet does not require you to include confidential information. However, it must provide enough information such that the problem can be replicable. Issues which are closed without resolution often lack required information for replication.
 
+## Contents
+- [Version Compatibility](#version-compatibility)
+- [Security Issues And Concerns](#security-issues-and-concerns)
+- [Compatibility Note](#compatibility-note)
+  * [Migrating from v1.0.x](#migrating-from-v10x)
+- [Dependencies](#dependencies)
+- [Install via NPM](#install-via-npm)
+- [Troubleshooting on Apple M1 Macs](#troubleshooting-on-apple-m1-macs)
+- [Usage](#usage)
+  * [async (recommended)](#async--recommended-)
+    + [To hash a password:](#to-hash-a-password-)
+    + [To check a password:](#to-check-a-password-)
+  * [with promises](#with-promises)
+  * [sync](#sync)
+    + [To hash a password:](#to-hash-a-password--1)
+    + [To check a password:](#to-check-a-password--1)
+  * [Why is async mode recommended over sync mode?](#why-is-async-mode-recommended-over-sync-mode-)
+- [API](#api)
+- [A Note on Rounds](#a-note-on-rounds)
+- [A Note on Timing Attacks](#a-note-on-timing-attacks)
+- [Hash Info](#hash-info)
+- [Testing](#testing)
+- [Credits](#credits)
+- [Contributors](#contributors)
+- [License](#license)
 
 ## Version Compatibility
 
@@ -89,6 +114,17 @@ node-pre-gyp ERR! Tried to download(404): https://github.com/kelektiv/node.bcryp
 ```
 
 make sure you have the appropriate dependencies installed and configured for your platform. You can find installation instructions for the dependencies for some common platforms [in this page][depsinstall].
+
+## Troubleshooting on Apple M1 Macs
+
+Users on Apple M1 Macs are supported but need to make sure that there are no spaces or special escapable characters in your entire project path. 
+Currently tested characters are dashes `-` or you can use CamelCase which is also fine. 
+If you get an error similar to this one:
+`npm ERR! node-pre-gyp ERR! node -v v16.13.1` 
+Then it is most likely that you have a space or a special character somewhere in your path. Type you can check it with `pwd`.
+If that is the case just simply rename your project folder or move it to a different folder where the path does not contain any spaces or special characters.
+For example if your path contains a folder named `-=Projects=-` then you are will encounter this issue and you should rename the folder to `Projects`
+Then try `npm install` again.
 
 ## Usage
 
