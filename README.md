@@ -174,6 +174,14 @@ async function checkUser(username, password) {
 }
 ```
 
+### ESM import
+```javascript
+import bcrypt from "bcrypt";
+
+// later
+await bcrypt.compare(password, hash);
+```
+
 ### sync
 
 ```javascript
