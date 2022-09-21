@@ -1,5 +1,6 @@
 # node.bcrypt.js
-[![Build Status](https://travis-ci.org/kelektiv/node.bcrypt.js.svg?branch=master)](https://travis-ci.org/kelektiv/node.bcrypt.js)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/kelektiv/node.bcrypt.js)](https://ci.appveyor.com/project/defunctzombie/node-bcrypt-js-pgo26/branch/master)
+
 [![Dependency Status](https://david-dm.org/kelektiv/node.bcrypt.js.svg)](https://david-dm.org/kelektiv/node.bcrypt.js)
 
 A library to help you hash passwords.
