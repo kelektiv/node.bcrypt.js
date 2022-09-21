@@ -21,7 +21,6 @@ install:
   - where npm
   - where node
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - 'npm install -g npm@latest'
 
 build: off
 
