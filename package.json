@@ -25,7 +25,7 @@
     "url": "https://github.com/kelektiv/node.bcrypt.js/issues"
   },
   "scripts": {
-    "test": "npm install --build-from-source && nodeunit test",
+    "test": "npm ci --build-from-source && nodeunit test",
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "dependencies": {

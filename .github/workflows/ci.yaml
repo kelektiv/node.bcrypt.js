@@ -2,16 +2,18 @@ name: ci
 
 on:
   push:
-    branches: [$default-branch]
+    branches:
+      - master
   pull_request:
-    branches: [$default-branch]
+    branches:
+      - master
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 17.x, 18.x]
+        node-version: [14.x, 16.x, 18.x]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -20,23 +22,22 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: |
-          sudo add-apt-repository -y ubuntu-toolchain-r-test
-          sudo apt-get -y update
-          sudo apt-get install -y python3 make g++-4.8
-      - run: npm ci
-      - run: npm test
+          sudo apt-get install -y python3 make g++
+      - name: Test
+        run: npm test
 
   build-alpine:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [14, 16, 17, 18]
+        node-version: [14, 16, 18]
     container:
       image: node:${{ matrix.node-version }}-alpine
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
-          apk add make g++ python
-      - run: npm ci --unsafe-perm
-      - run: npm test --unsafe-perm
+          apk add make g++ python3
+      - name: Test
+        run: |
+          npm test --unsafe-perm
