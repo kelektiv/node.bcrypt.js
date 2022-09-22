@@ -15,12 +15,10 @@ arch:
 - arm64
 
 node_js:
-- '10'
-- '11'
-- '12'
-- '13'
 - '14'
-- '15'
+- '16'
+- '17'
+- '18'
 
 addons:
   apt:
@@ -59,6 +57,6 @@ deploy:
   file_glob: true
   file: build/stage/kelektiv/node.bcrypt.js/releases/download/*/*
   on:
-    node_js: '10'
+    node_js: '14'
     repo: kelektiv/node.bcrypt.js
     tags: true
