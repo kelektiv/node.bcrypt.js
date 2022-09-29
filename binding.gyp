@@ -35,11 +35,6 @@
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
           }
         }],
-        [ 'OS=="zos"', {
-          'cflags': [
-            '-qascii',
-          ],
-        }],
       ],
     },
     {
