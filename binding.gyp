@@ -38,10 +38,11 @@
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
           }
         }],
-        ['OS=="zos" and NODE_VERSION < 16',{
+        ['OS=="zos" and NODE_VERSION < 17',{
             'cflags': [
               '-qascii',
             ],
+            "defines": [ "NAPI_DISABLE_CPP_EXCEPTIONS" ],
         }],
       ],
     },
