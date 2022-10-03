@@ -87,10 +87,14 @@ module.exports.genSalt = function genSalt(rounds, minor, cb) {
 /// @param {String} salt the salt to use when hashing
 /// @return {String} hash
 module.exports.hashSync = function hashSync(data, salt) {
+
     if (data == null || salt == null) {
         throw new Error('data and salt arguments required');
     }
-
+    
+    if (salt === '') {
+	throw new Error('Salt cannot be empty');
+    }
     if (typeof data !== 'string' || (typeof salt !== 'string' && typeof salt !== 'number')) {
         throw new Error('data must be a string and salt must either be a salt string or a number of rounds');
     }
