@@ -42,5 +42,5 @@ test('test_hash_and_compare', () => {
                     return Promise.all([goodCompare, badCompare]);
                 });
         }));
-})
+}, 10000);
 
