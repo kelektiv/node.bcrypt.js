@@ -1,7 +1,8 @@
 # node.bcrypt.js
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/kelektiv/node.bcrypt.js)](https://ci.appveyor.com/project/defunctzombie/node-bcrypt-js-pgo26/branch/master)
 
-[![Dependency Status](https://david-dm.org/kelektiv/node.bcrypt.js.svg)](https://david-dm.org/kelektiv/node.bcrypt.js)
+[![ci](https://github.com/kelektiv/node.bcrypt.js/actions/workflows/ci.yaml/badge.svg)](https://github.com/kelektiv/node.bcrypt.js/actions/workflows/ci.yaml)
+
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/kelektiv/node.bcrypt.js)](https://ci.appveyor.com/project/defunctzombie/node-bcrypt-js-pgo26/branch/master)
 
 A library to help you hash passwords.
 
@@ -10,12 +11,14 @@ You can read about [bcrypt in Wikipedia][bcryptwiki] as well as in the following
 
 ## If You Are Submitting Bugs or Issues
 
-Verify that the node version you are using is a _stable_ version; it has an even major release number. Unstable versions are currently not supported and issues created while using an unstable version will be closed.
+Please verify that the NodeJS version you are using is a _stable_ version; Unstable versions are currently not supported and issues created while using an unstable version will be closed.
 
-If you are on a stable version of node, please provide a sufficient code snippet or log files for installation issues. The code snippet does not require you to include confidential information. However, it must provide enough information such that the problem can be replicable. Issues which are closed without resolution often lack required information for replication.
+If you are on a stable version of NodeJS, please provide a sufficient code snippet or log files for installation issues. The code snippet does not require you to include confidential information. However, it must provide enough information so the problem can be replicable, or it may be closed without an explanation.
 
 
 ## Version Compatibility
+
+_Please upgrade to atleast v5.0.0 to avoid security issues mentioned below._
 
 | Node Version   |   Bcrypt Version  |
 | -------------- | ------------------|
@@ -37,13 +40,13 @@ gyp ERR! stack Error: "pre" versions of node cannot be installed, use the --node
 
 > Per bcrypt implementation, only the first 72 bytes of a string are used. Any extra bytes are ignored when matching passwords. Note that this is not the first 72 *characters*. It is possible for a string to contain less than 72 characters, while taking up more than 72 bytes (e.g. a UTF-8 encoded string containing emojis).
 
-As should be the case with any security tool, this library should be scrutinized by anyone using it. If you find or suspect an issue with the code, please bring it to my attention and I'll spend some time trying to make sure that this tool is as secure as possible.
+As should be the case with any security tool, anyone using this library should scrutinise it. If you find or suspect an issue with the code, please bring it to the maintainers' attention. We will spend some time ensuring that this library is as secure as possible.
 
-To make it easier for people using this tool to analyze what has been surveyed, here is a list of BCrypt related security issues/concerns as they've come up.
+Here is a list of BCrypt-related security issues/concerns that have come up over the years.
 
 * An [issue with passwords][jtr] was found with a version of the Blowfish algorithm developed for John the Ripper. This is not present in the OpenBSD version and is thus not a problem for this module. HT [zooko][zooko].
 * Versions `< 5.0.0` suffer from bcrypt wrap-around bug and _will truncate passwords >= 255 characters leading to severely weakened passwords_. Please upgrade at  earliest. See [this wiki page][wrap-around-bug] for more details.
-* Versions `< 5.0.0` _do not handle NUL characters inside passwords properly leading to all subsequent characters being dropped and thus resulting in severely  weakened passwords_. Please upgrade at earliest. See [this wiki page][improper-nuls] for more details.
+* Versions `< 5.0.0` _do not handle NUL characters inside passwords properly leading to all subsequent characters being dropped and thus resulting in severely weakened passwords_. Please upgrade at earliest. See [this wiki page][improper-nuls] for more details.
 
 ## Compatibility Note
 
@@ -63,7 +66,7 @@ Hashes generated in `v2.x.x` using the defaults parameters will not work in earl
 * `node-gyp`
  * Please check the dependencies for this tool at: https://github.com/nodejs/node-gyp
   * Windows users will need the options for c# and c++ installed with their visual studio instance.
-  * Python 2.x
+  * Python 2.x/3.x
 * `OpenSSL` - This is only required to build the `bcrypt` project if you are using versions <= 0.7.7. Otherwise, we're using the builtin node crypto bindings for seed data (which use the same OpenSSL code paths we were, but don't have the external dependency).
 
 ## Install via NPM
@@ -75,7 +78,9 @@ npm install bcrypt
 
 _Pre-built binaries for various NodeJS versions are made available on a best-effort basis._
 
-Only the current stable and supported LTS releases are actively tested against. Please note that there may be an interval between the release of the module and the availabilty of the compiled modules.
+Only the current stable and supported LTS releases are actively tested against.
+
+_There may be an interval between the release of the module and the availabilty of the compiled modules._
 
 Currently, we have pre-built binaries that support the following platforms:
 
@@ -140,7 +145,7 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
 
 ### with promises
 
-bcrypt uses whatever Promise implementation is available in `global.Promise`. NodeJS >= 0.12 has a native Promise implementation built in. However, this should work in any Promises/A+ compliant implementation.
+bcrypt uses whatever `Promise` implementation is available in `global.Promise`. NodeJS >= 0.12 has a native `Promise` implementation built in. However, this should work in any Promises/A+ compliant implementation.
 
 Async methods that accept a callback, return a `Promise` when callback is not specified if Promise support is available.
 
@@ -222,7 +227,7 @@ bcrypt.compareSync(someOtherPlaintextPassword, hash); // false
 [A Note on Timing Attacks](#a-note-on-timing-attacks)
 
 ### Why is async mode recommended over sync mode?
-If you are using bcrypt on a simple script, using the sync mode is perfectly fine. However, if you are using bcrypt on a server, the async mode is recommended. This is because the hashing done by bcrypt is CPU intensive, so the sync version will block the event loop and prevent your application from servicing any other inbound requests or events. The async version uses a thread pool which does not block the main event loop.
+We recommend using async API if you use `bcrypt` on a server. Bcrypt hashing is CPU intensive which will cause the sync APIs to block the event loop and prevent your application from servicing any inbound requests or events. The async version uses a thread pool which does not block the main event loop.
 
 ## API
 
@@ -260,7 +265,7 @@ If you are using bcrypt on a simple script, using the sync mode is perfectly fin
 
 ## A Note on Rounds
 
-A note about the cost. When you are hashing your data the module will go through a series of rounds to give you a secure hash. The value you submit there is not just the number of rounds that the module will go through to hash your data. The module will use the value you enter and go through `2^rounds` iterations of processing.
+A note about the cost: when you are hashing your data, the module will go through a series of rounds to give you a secure hash. The value you submit is not just the number of rounds the module will go through to hash your data. The module will use the value you enter and go through `2^rounds` hashing iterations.
 
 From @garthk, on a 2GHz core you can roughly expect:
 
@@ -278,7 +283,7 @@ From @garthk, on a 2GHz core you can roughly expect:
 
 ## A Note on Timing Attacks
 
-Because it's come up multiple times in this project, and other bcrypt projects, it needs to be said. The bcrypt comparison function is not susceptible to timing attacks. From codahale/bcrypt-ruby#42:
+Because it's come up multiple times in this project and other bcrypt projects, it needs to be said. The `bcrypt` library is not susceptible to timing attacks. From codahale/bcrypt-ruby#42:
 
 > One of the desired properties of a cryptographic hash function is preimage attack resistance, which means there is no shortcut for generating a message which, when hashed, produces a specific digest.
 
@@ -286,7 +291,7 @@ A great thread on this, in much more detail can be found @ codahale/bcrypt-ruby#
 
 If you're unfamiliar with timing attacks and want to learn more you can find a great writeup @ [A Lesson In Timing Attacks][timingatk]
 
-However, timing attacks are real. And, the comparison function is _not_ time safe. What that means is that it may exit the function early in the comparison process. This happens because of the above. We don't need to be careful that an attacker is going to learn anything, and our comparison function serves to provide a comparison of hashes, it is a utility to the overall purpose of the library. If you end up using it for something else we cannot guarantee the security of the comparator. Keep that in mind as you use the library.
+However, timing attacks are real. And the comparison function is _not_ time safe. That means that it may exit the function early in the comparison process. Timing attacks happen because of the above. We don't need to be careful that an attacker will learn anything, and our comparison function provides a comparison of hashes. It is a utility to the overall purpose of the library. If you end up using it for something else, we cannot guarantee the security of the comparator. Keep that in mind as you use the library.
 
 ## Hash Info
 
@@ -348,7 +353,7 @@ The code for this comes from a few sources:
 * [Nate Rajlich][tootallnate] - Bindings and build process.
 * [Sean McArthur][seanmonstar] - Windows Support
 * [Fanie Oosthuysen][weareu] - Windows Support
-* [Amitosh Swain Mahapatra][agathver] - $2b$ hash support, ES6 Promise support
+* [Amitosh Swain Mahapatra][recrsn] - $2b$ hash support, ES6 Promise support
 * [Nicola Del Gobbo][NickNaso] - Initial implementation with N-API
 
 ## License
@@ -379,5 +384,5 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [tootallnate]:https://github.com/tootallnate
 [seanmonstar]:https://github.com/seanmonstar
 [weareu]:https://github.com/weareu
-[agathver]:https://github.com/Agathver
+[recrsn]:https://github.com/recrsn
 [NickNaso]: https://github.com/NickNaso
