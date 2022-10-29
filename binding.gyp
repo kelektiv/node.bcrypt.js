@@ -1,4 +1,7 @@
 {
+  "variables": {
+    "NODE_VERSION%":"<!(node -p \"process.versions.node.split(\\\".\\\")[0]\")"
+  },
   'targets': [
     {
       'target_name': 'bcrypt_lib',
@@ -35,10 +38,11 @@
             'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES', # -fvisibility=hidden
           }
         }],
-        [ 'OS=="zos"', {
-          'cflags': [
-            '-qascii',
-          ],
+        ['OS=="zos" and NODE_VERSION <= 16',{
+            'cflags': [
+              '-qascii',
+            ],
+            'defines': ["NAPI_DISABLE_CPP_EXCEPTIONS"],
         }],
       ],
     },
