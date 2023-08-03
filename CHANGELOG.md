@@ -1,4 +1,7 @@
 # 5.1.0 (2022-10-06)
+  * Update `node-pre-gyp` to 1.0.11
+
+# 5.1.0 (2022-10-06)
   * Update `node-pre-gyp` to 1.0.10
   * Replace `nodeunit` with `jest` as the testing library
 
