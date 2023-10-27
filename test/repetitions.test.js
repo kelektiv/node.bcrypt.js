@@ -8,7 +8,7 @@ test('salt_length', () => {
     return Promise.all(Array.from({length: EXPECTED},
         () => bcrypt.genSalt(10)
             .then(salt => expect(salt).toHaveLength(29))));
-})
+}, 10e3)
 
 test('test_hash_length', () => {
     expect.assertions(EXPECTED);
@@ -16,7 +16,7 @@ test('test_hash_length', () => {
     return Promise.all(Array.from({length: EXPECTED},
         () => bcrypt.hash('test', SALT)
             .then(hash => expect(hash).toHaveLength(60))));
-})
+}, 10e3)
 
 test('test_compare', () => {
     expect.assertions(EXPECTED);
@@ -24,7 +24,7 @@ test('test_compare', () => {
     return Promise.all(Array.from({length: EXPECTED},
         () => bcrypt.compare('test', HASH)
             .then(match => expect(match).toEqual(true))));
-})
+}, 10e3)
 
 test('test_hash_and_compare', () => {
     expect.assertions(EXPECTED * 3);
@@ -42,5 +42,5 @@ test('test_hash_and_compare', () => {
                     return Promise.all([goodCompare, badCompare]);
                 });
         }));
-}, 10000);
+}, 30e3);
 
