@@ -11,29 +11,50 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        arch: [x64, arm, arm64, alpine, alpine-arm, alpine-arm64]
+        os: [linux]
+        arch: [amd64, arm64, arm]
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-qemu-action@v1
         with:
           image: tonistiigi/binfmt:latest
-          platforms: arm,arm64  #all
-      - run: docker build . -f ./Dockerfile-${{ matrix.arch }}
-             --tag node-bcrypt-builder-${{ matrix.arch }}
-      - run: docker create --name node-bcryptjs-builder node-bcrypt-builder-${{ matrix.arch }}
+          platforms: arm,arm64
+
+      - run: >
+          docker build .
+          --tag node-bcrypt-builder
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+      - run: >
+          docker create
+          --name node-bcryptjs-builder
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+          node-bcrypt-builder
       - run: docker cp "node-bcryptjs-builder:/usr/local/opt/bcrypt-js/prebuilds" .
+
+      # build for Alpine:
+      - run: >
+          docker build -f Dockerfile-alpine .
+          --tag node-bcrypt-builder-alpine
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+      - run: >
+          docker create
+          --name node-bcryptjs-builder-alpine
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+          node-bcrypt-builder-alpine
+      - run: docker cp "node-bcryptjs-builder-alpine:/usr/local/opt/bcrypt-js/prebuilds" .
+
       - run: find prebuilds
       - uses: actions/upload-artifact@v2
         with:
-          name: prebuild-${{ matrix.arch }}
+          name: prebuild-${{ matrix.os }}-${{ matrix.arch }}
           path: ./prebuilds
 
   pack:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -60,7 +81,7 @@ jobs:
   publish-npm:
     needs: pack
     if: github.event_name == 'release'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -78,7 +99,7 @@ jobs:
   publish-gpr:
     needs: pack
     if: github.event_name == 'release'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       packages: write

@@ -1,11 +1,24 @@
 # Usage:
 #
-#   docker build -t bcryptjs-linux-arm-builder -f Dockerfile-arm .
-#   docker create --name donut bcryptjs-linux-arm-builder
+#   docker build -t bcryptjs-builder .
+#   CONTAINER=$(docker create bcryptjs-builder)
 #   # Then copy the artifact to your host:
-#   docker cp donut:/usr/local/opt/bcrypt-js/prebuilds .
+#   docker cp "$CONTAINER:/usr/local/opt/bcrypt-js/prebuilds" .
+#   docker rm "$CONTAINER"
+#
+# Use --platform to build cross-platform i.e. for ARM:
+#
+#   docker build -t bcryptjs-builder --platform "linux/arm64/v8" .
+#   CONTAINER=$docker create --platform "linux/arm64/v8" bcryptjs-builder)
+#   # this copies the prebuilds/linux-arm artifacts
+#   docker cp "$CONTAINER:/usr/local/opt/bcrypt-js/prebuilds" .
+#   docker rm "$CONTAINER"
 
-FROM arm32v7/node:16-bullseye
+
+ARG FROM_IMAGE=node:18-bullseye
+#ARG FROM_IMAGE=arm32v7/node:16-bullseye
+#ARG FROM_IMAGE=arm64v8/node:16-bullseye
+FROM ${FROM_IMAGE}
 
 ENV project bcrypt-js
 ENV DEBIAN_FRONTEND noninteractive

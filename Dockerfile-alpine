@@ -6,7 +6,8 @@
 #   docker cp "$CONTAINER:/usr/local/opt/bcrypt-js/prebuilds" .
 #   docker rm "$CONTAINER"
 
-FROM node:16-alpine
+ARG FROM_IMAGE=node:18-alpine
+FROM ${FROM_IMAGE}
 
 ENV project bcrypt-js
 ENV DEBIAN_FRONTEND noninteractive
