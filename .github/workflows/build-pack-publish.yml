@@ -17,8 +17,8 @@ jobs:
         os: [linux]
         arch: [amd64, arm64, arm]
     steps:
-      - uses: actions/checkout@v2
-      - uses: docker/setup-qemu-action@v1
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
         with:
           image: tonistiigi/binfmt:latest
           platforms: arm,arm64
@@ -47,7 +47,7 @@ jobs:
       - run: docker cp "node-bcryptjs-builder-alpine:/usr/local/opt/bcrypt-js/prebuilds" .
 
       - run: find prebuilds
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: prebuild-${{ matrix.os }}-${{ matrix.arch }}
           path: ./prebuilds
@@ -56,8 +56,8 @@ jobs:
     needs: build
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
@@ -73,7 +73,7 @@ jobs:
           done
       - run: chmod a+x prebuilds/*/*.node && find prebuilds -executable -type f
       - run: echo "PACK_FILE=$(npm pack)" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: package-tgz
           path: ${{ env.PACK_FILE }}
@@ -83,8 +83,8 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
@@ -104,8 +104,8 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
           node-version: 20
           registry-url: https://npm.pkg.github.com/
