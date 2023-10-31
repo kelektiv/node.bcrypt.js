@@ -9,7 +9,7 @@ compile:
 	npm run install
 
 test: build
-	@./node_modules/nodeunit/bin/nodeunit \
+	@./node_modules/.bin/jest \
 		$(TESTS)
 
 clean:
