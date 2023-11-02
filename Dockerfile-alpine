@@ -29,6 +29,7 @@ RUN echo "#log: ${project}: Running build" \
   && npm run build
 
 ARG RUN_TESTS=true
+ARG TEST_TIMEOUT_SECONDS=
 
 RUN if "${RUN_TESTS}"; then \
     echo "#log ${project}: Running tests" \

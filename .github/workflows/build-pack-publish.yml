@@ -25,6 +25,7 @@ jobs:
 
       - run: >
           docker build .
+          --build-arg TEST_TIMEOUT_SECONDS=30
           --tag node-bcrypt-builder
           --platform ${{ matrix.os }}/${{ matrix.arch }}
       - run: >
@@ -37,6 +38,7 @@ jobs:
       # build for Alpine:
       - run: >
           docker build -f Dockerfile-alpine .
+          --build-arg TEST_TIMEOUT_SECONDS=30
           --tag node-bcrypt-builder-alpine
           --platform ${{ matrix.os }}/${{ matrix.arch }}
       - run: >
