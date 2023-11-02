@@ -25,12 +25,13 @@
     "url": "https://github.com/kelektiv/node.bcrypt.js/issues"
   },
   "scripts": {
-    "test": "npm ci --build-from-source && jest",
-    "install": "node-pre-gyp install --fallback-to-build"
+    "test": "jest",
+    "install": "node-gyp-build",
+    "build": "prebuildify --napi --tag-libc --strip"
   },
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^1.0.11",
-    "node-addon-api": "^5.0.0"
+    "node-addon-api": "^5.0.0",
+    "node-gyp-build": "^4.2.3"
   },
   "devDependencies": {
     "jest": "^29.6.2"
@@ -55,13 +56,6 @@
     "Nicola Del Gobbo <nicoladelgobbo@gmail.com> (https://github.com/NickNaso)"
   ],
   "binary": {
-    "module_name": "bcrypt_lib",
-    "module_path": "./lib/binding/napi-v{napi_build_version}-{platform}-{arch}-{libc}",
-    "package_name": "{module_name}-v{version}-napi-v{napi_build_version}-{platform}-{arch}-{libc}.tar.gz",
-    "host": "https://github.com",
-    "remote_path": "kelektiv/node.bcrypt.js/releases/download/v{version}",
-    "napi_versions": [
-      3
-    ]
+    "module_name": "bcrypt_lib"
   }
 }

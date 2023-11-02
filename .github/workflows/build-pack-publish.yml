@@ -1,0 +1,124 @@
+name: Prebuildify, package, publish
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  release:
+    types: [ prereleased, released ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        os: [linux]
+        arch: [amd64, arm64, arm]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: arm,arm64
+
+      - run: >
+          docker build .
+          --build-arg TEST_TIMEOUT_SECONDS=30
+          --tag node-bcrypt-builder
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+      - run: >
+          docker create
+          --name node-bcryptjs-builder
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+          node-bcrypt-builder
+      - run: docker cp "node-bcryptjs-builder:/usr/local/opt/bcrypt-js/prebuilds" .
+
+      # build for Alpine:
+      - run: >
+          docker build -f Dockerfile-alpine .
+          --build-arg TEST_TIMEOUT_SECONDS=30
+          --tag node-bcrypt-builder-alpine
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+      - run: >
+          docker create
+          --name node-bcryptjs-builder-alpine
+          --platform ${{ matrix.os }}/${{ matrix.arch }}
+          node-bcrypt-builder-alpine
+      - run: docker cp "node-bcryptjs-builder-alpine:/usr/local/opt/bcrypt-js/prebuilds" .
+
+      - run: find prebuilds
+      - uses: actions/upload-artifact@v3
+        with:
+          name: prebuild-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./prebuilds
+
+  pack:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - uses: actions/download-artifact@v2
+        with:
+          path: /tmp/prebuilds/
+      - name: Coalesce prebuilds from build matrix
+        run: |
+          mkdir prebuilds
+          for d in /tmp/prebuilds/*; do
+            cp -Rav $d/* prebuilds/
+          done
+      - run: chmod a+x prebuilds/*/*.node && find prebuilds -executable -type f
+      - run: echo "PACK_FILE=$(npm pack)" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v3
+        with:
+          name: package-tgz
+          path: ${{ env.PACK_FILE }}
+
+  publish-npm:
+    needs: pack
+    if: github.event_name == 'release'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-tgz
+          path: /tmp/package/
+      - run: npm publish /tmp/package/bcrypt*.tgz
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+  publish-gpr:
+    needs: pack
+    if: github.event_name == 'release'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+      - uses: actions/download-artifact@v2
+        with:
+          name: package-tgz
+          path: /tmp/package/
+      - run: npm publish /tmp/package/bcrypt*.tgz
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+
+
+

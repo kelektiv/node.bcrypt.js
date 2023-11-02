@@ -1,6 +1,15 @@
 const bcrypt = require('../bcrypt');
 
 const EXPECTED = 2500; //number of times to iterate these tests.)
+const { TEST_TIMEOUT_SECONDS } = process.env;
+let timeout = 5e3; // default test timeout
+
+// it is necessary to increase the test timeout when emulating cross-architecture
+// environments (i.e. arm64 from x86-64 host) which have significantly reduced performance:
+if ( TEST_TIMEOUT_SECONDS )
+    timeout = Number.parseInt(TEST_TIMEOUT_SECONDS, 10) * 1e3;
+
+jest.setTimeout(timeout);
 
 test('salt_length', () => {
     expect.assertions(EXPECTED);
@@ -42,5 +51,5 @@ test('test_hash_and_compare', () => {
                     return Promise.all([goodCompare, badCompare]);
                 });
         }));
-}, 10000);
+}, timeout * 3);
 

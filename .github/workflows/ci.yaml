@@ -13,16 +13,14 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [18, 20]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: |
-          sudo apt-get install -y python3 make g++
+      - run: npm ci
       - name: Test
         run: npm test
 
@@ -30,14 +28,15 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [14, 16, 18]
+        node-version: [18, 20]
     container:
       image: node:${{ matrix.node-version }}-alpine
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           apk add make g++ python3
+      - run: npm ci
       - name: Test
         run: |
           npm test --unsafe-perm

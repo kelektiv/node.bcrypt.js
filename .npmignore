@@ -1,0 +1,3 @@
+.lock*
+build*/
+*.sw[a-z]
