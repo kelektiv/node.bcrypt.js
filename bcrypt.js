@@ -80,6 +80,65 @@ module.exports.genSalt = function genSalt(rounds, minor, cb) {
     });
 };
 
+module.exports.genSaltByTime = function genSaltByTime(exptime, minor, cb) {
+    var error;
+    var rounds = 10;
+    // if callback is first argument, then use defaults for others
+    if (typeof arguments[0] === 'function') {
+        // have to set callback first otherwise arguments are overriden
+        cb = arguments[0];
+        exptime = 100;
+        minor = 'b';
+        // callback is second argument
+    } else if (typeof arguments[1] === 'function') {
+        // have to set callback first otherwise arguments are overriden
+        cb = arguments[1];
+        minor = 'b';
+    }
+
+    if (!cb) {
+        return promises.promise(genSaltByTime, this, [exptime, minor]);
+    }
+
+    // default 100 milliseconds and minimum 4 miliseconds
+    if (!exptime) {
+        exptime = 100;
+    } else if (exptime < 4) {
+        exptime = 4;
+    } else if (typeof exptime !== 'number') {
+        // callback error asynchronously
+        error = new Error('Expected time must be a number');
+        return process.nextTick(function() {
+            cb(error);
+        });
+    }
+
+    if (!minor) {
+        minor = 'b'
+    } else if (minor !== 'b' && minor !== 'a') {
+        error = new Error('minor must be either "a" or "b"');
+        return process.nextTick(function() {
+            cb(error);
+        });
+    }
+
+    crypto.randomBytes(16, function(error, randomBytes) {
+        if (error) {
+            cb(error);
+            return;
+        }
+
+        //since the relation b/w expected time and rounds roughly follows exptime = 2^(rounds-3)
+        //rounds is equal to log2(exptime)+3
+        rounds = Math.log(exptime)/Math.log(2);
+        rounds = Math.round(rounds)+3;
+        // for a secure hash, taking 4 as minimum rounds
+        rounds = Math.max(rounds, 4);
+
+        bindings.gen_salt(minor, rounds, randomBytes, cb);
+    });
+};
+
 /// hash data using a salt
 /// @param {String|Buffer} data the data to encrypt
 /// @param {String} salt the salt to use when hashing
@@ -148,6 +207,57 @@ module.exports.hash = function hash(data, salt, cb) {
 
     if (typeof salt === 'number') {
         return module.exports.genSalt(salt, function(err, salt) {
+            return bindings.encrypt(data, salt, cb);
+        });
+    }
+
+    return bindings.encrypt(data, salt, cb);
+};
+
+module.exports.hashByTime = function hashByTime(data, salt, cb) {
+    var error;
+
+    if (typeof data === 'function') {
+        error = new Error('data must be a string or Buffer and salt must either be a salt string or a number of rounds');
+        return process.nextTick(function() {
+            data(error);
+        });
+    }
+
+    if (typeof salt === 'function') {
+        error = new Error('data must be a string or Buffer and salt must either be a salt string or a number of rounds');
+        return process.nextTick(function() {
+            salt(error);
+        });
+    }
+
+    // cb exists but is not a function
+    // return a rejecting promise
+    if (cb && typeof cb !== 'function') {
+        return promises.reject(new Error('cb must be a function or null to return a Promise'));
+    }
+
+    if (!cb) {
+        return promises.promise(hashByTime, this, [data, salt]);
+    }
+
+    if (data == null || salt == null) {
+        error = new Error('data and salt arguments required');
+        return process.nextTick(function() {
+            cb(error);
+        });
+    }
+
+    if (!(typeof data === 'string' || data instanceof Buffer) || (typeof salt !== 'string' && typeof salt !== 'number')) {
+        error = new Error('data must be a string or Buffer and salt must either be a salt string or a number of rounds');
+        return process.nextTick(function() {
+            cb(error);
+        });
+    }
+
+
+    if (typeof salt === 'number') {
+        return module.exports.genSaltByTime(salt, function(err, salt) {
             return bindings.encrypt(data, salt, cb);
         });
     }

@@ -129,6 +129,15 @@ bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
 
 Note that both techniques achieve the same end-result.
 
+Technique 3 (same as technique 2 but defining work in terms of time (not rounds)):
+
+exptime = maximum time allotted for hashing  [#787](https://github.com/kelektiv/node.bcrypt.js/issues/787)
+```javascript
+bcrypt.hashByTime(myPlaintextPassword, expTime, function(err, hash) {
+    // Store hash in your password DB.
+});
+```
+
 #### To check a password:
 
 ```javascript
