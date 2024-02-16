@@ -1,4 +1,7 @@
-# 5.1.0 (2022-10-06)
+# 5.2.0 (2024-02-16)
+  * Support cross-platform builds (linux-x64, arm64 and arm32)
+
+# 5.1.1 (2022-10-06)
   * Update `node-pre-gyp` to 1.0.11
 
 # 5.1.0 (2022-10-06)
