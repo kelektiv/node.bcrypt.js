@@ -15,12 +15,12 @@ var bcrypt = require('../bcrypt');
     console.log('rounds used from hash:', bcrypt.getRounds(crypted));
 
     // compare
-    const res = await bcrypt.compare('test', crypted)
+    let res = await bcrypt.compare('test', crypted)
     console.log('compared true: ' + res);
     console.log('compared true cb end: ' + (Date.now() - start) + 'ms');
 
     // compare
-    const res = await bcrypt.compare('bacon', crypted)
+    res = await bcrypt.compare('bacon', crypted)
     console.log('compared false: ' + res);
     console.log('compared false cb end: ' + (Date.now() - start) + 'ms');
 
