@@ -16,7 +16,7 @@ ENV LANG ${LC_ALL}
 
 RUN echo "#log: ${project}: Setup system" \
   && set -x \
-  && apk add --update build-base python3 \
+  && apk add --update build-base python3 py3-setuptools \
   && sync
 
 ADD . /usr/local/opt/${project}

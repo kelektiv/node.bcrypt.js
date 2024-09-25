@@ -31,6 +31,7 @@ RUN echo "#log: ${project}: Setup system" \
   && apt-get install -y \
     build-essential \
     python3 \
+    python3-distutils \
   && apt-get clean \
   && update-alternatives --install /usr/local/bin/python python /usr/bin/python3 20 \
   && sync
