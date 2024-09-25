@@ -9,8 +9,8 @@ if [ -n "$CLEAN" ]; then
   rm -rf prebuilds
 fi
 
-npm i -g prebuildify@5 node-gyp@9
-npm ci
+npm install --include=dev
+npm ci --include=dev
 #npm run build
 
 for PLATFORM in linux/amd64 linux/arm64/v8 linux/arm/v7; do

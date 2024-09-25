@@ -33,7 +33,6 @@ RUN echo "#log: ${project}: Setup system" \
     python3 \
   && apt-get clean \
   && update-alternatives --install /usr/local/bin/python python /usr/bin/python3 20 \
-  && npm i -g prebuildify@5 node-gyp@9 \
   && sync
 
 ADD . /usr/local/opt/${project}
@@ -41,7 +40,7 @@ WORKDIR /usr/local/opt/${project}
 
 RUN echo "#log: ${project}: Running build" \
   && set -x \
-  && npm ci \
+  && npm ci --include=dev \
   && npm run build
 
 ARG RUN_TESTS=true
