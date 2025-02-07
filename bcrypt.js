@@ -35,13 +35,13 @@ module.exports.genSalt = function genSalt(rounds, minor, cb) {
 
     // if callback is first argument, then use defaults for others
     if (typeof arguments[0] === 'function') {
-        // have to set callback first otherwise arguments are overriden
+        // have to set callback first otherwise arguments are overridden
         cb = arguments[0];
         rounds = 10;
         minor = 'b';
     // callback is second argument
     } else if (typeof arguments[1] === 'function') {
-        // have to set callback first otherwise arguments are overriden
+        // have to set callback first otherwise arguments are overridden
         cb = arguments[1];
         minor = 'b';
     }
