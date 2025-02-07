@@ -9,7 +9,7 @@ var bcrypt = require('../bcrypt');
     console.log('salt cb end: ' + (Date.now() - start) + 'ms');
 
     // hash
-    const crypted = await bcrypt.hash('test', salt) 
+    const crypted = await bcrypt.hash('test', salt)
     console.log('crypted: ' + crypted);
     console.log('crypted cb end: ' + (Date.now() - start) + 'ms');
     console.log('rounds used from hash:', bcrypt.getRounds(crypted));
