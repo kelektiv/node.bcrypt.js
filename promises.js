@@ -1,14 +1,11 @@
-'use strict';
-
-var Promise = global.Promise;
+let Promise = global.Promise;
 
 /// encapsulate a method with a node-style callback in a Promise
 /// @param {object} 'this' of the encapsulated function
 /// @param {function} function to be encapsulated
 /// @param {Array-like} args to be passed to the called function
 /// @return {Promise} a Promise encapsulating the function
-module.exports.promise = function (fn, context, args) {
-
+function promise(fn, context, args) {
     if (!Array.isArray(args)) {
         args = Array.prototype.slice.call(args);
     }
@@ -17,8 +14,8 @@ module.exports.promise = function (fn, context, args) {
         return Promise.reject(new Error('fn must be a function'));
     }
 
-    return new Promise(function(resolve, reject) {
-        args.push(function(err, data) {
+    return new Promise((resolve, reject) => {
+        args.push((err, data) => {
             if (err) {
                 reject(err);
             } else {
@@ -28,15 +25,21 @@ module.exports.promise = function (fn, context, args) {
 
         fn.apply(context, args);
     });
-};
+}
 
 /// @param {err} the error to be thrown
-module.exports.reject = function (err) {
+function reject(err) {
     return Promise.reject(err);
-};
+}
 
 /// changes the promise implementation that bcrypt uses
 /// @param {Promise} the implementation to use
-module.exports.use = function(promise) {
-  Promise = promise;
-};
+function use(promise) {
+    Promise = promise;
+}
+
+module.exports = {
+    promise,
+    reject,
+    use
+}
