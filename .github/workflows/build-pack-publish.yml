@@ -16,12 +16,12 @@ jobs:
       - uses: actions/checkout@v4
       # This is unsafe, but we really don't use any other native dependencies
       - run: npm ci
-      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/almalinux-devtoolset11 npx prebuildify --napi --tag-libc --strip
-      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/alpine npx prebuildify --napi --tag-libc --strip
-      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-armv7 npx prebuildify --napi --tag-libc --strip
-      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-armv7l-musl npx prebuildify --napi --tag-libc --strip
-      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-arm64 npx prebuildify --napi --tag-libc --strip
-      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-arm64-musl npx prebuildify --napi --tag-libc --strip
+      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/almalinux-devtoolset11 npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
+      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/alpine npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
+      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-armv7 npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
+      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-armv7l-musl npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
+      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-arm64 npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
+      - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-arm64-musl npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
       - run: find prebuilds
       - uses: actions/upload-artifact@v4
         with:
