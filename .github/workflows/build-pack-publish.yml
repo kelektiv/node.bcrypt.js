@@ -37,8 +37,8 @@ jobs:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      - run: npx prebuildify --napi --strip --arch=ia32
-      - run: npx prebuildify --napi --strip --arch=x64
+      - run: npx prebuildify --napi --strip --arch=ia32 --target=node@18.0.0
+      - run: npx prebuildify --napi --strip --arch=x64 --target=node@18.0.0
       - run: dir prebuilds
       - uses: actions/upload-artifact@v4
         with:
@@ -54,7 +54,7 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      - run: npx prebuildify --napi --strip --arch=arm64
+      - run: npx prebuildify --napi --strip --arch=arm64 --target=node@20.0.0
       - run: dir prebuilds
       - uses: actions/upload-artifact@v4
         with:
@@ -70,8 +70,8 @@ jobs:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      - run: npx prebuildify --napi --strip --arch=arm64
-      - run: npx prebuildify --napi --strip --arch=x64
+      - run: npx prebuildify --napi --strip --arch=arm64 --target=node@18.0.0
+      - run: npx prebuildify --napi --strip --arch=x64 --target=node@18.0.0
       - run: find prebuilds
       - uses: actions/upload-artifact@v4
         with:
