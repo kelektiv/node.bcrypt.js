@@ -67,6 +67,8 @@ jobs:
       - build-windows
       - build-macos
     runs-on: ubuntu-latest
+    outputs:
+        PACK_FILE: ${{ steps.pack.outputs.PACK_FILE }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -79,8 +81,30 @@ jobs:
             cp -Rav $d/* prebuilds/
           done
       - run: chmod a+x prebuilds/*/*.node && find prebuilds -executable -type f
-      - run: echo "PACK_FILE=$(npm pack)" >> $GITHUB_ENV
+      - id: pack
+        name: Prepare NPM package
+        run: |
+          echo "PACK_FILE=$(npm pack)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: package-tgz
-          path: ${{ env.PACK_FILE }}
+          path: ${{ steps.pack.outputs.PACK_FILE }}
+          if-no-files-found: 'error'
+
+  test-package:
+    needs: pack
+    strategy:
+      matrix:
+        node-version: [ 18, 20, 22, 23 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-tgz
+      - run: npm install ${{ needs.pack.outputs.PACK_FILE }}
+      - run: node -e "const b = require('bcrypt'); const h = b.hashSync('hello', 10); console.log(h, b.compareSync('hello', h))"

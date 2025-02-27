@@ -1,4 +1,4 @@
-var bcrypt = require('../bcrypt');
+const bcrypt = require('../bcrypt');
 
 (async () => {
     const start = Date.now();
