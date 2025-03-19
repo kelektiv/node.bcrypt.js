@@ -1,3 +1,9 @@
+# 6.0.0 (2025-02-28)
+  * Drop support for NodeJS <= 16
+  * Remove `node-pre-gyp` in favor of `prebuildify`, prebuilt binaries are now shipped with the package
+  * Update `node-addon-api` to 8.3.0
+  * Update JS code to newer ES syntax
+
 # 5.1.0 (2022-10-06)
   * Update `node-pre-gyp` to 1.0.11
 
