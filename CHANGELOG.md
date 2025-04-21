@@ -4,7 +4,7 @@
   * Update `node-addon-api` to 8.3.0
   * Update JS code to newer ES syntax
 
-# 5.1.0 (2022-10-06)
+# 5.1.1 (2022-10-06)
   * Update `node-pre-gyp` to 1.0.11
 
 # 5.1.0 (2022-10-06)
