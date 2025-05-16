@@ -18,7 +18,7 @@ If you are on a stable version of NodeJS, please provide a sufficient code snipp
 
 ## Version Compatibility
 
-_Please upgrade to atleast v5.0.0 to avoid security issues mentioned below._
+_Please upgrade to at least v5.0.0 to avoid security issues mentioned below._
 
 | Node Version   |   Bcrypt Version  |
 | -------------- | ------------------|
@@ -29,6 +29,7 @@ _Please upgrade to atleast v5.0.0 to avoid security issues mentioned below._
 | 8              | >= 1.0.3 < 4.0.0  |
 | 10, 11         | >= 3              |
 | 12 onwards     | >= 3.0.6          |
+| 18 onwards     | >= 6.0.0          |
 
 `node-gyp` only works with stable/released versions of node. Since the `bcrypt` module uses `node-gyp` to build and install, you'll need a stable version of node to use bcrypt. If you do not, you'll likely see an error that starts with:
 
@@ -78,15 +79,15 @@ npm install bcrypt
 
 _Pre-built binaries for various NodeJS versions are made available on a best-effort basis._
 
-Only the current stable and supported LTS releases are actively tested against.
+Only the current stable and supported LTS releases (Node 18+) are actively tested against.
 
 _There may be an interval between the release of the module and the availabilty of the compiled modules._
 
 Currently, we have pre-built binaries that support the following platforms:
 
-1. Windows x32 and x64
-2. Linux x64 (GlibC and musl)
-3. macOS
+1. Windows x64 and arm64
+2. Linux x64 and arm64 (GlibC and musl)
+3. macOS x64 and arm64
 
 If you face an error like this:
 
@@ -94,7 +95,7 @@ If you face an error like this:
 node-pre-gyp ERR! Tried to download(404): https://github.com/kelektiv/node.bcrypt.js/releases/download/v1.0.2/bcrypt_lib-v1.0.2-node-v48-linux-x64.tar.gz
 ```
 
-make sure you have the appropriate dependencies installed and configured for your platform. You can find installation instructions for the dependencies for some common platforms [in this page][depsinstall].
+Make sure you have the appropriate dependencies installed and configured for your platform. You can find installation instructions for the dependencies for some common platforms [in this page][depsinstall].
 
 ## Usage
 
@@ -145,9 +146,17 @@ bcrypt.compare(someOtherPlaintextPassword, hash, function(err, result) {
 
 ### with promises
 
-bcrypt uses whatever `Promise` implementation is available in `global.Promise`. NodeJS >= 0.12 has a native `Promise` implementation built in. However, this should work in any Promises/A+ compliant implementation.
+bcrypt uses whatever `Promise` implementation is available in `global.Promise`. NodeJS has a native `Promise` implementation built in. However, this should work in any Promises/A+ compliant implementation.
 
-Async methods that accept a callback, return a `Promise` when callback is not specified if Promise support is available.
+Async methods that accept a callback, return a `Promise` when the callback is not specified if Promise support is available.
+
+The Promise implementation can be customized using the `bcrypt.promises.use()` method:
+
+```javascript
+// Example: Using a custom Promise implementation
+const bluebird = require('bluebird');
+bcrypt.promises.use(bluebird);
+```
 
 ```javascript
 bcrypt.hash(myPlaintextPassword, saltRounds).then(function(hash) {
@@ -239,29 +248,31 @@ We recommend using async API if you use `bcrypt` on a server. Bcrypt hashing is 
   * `genSalt(rounds, minor, cb)`
     * `rounds` - [OPTIONAL] - the cost of processing the data. (default - 10)
     * `minor` - [OPTIONAL] - minor version of bcrypt to use. (default - b)
-    * `cb` - [OPTIONAL] - a callback to be fired once the salt has been generated. uses eio making it asynchronous. If `cb` is not specified, a `Promise` is returned if Promise support is available.
+    * `cb` - [OPTIONAL] - a callback to be fired once the salt has been generated. If `cb` is not specified, a `Promise` is returned if Promise support is available.
       * `err` - First parameter to the callback detailing any errors.
       * `salt` - Second parameter to the callback providing the generated salt.
   * `hashSync(data, salt)`
-    * `data` - [REQUIRED] - the data to be encrypted.
-    * `salt` - [REQUIRED] - the salt to be used to hash the password. if specified as a number then a salt will be generated with the specified number of rounds and used (see example under **Usage**).
+    * `data` - [REQUIRED] - the data to be encrypted (string or Buffer).
+    * `salt` - [REQUIRED] - the salt to be used to hash the password. If specified as a number then a salt will be generated with the specified number of rounds and used (see example under **Usage**).
   * `hash(data, salt, cb)`
-    * `data` - [REQUIRED] - the data to be encrypted.
-    * `salt` - [REQUIRED] - the salt to be used to hash the password. if specified as a number then a salt will be generated with the specified number of rounds and used (see example under **Usage**).
-    * `cb` - [OPTIONAL] - a callback to be fired once the data has been encrypted. uses eio making it asynchronous. If `cb` is not specified, a `Promise` is returned if Promise support is available.
+    * `data` - [REQUIRED] - the data to be encrypted (string or Buffer).
+    * `salt` - [REQUIRED] - the salt to be used to hash the password. If specified as a number then a salt will be generated with the specified number of rounds and used (see example under **Usage**).
+    * `cb` - [OPTIONAL] - a callback to be fired once the data has been encrypted. If `cb` is not specified, a `Promise` is returned if Promise support is available.
       * `err` - First parameter to the callback detailing any errors.
       * `encrypted` - Second parameter to the callback providing the encrypted form.
   * `compareSync(data, encrypted)`
-    * `data` - [REQUIRED] - data to compare.
+    * `data` - [REQUIRED] - data to compare (string or Buffer).
     * `encrypted` - [REQUIRED] - data to be compared to.
   * `compare(data, encrypted, cb)`
-    * `data` - [REQUIRED] - data to compare.
+    * `data` - [REQUIRED] - data to compare (string or Buffer).
     * `encrypted` - [REQUIRED] - data to be compared to.
-    * `cb` - [OPTIONAL] - a callback to be fired once the data has been compared. uses eio making it asynchronous. If `cb` is not specified, a `Promise` is returned if Promise support is available.
+    * `cb` - [OPTIONAL] - a callback to be fired once the data has been compared. If `cb` is not specified, a `Promise` is returned if Promise support is available.
       * `err` - First parameter to the callback detailing any errors.
       * `same` - Second parameter to the callback providing whether the data and encrypted forms match [true | false].
   * `getRounds(encrypted)` - return the number of rounds used to encrypt a given hash
     * `encrypted` - [REQUIRED] - hash from which the number of rounds used should be extracted.
+  * `promises.use(promiseImplementation)` - change the Promise implementation that bcrypt uses
+    * `promiseImplementation` - [REQUIRED] - a Promises/A+ compatible implementation to be used.
 
 ## A Note on Rounds
 
