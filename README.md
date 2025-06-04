@@ -81,7 +81,7 @@ _Pre-built binaries for various NodeJS versions are made available on a best-eff
 
 Only the current stable and supported LTS releases (Node 18+) are actively tested against.
 
-_There may be an interval between the release of the module and the availabilty of the compiled modules._
+_There may be an interval between the release of the module and the availability of the compiled modules._
 
 Currently, we have pre-built binaries that support the following platforms:
 
