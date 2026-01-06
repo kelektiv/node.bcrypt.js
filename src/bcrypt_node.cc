@@ -195,8 +195,20 @@ namespace {
     }
 
     /* COMPARATOR */
+    /* COMPARATOR - constant-time to avoid timing attacks */
     inline bool CompareStrings(const char* s1, const char* s2) {
-        return strcmp(s1, s2) == 0;
+        if (!s1 || !s2) return false;
+        size_t len1 = strlen(s1);
+        size_t len2 = strlen(s2);
+        size_t maxlen = len1 > len2 ? len1 : len2;
+        unsigned char diff = 0;
+        for (size_t i = 0; i < maxlen; i++) {
+            unsigned char c1 = i < len1 ? (unsigned char)s1[i] : 0;
+            unsigned char c2 = i < len2 ? (unsigned char)s2[i] : 0;
+            diff |= c1 ^ c2;
+        }
+        diff |= (unsigned char)(len1 ^ len2);
+        return diff == 0;
     }
 
     class CompareAsyncWorker : public Napi::AsyncWorker {
