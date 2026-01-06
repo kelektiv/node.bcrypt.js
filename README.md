@@ -302,7 +302,7 @@ A great thread on this, in much more detail can be found @ codahale/bcrypt-ruby#
 
 If you're unfamiliar with timing attacks and want to learn more you can find a great writeup @ [A Lesson In Timing Attacks][timingatk]
 
-However, timing attacks are real. And the comparison function is _not_ time safe. That means that it may exit the function early in the comparison process. Timing attacks happen because of the above. We don't need to be careful that an attacker will learn anything, and our comparison function provides a comparison of hashes. It is a utility to the overall purpose of the library. If you end up using it for something else, we cannot guarantee the security of the comparator. Keep that in mind as you use the library.
+However, the comparison function is _not_ time safe (constant-time), as it may exit early when a mismatch is found. Normally, this could enable a timing attack, but because it compares full bcrypt hash digests rather than raw passwords, and hashes are preimage-resistant, an attacker cannot gain any information about the stored hash. If you use the comparison function outside the bcrypt library, we cannot guarantee its security. Keep this in mind when using the library.
 
 ## Hash Info
 
