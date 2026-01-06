@@ -13,6 +13,32 @@
 
 namespace {
 
+    /**
+     * Securely clear a string to prevent sensitive data from remaining in memory.
+     * Uses volatile pointer to prevent compiler optimization from removing the clearing.
+     * 
+     * This is a defense-in-depth measure following secure coding best practices.
+     */
+    inline void secure_clear_string(std::string& str) {
+        if (str.empty()) return;
+        volatile char* p = &str[0];
+        size_t len = str.size();
+        while (len--) {
+            *p++ = 0;
+        }
+        str.clear();
+    }
+
+    /**
+     * Securely clear a character buffer.
+     */
+    inline void secure_clear_buffer(char* buf, size_t len) {
+        volatile char* p = buf;
+        while (len--) {
+            *p++ = 0;
+        }
+    }
+
     bool ValidateSalt(const char* salt) {
 
         if (!salt || *salt != '$') {
@@ -73,7 +99,9 @@ namespace {
                 : Napi::AsyncWorker(callback, "bcrypt:SaltAsyncWorker"), seed(seed), rounds(rounds), minor_ver(minor_ver) {
             }
 
-            ~SaltAsyncWorker() {}
+            ~SaltAsyncWorker() {
+                secure_clear_string(seed);
+            }
 
             void Execute() {
                 bcrypt_gensalt(minor_ver, rounds, (u_int8_t *)&seed[0], salt);
@@ -144,7 +172,11 @@ namespace {
                 : Napi::AsyncWorker(callback, "bcrypt:EncryptAsyncWorker"), input(input), salt(salt) {
             }
 
-            ~EncryptAsyncWorker() {}
+            ~EncryptAsyncWorker() {
+                secure_clear_string(input);
+                secure_clear_string(salt);
+                secure_clear_buffer(bcrypted, _PASSWORD_LEN);
+            }
 
             void Execute() {
                 if (!(ValidateSalt(salt.c_str()))) {
@@ -206,7 +238,10 @@ namespace {
                 result = false;
             }
 
-            ~CompareAsyncWorker() {}
+            ~CompareAsyncWorker() {
+                secure_clear_string(input);
+                secure_clear_string(encrypted);
+            }
 
             void Execute() {
                 char bcrypted[_PASSWORD_LEN];
