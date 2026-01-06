@@ -140,7 +140,7 @@
   * Fix for issue around empty string params throwing Errors.
   * Method deprecation.
   * Upgrade from libeio/ev to libuv. (shtylman)
-  ** --- NOTE --- Breaks 0.4.x compatability
+  ** --- NOTE --- Breaks 0.4.x compatibility
   * EV_MULTIPLICITY compile flag.
 
 # v0.4.1
