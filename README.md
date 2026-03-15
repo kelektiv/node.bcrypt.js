@@ -372,11 +372,11 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 
 [bcryptwiki]: https://en.wikipedia.org/wiki/Bcrypt
 [bcryptgs]: http://mail-index.netbsd.org/tech-crypto/2002/05/24/msg000204.html
-[codahale]: http://codahale.com/how-to-safely-store-a-password/
+[codahale]: https://web.archive.org/web/20230105172923/https://codahale.com/how-to-safely-store-a-password/
 [gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
 [jtr]: http://www.openwall.com/lists/oss-security/2011/06/20/2
 [depsinstall]: https://github.com/kelektiv/node.bcrypt.js/wiki/Installation-Instructions
-[timingatk]: https://codahale.com/a-lesson-in-timing-attacks/
+[timingatk]: https://web.archive.org/web/20230121050709/https://codahale.com/a-lesson-in-timing-attacks/
 [wrap-around-bug]: https://github.com/kelektiv/node.bcrypt.js/wiki/Security-Issues-and-Concerns#bcrypt-wrap-around-bug-medium-severity
 [improper-nuls]: https://github.com/kelektiv/node.bcrypt.js/wiki/Security-Issues-and-Concerns#improper-nul-handling-medium-severity
 
