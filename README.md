@@ -376,7 +376,7 @@ Unless stated elsewhere, file headers or otherwise, the license as stated in the
 [gh13]: https://github.com/ncb000gt/node.bcrypt.js/issues/13
 [jtr]: http://www.openwall.com/lists/oss-security/2011/06/20/2
 [depsinstall]: https://github.com/kelektiv/node.bcrypt.js/wiki/Installation-Instructions
-[timingatk]: https://codahale.com/a-lesson-in-timing-attacks/
+[timingatk]: https://web.archive.org/web/20250815071532/https://codahale.com/a-lesson-in-timing-attacks/
 [wrap-around-bug]: https://github.com/kelektiv/node.bcrypt.js/wiki/Security-Issues-and-Concerns#bcrypt-wrap-around-bug-medium-severity
 [improper-nuls]: https://github.com/kelektiv/node.bcrypt.js/wiki/Security-Issues-and-Concerns#improper-nul-handling-medium-severity
 
