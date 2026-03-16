@@ -1,3 +1,4 @@
 .lock*
 build*/
 *.sw[a-z]
+test
