@@ -207,3 +207,21 @@ test('hash_compare_one_param', done => {
         done();
     });
 })
+
+test('salt_rounds_is_negative', done => {
+    expect.assertions(2);
+    bcrypt.genSalt(-1, function (err, salt) {
+        expect(err instanceof Error).toBe(true)
+        expect(err.message).toBe('rounds must be a positive integer')
+        done();
+    });
+})
+
+test('hash_rounds_is_negative', done => {
+    expect.assertions(2);
+    bcrypt.hash('password', -1, function (err, hash) {
+        expect(err instanceof Error).toBe(true)
+        expect(err.message).toBe('rounds must be a positive integer')
+        done();
+    });
+})
