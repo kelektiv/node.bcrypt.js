@@ -14,6 +14,8 @@ function genSaltSync(rounds, minor) {
         rounds = 10;
     } else if (typeof rounds !== 'number') {
         throw new Error('rounds must be a number');
+    } else if (rounds < 0) {
+        throw new Error('rounds must be a positive integer');
     }
 
     if (!minor) {
@@ -54,6 +56,12 @@ function genSalt(rounds, minor, cb) {
     } else if (typeof rounds !== 'number') {
         // callback error asynchronously
         error = new Error('rounds must be a number');
+        return process.nextTick(function () {
+            cb(error);
+        });
+    } else if (rounds < 0) {
+        // callback error asynchronously
+        error = new Error('rounds must be a positive integer');
         return process.nextTick(function () {
             cb(error);
         });
@@ -145,8 +153,11 @@ function hash(data, salt, cb) {
 
 
     if (typeof salt === 'number') {
-        return module.exports.genSalt(salt, function (err, salt) {
-            return bindings.encrypt(data, salt, cb);
+        return module.exports.genSalt(salt, function (err, generatedSalt) {
+            if (err) {
+                return cb(err);
+            }
+            return bindings.encrypt(data, generatedSalt, cb);
         });
     }
 

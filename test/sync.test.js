@@ -123,3 +123,11 @@ test('getRounds', () => {
     expect(9).toStrictEqual(bcrypt.getRounds(hash))
     expect(() => bcrypt.getRounds('')).toThrow("invalid hash provided");
 });
+
+test('salt_rounds_is_negative', () => {
+    expect(() => bcrypt.genSaltSync(-1)).toThrowError('rounds must be a positive integer');
+})
+
+test('hash_rounds_is_negative', () => {
+    expect(() => bcrypt.hashSync('password', -1)).toThrowError('rounds must be a positive integer');
+})
