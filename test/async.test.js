@@ -34,6 +34,15 @@ test('salt_rounds_is_string_non_number', done => {
     });
 })
 
+test('salt_rounds_is_negative', done => {
+    expect.assertions(2);
+    bcrypt.genSalt(-5, function (err, salt) {
+        expect(err instanceof Error).toBe(true)
+        expect(err.message).toBe('rounds must be a positive number')
+        done();
+    });
+})
+
 test('salt_minor', done => {
     expect.assertions(3);
     bcrypt.genSalt(10, 'a', function (err, value) {
@@ -71,6 +80,15 @@ test('hash_rounds', done => {
     expect.assertions(1);
     bcrypt.hash('bacon', 8, function (err, hash) {
         expect(bcrypt.getRounds(hash)).toEqual(8);
+        done();
+    });
+})
+
+test('hash_rounds_is_negative', done => {
+    expect.assertions(2);
+    bcrypt.hash('bacon', -5, function (err, hash) {
+        expect(err instanceof Error).toBe(true);
+        expect(err.message).toBe('rounds must be a positive number');
         done();
     });
 })

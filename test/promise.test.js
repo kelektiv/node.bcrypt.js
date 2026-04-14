@@ -23,6 +23,14 @@ test('salt_rounds_is_string_non_number', () => {
     return expect(bcrypt.genSalt('b')).rejects.toThrow('rounds must be a number');
 })
 
+test('salt_rounds_is_negative', () => {
+    return expect(bcrypt.genSalt(-5)).rejects.toThrow('rounds must be a positive number');
+})
+
+test('hash_rounds_is_negative', () => {
+    return expect(bcrypt.hash('password', -5)).rejects.toThrow('rounds must be a positive number');
+})
+
 test('hash_returns_promise_on_null_callback', () => {
     expect(typeof bcrypt.hash('password', 10, null).then).toStrictEqual('function')
 })

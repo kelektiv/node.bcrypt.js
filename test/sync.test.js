@@ -23,6 +23,10 @@ test('salt_rounds_is_NaN', () => {
     expect(() => bcrypt.genSaltSync('b')).toThrowError("rounds must be a number");
 })
 
+test('salt_rounds_is_negative', () => {
+    expect(() => bcrypt.genSaltSync(-5)).toThrowError("rounds must be a positive number");
+})
+
 test('salt_minor_a', () => {
     const salt = bcrypt.genSaltSync(10, 'a');
     const [_, version, rounds] = salt.split('$');
@@ -44,6 +48,10 @@ test('hash', () => {
 test('hash_rounds', () => {
     const hash = bcrypt.hashSync('password', 8);
     expect(bcrypt.getRounds(hash)).toStrictEqual(8)
+})
+
+test('hash_rounds_is_negative', () => {
+    expect(() => bcrypt.hashSync('password', -5)).toThrowError('rounds must be a positive number');
 })
 
 test('hash_empty_string', () => {
