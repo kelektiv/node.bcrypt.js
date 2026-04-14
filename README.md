@@ -317,6 +317,15 @@ Resultant hashes will be 60 characters long and they will include the salt among
 - 16-byte (128-bit) salt, base64 encoded to 22 characters
 - 24-byte (192-bit) hash, base64 encoded to 31 characters
 
+### What is a Salt?
+A salt is a random value that is added to a password before hashing.
+
+It ensures that:
+- The same password does not produce the same hash every time
+- Precomputed attacks like rainbow tables become ineffective
+
+bcrypt automatically generates and stores the salt as part of the hash, so you do not need to manage it manually.
+
 Example:
 ```
 $2b$10$nOUIs5kJ7naTuTFkBy1veuK0kSxUFXfuaOKdOKf9xYT0KKIGSJwFa
