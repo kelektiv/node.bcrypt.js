@@ -123,3 +123,15 @@ test('getRounds', () => {
     expect(9).toStrictEqual(bcrypt.getRounds(hash))
     expect(() => bcrypt.getRounds('')).toThrow("invalid hash provided");
 });
+
+test('compareSync_rejects_nul_byte_in_hash', () => {
+    const hash = bcrypt.hashSync("password", bcrypt.genSaltSync(10));
+    expect(bcrypt.compareSync("password", hash)).toBe(true);
+    expect(() => bcrypt.compareSync("password", hash + "\x00extra")).toThrow("hash must not contain null bytes");
+});
+
+test('compareSync_rejects_nul_byte_mid_hash', () => {
+    const hash = bcrypt.hashSync("password", bcrypt.genSaltSync(10));
+    const tampered = hash.slice(0, 30) + "\x00" + hash.slice(31);
+    expect(() => bcrypt.compareSync("password", tampered)).toThrow("hash must not contain null bytes");
+});

@@ -138,6 +138,16 @@ test('hash_compare_one_param', () => {
     return expect(bcrypt.compare('password')).rejects.toThrow('data and hash arguments required')
 })
 
+test('compare_rejects_nul_byte_in_hash', () => {
+    const hash = bcrypt.hashSync("password", bcrypt.genSaltSync(10));
+    return expect(bcrypt.compare("password", hash + "\x00extra")).rejects.toThrow('hash must not contain null bytes');
+})
+
+test('compare_nul_byte_normal_hash_still_works', () => {
+    const hash = bcrypt.hashSync("password", bcrypt.genSaltSync(10));
+    return expect(bcrypt.compare("password", hash)).resolves.toEqual(true);
+})
+
 test('change_promise_impl_reject', () => {
 
     promises.use({

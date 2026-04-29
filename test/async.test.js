@@ -207,3 +207,22 @@ test('hash_compare_one_param', done => {
         done();
     });
 })
+
+test('compare_rejects_nul_byte_in_hash', done => {
+    expect.assertions(2);
+    const hash = bcrypt.hashSync("password", bcrypt.genSaltSync(10));
+    bcrypt.compare("password", hash + "\x00extra", function (err, res) {
+        expect(err).toBeInstanceOf(Error);
+        expect(err.message).toBe('hash must not contain null bytes');
+        done();
+    });
+})
+
+test('compare_normal_hash_still_works', done => {
+    expect.assertions(1);
+    const hash = bcrypt.hashSync("password", bcrypt.genSaltSync(10));
+    bcrypt.compare("password", hash, function (err, res) {
+        expect(res).toBe(true);
+        done();
+    });
+})

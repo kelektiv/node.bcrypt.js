@@ -166,6 +166,10 @@ function compareSync(data, hash) {
         throw new Error('data must be a string or Buffer and hash must be a string');
     }
 
+    if (hash.indexOf('\0') !== -1) {
+        throw new Error('hash must not contain null bytes');
+    }
+
     return bindings.compare_sync(data, hash);
 }
 
@@ -209,6 +213,13 @@ function compare(data, hash, cb) {
 
     if (!(typeof data === 'string' || data instanceof Buffer) || typeof hash !== 'string') {
         error = new Error('data and hash must be strings');
+        return process.nextTick(function () {
+            cb(error);
+        });
+    }
+
+    if (hash.indexOf('\0') !== -1) {
+        error = new Error('hash must not contain null bytes');
         return process.nextTick(function () {
             cb(error);
         });
