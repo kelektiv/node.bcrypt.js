@@ -12,7 +12,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # This is unsafe, but we really don't use any other native dependencies
       - run: npm ci
       - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/almalinux-devtoolset11 npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
@@ -22,7 +22,7 @@ jobs:
       - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-arm64 npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
       - run: docker run -u $(id -u):$(id -g) -v `pwd`:/input -w /input ghcr.io/prebuild/linux-arm64-musl npx prebuildify --napi --tag-libc --strip --target=node@18.0.0
       - run: find prebuilds
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: prebuild-linux
           path: ./prebuilds/
@@ -30,8 +30,8 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
@@ -39,7 +39,7 @@ jobs:
       - run: npx prebuildify --napi --strip --arch=x64 --target=node@18.0.0
       - run: npx prebuildify --napi --strip --arch=arm64 --target=node@20.0.0
       - run: dir prebuilds
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: prebuild-windows
           path: ./prebuilds/
@@ -47,8 +47,8 @@ jobs:
   build-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
@@ -56,7 +56,7 @@ jobs:
       - run: npx prebuildify --napi --strip --arch=arm64 --target=node@18.0.0
       - run: npx prebuildify --napi --strip --arch=x64 --target=node@18.0.0
       - run: find prebuilds
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: prebuild-macos
           path: ./prebuilds/
@@ -70,8 +70,8 @@ jobs:
     outputs:
         PACK_FILE: ${{ steps.pack.outputs.PACK_FILE }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
         with:
           path: /tmp/prebuilds/
       - name: Coalesce prebuilds from build matrix
@@ -85,7 +85,7 @@ jobs:
         name: Prepare NPM package
         run: |
           echo "PACK_FILE=$(npm pack)" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: package-tgz
           path: ${{ steps.pack.outputs.PACK_FILE }}
@@ -99,11 +99,11 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://registry.npmjs.org'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: package-tgz
       - run: npm install ${{ needs.pack.outputs.PACK_FILE }}
