@@ -70,6 +70,16 @@ test('hash_salt_validity', () => {
     expect(() => bcrypt.hashSync('password', 'some$value')).toThrow('Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue')
 })
 
+test('hash_short_salt_prefix', () => {
+    // Truncated "$"-prefixed salts must be rejected without reading past the
+    // end of the string (see ValidateSalt bounds handling).
+    const truncated = ['$', '$2', '$2b', '$2b$', '$2b$1', '$2b$10', '$2b$10$'];
+    for (const salt of truncated) {
+        expect(() => bcrypt.hashSync('password', salt)).toThrow('Invalid salt. Salt must be in the form of: $Vers$log2(NumRounds)$saltvalue')
+        expect(bcrypt.compareSync('password', salt)).toBe(false)
+    }
+})
+
 test('verify_salt', () => {
     const salt = bcrypt.genSaltSync(10);
     const split_salt = salt.split('$');
