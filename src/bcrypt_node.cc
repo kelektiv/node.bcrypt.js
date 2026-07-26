@@ -22,7 +22,10 @@ namespace {
         // discard $
         salt++;
 
-        if (*salt > BCRYPT_VERSION) {
+        // A short, truncated salt such as "$" or "$2" must be rejected before
+        // reading further offsets, otherwise the fixed lookups below would read
+        // past the terminating NUL byte.
+        if (*salt == '\0' || *salt > BCRYPT_VERSION) {
             return false;
         }
 
@@ -37,10 +40,16 @@ namespace {
             }
         }
 
+        // the version must be followed by the '$' separator; bail out here so a
+        // salt like "$2b" cannot advance the pointer past its NUL terminator
+        if (salt[1] != '$') {
+            return false;
+        }
+
         // discard version + $
         salt += 2;
 
-        if (salt[2] != '$') {
+        if (salt[0] == '\0' || salt[1] == '\0' || salt[2] != '$') {
             return false;
         }
 
